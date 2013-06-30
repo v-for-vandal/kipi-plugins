@@ -1,2 +1,9 @@
 Remove unneeded debug messages.
 Choose correct menu for plugin. Perhaps it should be Tools
+
+Add item
+Input=>Open sidecar file
+
+Should exactly one chosen image
+
+Add option to ignore sidecar

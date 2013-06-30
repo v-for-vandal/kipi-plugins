@@ -29,12 +29,12 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/plugin
                     ${CMAKE_CURRENT_BINARY_DIR}
 		    )
 
-SET(kipiplugin_photivoexport_PART_SRCS
-    plugin/plugin_photivoexport.cpp)
+SET(kipiplugin_photivotool_PART_SRCS
+    plugin/plugin_photivotool.cpp)
 
-KDE4_ADD_PLUGIN(kipiplugin_photivoexport ${kipiplugin_photivoexport_PART_SRCS})
+KDE4_ADD_PLUGIN(kipiplugin_photivotool ${kipiplugin_photivotool_PART_SRCS})
 
-TARGET_LINK_LIBRARIES(kipiplugin_photivoexport
+TARGET_LINK_LIBRARIES(kipiplugin_photivotool
                       ${KDE4_KPARTS_LIBS}
                       ${QT_AND_KDECORE_LIBS}
                       ${KIPI_LIBRARIES}
@@ -43,8 +43,8 @@ TARGET_LINK_LIBRARIES(kipiplugin_photivoexport
 		      kipiplugins
                      )
 
-CONFIGURE_FILE(plugin/kipiplugin_photivoexport.desktop.cmake ${CMAKE_CURRENT_BINARY_DIR}/plugin/kipiplugin_photivoexport.desktop)
+CONFIGURE_FILE(plugin/kipiplugin_photivotool.desktop.cmake ${CMAKE_CURRENT_BINARY_DIR}/plugin/kipiplugin_photivotool.desktop)
 
-INSTALL(FILES   ${CMAKE_CURRENT_BINARY_DIR}/plugin/kipiplugin_photivoexport.desktop DESTINATION ${SERVICES_INSTALL_DIR})
-INSTALL(TARGETS kipiplugin_photivoexport                                            DESTINATION ${PLUGIN_INSTALL_DIR})
-INSTALL(FILES   plugin/kipiplugin_photivoexportui.rc                                DESTINATION ${DATA_INSTALL_DIR}/kipi)
+INSTALL(FILES   ${CMAKE_CURRENT_BINARY_DIR}/plugin/kipiplugin_photivotool.desktop DESTINATION ${SERVICES_INSTALL_DIR})
+INSTALL(TARGETS kipiplugin_photivotool                                            DESTINATION ${PLUGIN_INSTALL_DIR})
+INSTALL(FILES   plugin/kipiplugin_photivotoolui.rc                                DESTINATION ${DATA_INSTALL_DIR}/kipi)

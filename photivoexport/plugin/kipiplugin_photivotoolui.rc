@@ -1,0 +1,16 @@
+<!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
+<gui version="11" name="kipiplugin_photivotool" >
+
+    <MenuBar>
+
+        <Menu name="Tools"><text>&amp;Tools</text>
+            <Action name="photivotool-actionImage" group="kipi_tool_group" />
+        </Menu>
+
+    </MenuBar>
+
+    <ToolBar name="mainToolBar"><text>Main Toolbar</text>
+            <Action name="photivotool-actionImage" group="kipi_tool_group" />
+    </ToolBar>
+
+</gui>

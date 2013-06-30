@@ -34,8 +34,8 @@
  *  but do not use it with KDE4 header (use C ANSI style instead).
  */
 
-/// No need to include plugin_photivoexport.h, it will be done through Qt moc file.
-#include "plugin_photivoexport.moc"
+/// No need to include plugin_photivotool.h, it will be done through Qt moc file.
+#include "plugin_photivotool.moc"
 
 // Qt includes
 
@@ -115,7 +115,7 @@ K_PLUGIN_FACTORY(PhotivoExportFactory, registerPlugin<Plugin_PhotivoExport>();)
  *  NOTE: The plugin library is the name used in CMakeList.txt to link bin file,
  *  and with X-KDE-Library value from .desktop file.
  */
-K_EXPORT_PLUGIN(PhotivoExportFactory("kipiplugin_photivoexport") )
+K_EXPORT_PLUGIN(PhotivoExportFactory("kipiplugin_photivotool") )
 
 /** The plugin constructor. Note that plugin name passed as string in 3rd arguement of KIPI::Plugin parent class
  *  is the same than Name value from .desktop file.
@@ -133,7 +133,7 @@ Plugin_PhotivoExport::Plugin_PhotivoExport(QObject* const parent, const QVariant
      *  is the name given to the plugin factory, usualy: kipiplugin_<name> .
      *  UI file of the plugin must be installed in kipi data dir.
      */
-    setUiBaseName("kipiplugin_photivoexportui.rc");
+    setUiBaseName("kipiplugin_photivotoolui.rc");
 
     /** We need to call setupXML so the XML file and the GUI of the plugin to
       * be merged with those of the KIPI host app
@@ -185,7 +185,7 @@ void Plugin_PhotivoExport::setupActions()
     /** An action dedicated to be plugged in digiKam Image menu.
      */
     d->actionImages = new KAction(this);
-    d->actionImages->setText(i18n("photivoexport Image..."));
+    d->actionImages->setText(i18n("photivo..."));
     //    d->actionImages->setIcon(KIcon("script-error"));
     d->actionImages->setEnabled(false);
     d->actionImages->setShortcut(KShortcut(Qt::ALT + Qt::SHIFT + Qt::CTRL + Qt::Key_F1));
@@ -196,7 +196,7 @@ void Plugin_PhotivoExport::setupActions()
             this, SLOT(slotActivateActionImages()));
     /** We need to register actions in plugin instance
      */
-    addAction("photivoexport-actionImage", d->actionImages, ImagesPlugin);
+    addAction("photivotool-actionImage", d->actionImages, ImagesPlugin);
 
     /** This will get items selection from KIPI host application.
      */
@@ -229,7 +229,7 @@ void Plugin_PhotivoExport::slotActivateActionImages()
 	  KProcess process;
 	  process.clearProgram();
 	  QStringList args;
-	  args << "/home/kevin/src/photivo-hg/photivo/photivo";
+	  args << "photivo";
 	  args << "-i" << url.path();
 	  if (KExiv2::hasSidecar(url.path())) {
 	    args << "--sidecar" << KExiv2::sidecarPath(url.path());

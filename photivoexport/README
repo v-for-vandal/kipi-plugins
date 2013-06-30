@@ -26,3 +26,5 @@ choose:
 Under digikam:
 Choose Image=>Photivo
 
+Note:
+Rating in sidecar takes precedence over pts file
