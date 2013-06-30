@@ -43,13 +43,13 @@ using namespace KIPI;
 
 /** Each plugin must be fully wrapped into a dedicated C++ namespace to prevent conflicts with symbols and identifiers.
  */
-namespace KIPIPhotivoExportPlugin
+namespace KIPIPhotivoToolPlugin
 {
 
 /** We will use KIPI::Plugin class as parent from libkipi
  *  See this API for details : http://api.kde.org/4.x-api/kdegraphics-apidocs/libs/libkipi/libkipi/html/index.html
  */
-class Plugin_PhotivoExport : public Plugin
+class Plugin_PhotivoTool : public Plugin
 {
     Q_OBJECT
 
@@ -59,8 +59,8 @@ public:
         takes two arguments QObject* const parent (the parent of this object),
         and const QStringList& args (the arguments passed).
     */
-    Plugin_PhotivoExport(QObject* const parent, const QVariantList& args);
-    ~Plugin_PhotivoExport();
+    Plugin_PhotivoTool(QObject* const parent, const QVariantList& args);
+    ~Plugin_PhotivoTool();
 
     /** This method setup the plugin actions and connect internal signals and slots to handle plugin actions.
      */
@@ -70,7 +70,7 @@ private Q_SLOTS:
 
     /** There are slots to handle action events.
      */
-    void slotActivateActionImages();
+    void slotActivateActionTools();
 
 private:
 
@@ -86,6 +86,6 @@ private:
     Private* const d;
 };
 
-}  // namespace KIPIPhotivoExportPlugin
+}  // namespace KIPIPhotivoToolPlugin
 
 #endif // PLUGIN_PHOTIVOEXPORT_H

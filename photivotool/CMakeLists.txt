@@ -21,6 +21,8 @@
 #
 # ============================================================
 
+ADD_SUBDIRECTORY(icons)
+
 #                    ${CMAKE_CURRENT_BINARY_DIR}/../../libkipi
 #                    ${CMAKE_CURRENT_SOURCE_DIR}/../../libkipi
 

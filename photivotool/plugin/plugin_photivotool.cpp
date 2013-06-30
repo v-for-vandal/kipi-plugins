@@ -71,7 +71,7 @@ using namespace KIPIPlugins;
  */
 
 /// You must wrap all your plugin code to a dedicated namespace
-namespace KIPIPhotivoExportPlugin
+namespace KIPIPhotivoToolPlugin
 {
 
 /** We will use KPToolDialog class from kipi-plugins to display plugin dialogs. It offers some facilities to
@@ -82,7 +82,7 @@ namespace KIPIPhotivoExportPlugin
 /** Using private container everywhere is clear to speed up compilation and reduce source code depencies through header files.
  *  See this url for details : http://techbase.kde.org/Policies/Binary_Compatibility_Issues_With_C%2B%2B#Using_a_d-Pointer
  */
-class Plugin_PhotivoExport::Private
+class Plugin_PhotivoTool::Private
 {
 public:
 
@@ -90,18 +90,12 @@ public:
     {
         /// It's always clean to init pointers to zero. If crash appear,
         /// debugger will show a null pointer instead a non initialized one.
-        actionImages = 0;
         actionTools  = 0;
-        actionExport = 0;
-        actionImport = 0;
     }
 
     /** These plugin actions will pluged into menu KIPI host application.
      */
-    KAction*   actionImages;
     KAction*   actionTools;
-    KAction*   actionExport;
-    KAction*   actionImport;
 };
 
 /** Macro from KDE KParts to create the factory for this plugin.
@@ -109,23 +103,23 @@ public:
  *  and the second is the generic factory templated from
  *  the class for your plugin.
  */
-K_PLUGIN_FACTORY(PhotivoExportFactory, registerPlugin<Plugin_PhotivoExport>();)
+K_PLUGIN_FACTORY(PhotivoToolFactory, registerPlugin<Plugin_PhotivoTool>();)
 
 /** Macro from KDE KParts to export the symbols for this plugin
  *  NOTE: The plugin library is the name used in CMakeList.txt to link bin file,
  *  and with X-KDE-Library value from .desktop file.
  */
-K_EXPORT_PLUGIN(PhotivoExportFactory("kipiplugin_photivotool") )
+K_EXPORT_PLUGIN(PhotivoToolFactory("kipiplugin_photivotool") )
 
 /** The plugin constructor. Note that plugin name passed as string in 3rd arguement of KIPI::Plugin parent class
  *  is the same than Name value from .desktop file.
  */
-Plugin_PhotivoExport::Plugin_PhotivoExport(QObject* const parent, const QVariantList&)
-    : Plugin(PhotivoExportFactory::componentData(), parent, "PhotivoExport"),
+Plugin_PhotivoTool::Plugin_PhotivoTool(QObject* const parent, const QVariantList&)
+    : Plugin(PhotivoToolFactory::componentData(), parent, "PhotivoTool"),
       /// Private container is allocated here.
       d(new Private)
 {
-    kDebug() << "Plugin_PhotivoExport plugin loaded";
+    kDebug() << "Plugin_PhotivoTool plugin loaded";
 
     /** This is needed to setup the plugin gui and to merge with the kipi host
      *  application gui.
@@ -141,13 +135,13 @@ Plugin_PhotivoExport::Plugin_PhotivoExport(QObject* const parent, const QVariant
     setupXML();
 }
 
-Plugin_PhotivoExport::~Plugin_PhotivoExport()
+Plugin_PhotivoTool::~Plugin_PhotivoTool()
 {
     /// Don't forget to clear d private container allocation in destructor to prevent memory leak.
     delete d;
 }
 
-void Plugin_PhotivoExport::setup(QWidget* const widget)
+void Plugin_PhotivoTool::setup(QWidget* const widget)
 {
     /** Each plugin must overload Plugin::setup method.
      *  We pass the widget which host plugin in KIPI host application
@@ -166,7 +160,7 @@ void Plugin_PhotivoExport::setup(QWidget* const widget)
     setupActions();
 }
 
-void Plugin_PhotivoExport::setupActions()
+void Plugin_PhotivoTool::setupActions()
 {
     /** We define plugin action which will be plug in KIPI host application.
      *  Note that if you set keyboard shortcut to an action you must take a care
@@ -180,41 +174,41 @@ void Plugin_PhotivoExport::setupActions()
       * recognize the category of an action
       */
   //    setDefaultCategory(ImagesPlugin);
-    setDefaultCategory(ImagesPlugin);
+    setDefaultCategory(ToolsPlugin);
 
     /** An action dedicated to be plugged in digiKam Image menu.
      */
-    d->actionImages = new KAction(this);
-    d->actionImages->setText(i18n("photivo..."));
-    //    d->actionImages->setIcon(KIcon("script-error"));
-    d->actionImages->setEnabled(false);
-    d->actionImages->setShortcut(KShortcut(Qt::ALT + Qt::SHIFT + Qt::CTRL + Qt::Key_F1));
+    d->actionTools = new KAction(this);
+    d->actionTools->setText(i18n("Photivo..."));
+    d->actionTools->setIcon(KIcon("kipi-photivo"));
+    d->actionTools->setEnabled(false);
+    d->actionTools->setShortcut(KShortcut(Qt::ALT + Qt::SHIFT + Qt::CTRL + Qt::Key_F1));
 
     /** Connect plugin action signal to dedicated slot.
      */
-    connect(d->actionImages, SIGNAL(triggered(bool)),
-            this, SLOT(slotActivateActionImages()));
+    connect(d->actionTools, SIGNAL(triggered(bool)),
+            this, SLOT(slotActivateActionTools()));
     /** We need to register actions in plugin instance
      */
-    addAction("photivotool-actionImage", d->actionImages, ImagesPlugin);
+    addAction("photivotool-actionTool", d->actionTools, ToolsPlugin);
 
     /** This will get items selection from KIPI host application.
      */
     ImageCollection selection = interface()->currentSelection();
-    d->actionImages->setEnabled(selection.isValid() && !selection.images().isEmpty());
+    d->actionTools->setEnabled(selection.isValid() && !selection.images().isEmpty());
 
     /** If selection change in KIPI host application, this signal will be fired, and plugin action enabled accordingly.
      */
     connect(interface(), SIGNAL(selectionChanged(bool)),
-            d->actionImages, SLOT(setEnabled(bool)));
+            d->actionTools, SLOT(setEnabled(bool)));
 
     connect(interface(), SIGNAL(currentAlbumChanged(bool)),
             d->actionTools, SLOT(setEnabled(bool)));
 }
 
-void Plugin_PhotivoExport::slotActivateActionImages()
+void Plugin_PhotivoTool::slotActivateActionTools()
 {
-  /** When actionImages is actived, we display list of items selected in a message box.
+  /** When actionTools is actived, we display list of items selected in a message box.
    *  This example show a simple dialog with current items selected in KIPI host application.
    *  You can branch here your dedicated dialog to process items as you want.
    */
@@ -247,4 +241,4 @@ void Plugin_PhotivoExport::slotActivateActionImages()
 }
 
 
-}  // namespace KIPIPhotivoExportPlugin
+}  // namespace KIPIPhotivoToolPlugin
