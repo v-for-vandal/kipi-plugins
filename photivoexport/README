@@ -1,0 +1,28 @@
+This is a kipi plugin which calls photivo.
+
+
+This plugin calls photivo which the image file, and a sidecar, if the
+sidecar exists. 
+
+Photivo requirements:
+This plugin requires a version of photivo which supports the
+"--sidecar" option.
+
+Digikam settings:
+Go to this setting:
+Settings=>Configure digikam...
+Select:
+Under the setting:
+      Write this Information to the Metadata:
+      Select all data which should be passed to photivo. I select
+      everything except Face Tags, because Face Rectangles do not seem
+      to be copied correctly.
+
+Under the setting:
+      Write to sidecar files
+choose:
+      Write to XMP sidecar for read-only image only
+
+Under digikam:
+Choose Image=>Photivo
+

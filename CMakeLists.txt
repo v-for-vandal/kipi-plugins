@@ -433,6 +433,7 @@ IF(KIPIPLUGINS_CAN_BE_COMPILED)
     ADD_SUBDIRECTORY(photolayoutseditor)
     ADD_SUBDIRECTORY(dlnaexport)
     ADD_SUBDIRECTORY(jalbumexport)
+    ADD_SUBDIRECTORY(photivoexport)
 
     # Plugin not yet ready for production
     #ADD_SUBDIRECTORY(photivointegration)
