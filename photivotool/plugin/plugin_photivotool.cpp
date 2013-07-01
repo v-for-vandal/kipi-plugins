@@ -3,11 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2012-02-16
- * Description : an Hello World plugin using KDE XML-GUI technology.
+ * Date        : 2013-06-30
+ * Description : a plugin for calling photivo, with sidecar
  *
- * Copyright (C) 2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
- * Copyright (C) 2012 by Victor Dodon   <dodonvictor at gmail dot com>
+ * Copyright (C) 2013 by Kevin Dalley <kevin at kelphead dot org>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -75,7 +74,7 @@ namespace KIPIPhotivoToolPlugin
 {
 
 /** We will use KPToolDialog class from kipi-plugins to display plugin dialogs. It offers some facilities to
-    set data and rules about plugins, especially to wrap properlly tool with KDE bugilla. We use KPAboutData container
+    set data and rules about plugins, especially to wrap properly tool with KDE bugilla. We use KPAboutData container
     for that.
 */
 
@@ -86,11 +85,10 @@ class Plugin_PhotivoTool::Private
 {
 public:
 
-    Private()
+  /// It's always clean to init pointers to zero. If crash appear,
+  /// debugger will show a null pointer instead a non initialized one.
+  Private():actionTools(0)
     {
-        /// It's always clean to init pointers to zero. If crash appear,
-        /// debugger will show a null pointer instead a non initialized one.
-        actionTools  = 0;
     }
 
     /** These plugin actions will pluged into menu KIPI host application.
@@ -173,7 +171,6 @@ void Plugin_PhotivoTool::setupActions()
     /** We need to call setDefaultCategory in case the plugin loader cannot
       * recognize the category of an action
       */
-  //    setDefaultCategory(ImagesPlugin);
     setDefaultCategory(ToolsPlugin);
 
     /** An action dedicated to be plugged in digiKam Image menu.
@@ -208,37 +205,36 @@ void Plugin_PhotivoTool::setupActions()
 
 void Plugin_PhotivoTool::slotActivateActionTools()
 {
-  /** When actionTools is actived, we display list of items selected in a message box.
-   *  This example show a simple dialog with current items selected in KIPI host application.
-   *  You can branch here your dedicated dialog to process items as you want.
+  /**
+   * Run items through photivo
    */
   kDebug() << "slotActivateActionImages entered";
 
   ImageCollection images = interface()->currentSelection();
 
-  if (images.isValid()) {
-    if (!images.images().isEmpty())
-      {
-	foreach (const KUrl& url, images.images()) {
-	  KProcess process;
-	  process.clearProgram();
-	  QStringList args;
-	  args << "photivo";
-	  args << "-i" << url.path();
-	  if (KExiv2::hasSidecar(url.path())) {
-	    args << "--sidecar" << KExiv2::sidecarPath(url.path());
-	  }
-	  //	}
-	  const QMap< QString, QVariant > attr =  interface()->info(url).attributes();
-	  kDebug() << "Starting process\n";
-	  process.setProgram(args);
-	  kDebug() << "Program: " << process.program();
-	  process.startDetached();
-	}
-
+  if (images.isValid())
+    {
+      if (images.images().count() != 1) {
+        KMessageBox::sorry(0, i18n("Exactly one image must be chosen"));
+	return;
       }
+      foreach (const KUrl& url, images.images()) {
+	KProcess process;
+	process.clearProgram();
+	QStringList args;
+	args << "photivo";
+	args << "-i" << url.path();
+	if (KExiv2::hasSidecar(url.path())) {
+	  args << "--sidecar" << KExiv2::sidecarPath(url.path());
+	}
+	//	}
+	const QMap< QString, QVariant > attr =  interface()->info(url).attributes();
+	kDebug() << "Starting process\n";
+	process.setProgram(args);
+	kDebug() << "Program: " << process.program();
+	process.startDetached();
+      }
+
+    }
   }
-}
-
-
 }  // namespace KIPIPhotivoToolPlugin

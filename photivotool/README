@@ -1,21 +1,22 @@
-This is a kipi plugin which calls photivo.
+This is a kipi plugin which calls photivo, using digikam sidecars
 
 
-This plugin calls photivo which the image file, and a sidecar, if the
-sidecar exists. 
+This plugin calls photivo using arguments of the image file,
+and a sidecar, if the sidecar exists. 
 
 Photivo requirements:
 This plugin requires a version of photivo which supports the
 "--sidecar" option.
 
 Digikam settings:
+The following digikam setting should be set.
 Go to this setting:
 Settings=>Configure digikam...
 Select:
 Under the setting:
       Write this Information to the Metadata:
       Select all data which should be passed to photivo. I select
-      everything except Face Tags, because Face Rectangles do not seem
+      everything except Face Tags; Face Rectangles do not seem
       to be copied correctly.
 
 Under the setting:
@@ -28,3 +29,29 @@ Choose Image=>Photivo
 
 Note:
 Rating in sidecar takes precedence over pts file
+The rating in the pts file will be ignored if there is a rating in the sidecar
+
+Workflow
+
+Here is my workflow.
+
+Load photos from camera into digikam
+
+Use digikam to select preferred photos
+I use PickLabel and Rating, mostly.
+In the process, I may use digikam to make the decision, saving a pts
+file during this process.
+
+Image=>Metadata=>Edit all Metadata...
+Modify:
+EXIF Caption=>Description (this becomes Title in flickr)
+     alternatively, edit IPTC Content=>Headline or XMP Content=>Headline
+EXIF Caption (this becomes Description in flickr)
+     alternatively, edit IPTC Content=>Caption or XMP Content=>Caption
+
+Edit GPS data
+Perhaps Use Image=>Geo-location
+
+Run photivo by choosing Tools=>Photivo...
+This will load sidecar data
+Load pts file, if it exists

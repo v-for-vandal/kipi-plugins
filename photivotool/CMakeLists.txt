@@ -3,11 +3,10 @@
 # This file is a part of digiKam project
 # http://www.digikam.org
 #
-# Date        : 2012-02-16
-# Description : a Hello World plugin using KDE XML-GUI techlnology.
+# Date        : 2013-06-30
+# Description : a plugin for calling photivo, with sidecar
 #
-# Copyright (C) 2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
-# Copyright (C) 2012 by Victor Dodon <dodonvictor at gmail dot com>
+# Copyright (C) 2013 by Kevin Dalley <kevin at kelphead dot org>
 #
 # This program is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General
@@ -22,9 +21,6 @@
 # ============================================================
 
 ADD_SUBDIRECTORY(icons)
-
-#                    ${CMAKE_CURRENT_BINARY_DIR}/../../libkipi
-#                    ${CMAKE_CURRENT_SOURCE_DIR}/../../libkipi
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/plugin
                     ${CMAKE_CURRENT_SOURCE_DIR}/widgets

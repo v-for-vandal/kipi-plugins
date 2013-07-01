@@ -10,7 +10,6 @@
     </MenuBar>
 
     <ToolBar name="mainToolBar"><text>Main Toolbar</text>
-            <Action name="photivotool-actionTool" group="kipi_tool_group" />
     </ToolBar>
 
 </gui>

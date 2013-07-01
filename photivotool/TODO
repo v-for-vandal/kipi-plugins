@@ -1,9 +1,9 @@
-Remove unneeded debug messages.
-Choose correct menu for plugin. Perhaps it should be Tools
+This is a TODO list for changes in both this plugin and for photivo
+changes related to this plugin
 
-Add item
+Is Tools the correct menu for this plugin?
+
+Add item to photivo.
 Input=>Open sidecar file
-
-Should exactly one chosen image
-
-Add option to ignore sidecar
+Option to have sidecar to be removed
+Maybe sidecar could be deleted as new image file is loaded.
