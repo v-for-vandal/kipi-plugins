@@ -1,9 +1,13 @@
+   cmake_minimum_required(VERSION 2.8)
+
 SUBDIRS(icons)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/importwizard
                     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg
                     ${CMAKE_CURRENT_SOURCE_DIR}/manager
                     ${CMAKE_CURRENT_SOURCE_DIR}/plugin
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tasks
+                    
                    )
 
 # NOTE: OpenMP under MacOSX do not support multithreading.
@@ -37,6 +41,8 @@ SET(expoblending_common_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg/enfusesettings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg/bracketstack.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg/enfusestack.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tasks/task.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tasks/preprocesstask.cpp
    )
 
 # Adjust flag for static lib and 64 bits computers using -fPIC for GCC compiler (B.K.O: #269903)
@@ -78,7 +84,7 @@ INSTALL(FILES   plugin/kipiplugin_expoblendingui.rc                             
 
 SET(expoblending_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/plugin/expoblending.cpp)
 
-KDE4_ADD_APP_ICON(expoblending_SRCS "./icons/*kipi-expoblending.png")
+KDE4_ADD_APP_ICON(expoblending_SRCS "./icons/*expoblending.png")
 
 KDE4_ADD_EXECUTABLE(expoblending ${expoblending_SRCS})
 
