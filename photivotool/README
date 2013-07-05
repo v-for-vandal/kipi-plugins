@@ -55,3 +55,6 @@ Perhaps Use Image=>Geo-location
 Run photivo by choosing Tools=>Photivo...
 This will load sidecar data
 Load pts file, if it exists
+
+
+This plugin cannot be run from the light table, which is unfortunate.
