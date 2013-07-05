@@ -1,0 +1,13 @@
+This is a TODO list for changes in both this plugin and for photivo
+changes related to this plugin
+
+Is Tools the correct menu for this plugin?
+
+Add item to photivo.
+Input=>Open sidecar file
+Option to have sidecar to be removed
+Maybe sidecar could be deleted as new image file is loaded.
+
+Add menu item to services menu so that photivo can be opened from
+light table image, or from main image, without using Tools menu.
+
