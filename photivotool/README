@@ -58,3 +58,14 @@ Load pts file, if it exists
 
 
 This plugin cannot be run from the light table, which is unfortunate.
+The flickr export tool does not have an option for replacing a file in
+flickr.  Flickr export will include:
+
+Title
+Caption
+GPS data
+tags
+
+
+Use flickr web menu item "Replace this photo" will update GPS data, I
+believe, but not the other 3 items.
