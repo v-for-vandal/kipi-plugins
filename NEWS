@@ -6,5 +6,7 @@ NEW FEATURES:
 
 BUGFIXES FROM KDE BUGZILLA (alias B.K.O | http://bugs.kde.org):
 
-001 ==> 321274 - geolocation edit bookmarks.....NOTHING happens
-002 ==> 
+001 ==> 321274 - Geolocation edit bookmarks.....NOTHING happens
+002 ==> 230360 - Not possible to add non-ascii characters in kipi-plugins Byline-field.
+003 ==> 
+
