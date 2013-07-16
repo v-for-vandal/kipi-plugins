@@ -177,6 +177,28 @@ void GDTalker::getAccessToken(){
     emit signalBusy(true);
 }
 
+
+void GDTalker::getUserName(){
+    KUrl url("https://www.googleapis.com/drive/v2/about");
+    url.addQueryItem("scope",m_scope);
+    url.addQueryItem("access_token",m_access_token);
+    kDebug() << "in user name";
+    QString auth = "Authorization: " + m_bearer_access_token.toAscii();
+
+    KIO::TransferJob* job = KIO::get(url,KIO::NoReload,KIO::HideProgressInfo);
+    job->addMetaData("content-type","Content-Type: application/json");
+    job->addMetaData("customHTTPHeader",auth.toAscii());
+    connect(job,SIGNAL(data(KIO::Job*,QByteArray)),
+            this,SLOT(data(KIO::Job*,QByteArray)));
+    connect(job,SIGNAL(result(KJob*)),
+            this,SLOT(slotResult(KJob*)));
+
+    m_state = GD_USERNAME;
+    m_job = job;
+    m_buffer.resize(0);
+    emit signalBusy(true);
+}
+
 void GDTalker::listFolders(){
     KUrl url("https://www.googleapis.com/drive/v2/files?q=mimeType = 'application/vnd.google-apps.folder'");
     //KUrl url("https://www.googleapis.com/drive/v2/files");
@@ -330,7 +352,7 @@ void GDTalker::slotResult(KJob* kjob){
 
     switch(m_state){
         case (GD_ACCESSTOKEN):
-            kDebug() << "In GD_ACCESSTOKEN" << m_buffer;
+            kDebug() << "In GD_ACCESSTOKEN";// << m_buffer;
             parseResponseAccessToken(m_buffer);
             break;
         case (GD_LISTFOLDERS):
@@ -342,8 +364,12 @@ void GDTalker::slotResult(KJob* kjob){
             parseResponseCreateFolder(m_buffer);
             break;
         case (GD_ADDPHOTO):
-            kDebug() << "In GD_ADDPHOTO" << m_buffer;
+            kDebug() << "In GD_ADDPHOTO";// << m_buffer;
             parseResponseAddPhoto(m_buffer);
+            break;
+        case (GD_USERNAME):
+            kDebug() << "In GD_USERNAME";// << m_buffer;
+            parseResponseUserName(m_buffer);
             break;
         default:
             break;
@@ -355,6 +381,39 @@ void GDTalker::parseResponseAccessToken(const QByteArray& data){
     m_bearer_access_token = "Bearer " + m_access_token;
     kDebug() << "In parse GD_ACCESSTOKEN" << m_bearer_access_token << "  " << data;
     emit signalAccessTokenObtained();
+}
+
+void GDTalker::parseResponseUserName(const QByteArray& data){
+    qDebug() << "1234";
+
+    QJson::Parser parser;
+
+    bool ok;
+
+    // json is a QString containing the data to convert
+    QVariant result = parser.parse(data, &ok);
+
+    if(!ok){
+        kDebug() << "here";
+        emit signalBusy(false);
+        return;
+    }
+    QVariantMap rlist = result.toMap();
+    qDebug() << "x " << rlist.size();
+    QList<QString> a = rlist.uniqueKeys();
+
+    QString temp;
+    for(int i=0;i<rlist.size();i++){
+        //qDebug() << i << " " << a[i] << " " << rlist[a[i]] << endl;
+        if(a[i] == "name"){
+            kDebug() << "inside:" << rlist[a[i]].value<QString>();
+            temp = rlist[a[i]].value<QString>();
+            break;
+        }
+    }
+    emit signalBusy(false);
+    emit signalSetUserName(temp);
+
 }
 
 void GDTalker::parseResponseListFolders(const QByteArray& data){

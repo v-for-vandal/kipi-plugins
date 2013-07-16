@@ -128,6 +128,9 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(m_talker,SIGNAL(signalAccessTokenObtained()),
             this,SLOT(slotAccessTokenObtained()));
 
+    connect(m_talker,SIGNAL(signalSetUserName(QString)),
+            this,SLOT(slotSetUserName(QString)));
+
     connect(m_talker,SIGNAL(signalListAlbumsFailed(QString)),
             this,SLOT(slotListAlbumsFailed(QString)));
     kDebug() << "114";
@@ -207,6 +210,10 @@ void GDWindow::writeSettings(){
 
 }
 
+void GDWindow::slotSetUserName(const QString& msg){
+    m_widget->updateLabels(msg,"");
+}
+
 void GDWindow::slotListAlbumsDone(const QList<QPair<QString,QString> >& list){
     m_widget->m_albumsCoB->clear();
     kDebug() << "slotListAlbumsDone1:" << list.size();
@@ -220,6 +227,9 @@ void GDWindow::slotListAlbumsDone(const QList<QPair<QString,QString> >& list){
         }
     }
     buttonStateChange(true);
+    kDebug() << "calling xxyy";
+    m_talker->getUserName();
+
 }
 
 void GDWindow::slotBusy(bool val)

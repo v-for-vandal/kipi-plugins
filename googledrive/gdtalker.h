@@ -61,6 +61,7 @@ Q_SIGNALS:
     void signalCreateFolderSucceeded();
     void signalAddPhotoFailed(const QString& msg);
     void signalAddPhotoSucceeded();
+    void signalSetUserName(const QString& msg);
 
 private Q_SLOTS:
 
@@ -70,6 +71,7 @@ private Q_SLOTS:
 public:
     void doOAuth();
     void getAccessToken();
+    void getUserName();
     void listFolders();
     void createFolder(const QString& title,const QString& id);
     bool addPhoto(const QString& imgPath,const GDPhoto& info,const QString& id,bool rescale,int maxDim,int imageQuality);
@@ -87,14 +89,15 @@ private:
     void parseResponseListFolders(const QByteArray& data);
     void parseResponseCreateFolder(const QByteArray& data);
     void parseResponseAddPhoto(const QByteArray& data);
-
+    void parseResponseUserName(const QByteArray& data);
 
 private:
     enum State{
         GD_LISTFOLDERS=0,
         GD_CREATEFOLDER,
         GD_ADDPHOTO,
-        GD_ACCESSTOKEN
+        GD_ACCESSTOKEN,
+        GD_USERNAME
     };
 
 private:
@@ -120,6 +123,8 @@ private:
 
     QString      m_rootid;
     QString      m_rootfoldername;
+
+    QString      m_username;
 
 };
 
