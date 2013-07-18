@@ -82,7 +82,6 @@ GDTalker::GDTalker(QWidget* const parent){
 
 GDTalker::~GDTalker()
 {
-    // do not logout - may reuse session for next upload
 
     if (m_job)
         m_job->kill();
@@ -151,16 +150,6 @@ void GDTalker::getAccessToken(){
     postData += m_redirect_uri.toAscii();
     postData += "&grant_type=authorization_code";
 
-/*    QNetworkRequest request;
-    request.setUrl(url);
-    request.setRawHeader("Content-Type","application/x-www-form-urlencoded");
-
-    QNetworkAccessManager m_networkManager = new QNetworkAccessManager;
-    QObject::connect(m_networkManager,SIGNAL(finished(QNetworkReply*)),
-                     this,SLOT(slotgetAccessToken(QNetworkReply*)));
-
-    m_networkmanager->post(request,postData);
-*/
     //kDebug() << "In access token" << url;
     //kDebug() << "In access token" << postData;
     KIO::TransferJob* job = KIO::http_post(url,postData,KIO::HideProgressInfo);
@@ -378,6 +367,11 @@ void GDTalker::slotResult(KJob* kjob){
 
 void GDTalker::parseResponseAccessToken(const QByteArray& data){
     m_access_token = getValue(data,"access_token");
+    if(getValue(data,"error") == "invalid_grant"){
+        kDebug() << "in error";
+        doOAuth();
+        return;
+    }
     m_bearer_access_token = "Bearer " + m_access_token;
     kDebug() << "In parse GD_ACCESSTOKEN" << m_bearer_access_token << "  " << data;
     emit signalAccessTokenObtained();

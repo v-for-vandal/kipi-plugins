@@ -78,7 +78,7 @@ private:
 
 private Q_SLOTS:
     void slotImageListChanged();
-    void slotLogout();
+    void slotUserChangeRequest();
     void slotNewAlbumRequest();
     void slotReloadAlbumsRequest();
     void slotStartTransfer();

@@ -50,6 +50,7 @@
 #include <kwallet.h>
 #include <kpushbutton.h>
 #include <kurl.h>
+#include <ktoolinvocation.h>
 
 // LibKIPI includes
 
@@ -88,8 +89,8 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(m_widget->m_imgList, SIGNAL(signalImageListChanged()),
             this, SLOT(slotImageListChanged()));
 
-    connect(m_widget->m_logout,SIGNAL(clicked()),
-            this,SLOT(slotLogout()));
+    connect(m_widget->m_changeUserBtn,SIGNAL(clicked()),
+            this,SLOT(slotUserChangeRequest()));
 
     connect(m_widget->m_newAlbumBtn,SIGNAL(clicked()),
             this,SLOT(slotNewAlbumRequest()));
@@ -237,13 +238,13 @@ void GDWindow::slotBusy(bool val)
     if (val)
     {
         setCursor(Qt::WaitCursor);
-        m_widget->m_logout->setEnabled(false);
+        m_widget->m_changeUserBtn->setEnabled(false);
         buttonStateChange(false);
     }
     else
     {
         setCursor(Qt::ArrowCursor);
-        m_widget->m_logout->setEnabled(true);
+        m_widget->m_changeUserBtn->setEnabled(true);
         buttonStateChange(true);
     }
 }
@@ -402,7 +403,15 @@ void GDWindow::slotTransferCancel()
     m_talker->cancel();
 }
 
-void GDWindow::slotLogout(){
+void GDWindow::slotUserChangeRequest(){
+    KUrl url("https://accounts.google.com/logout");
+    KToolInvocation::invokeBrowser(url.url());
+
+    if (KMessageBox::warningContinueCancel(this, i18n("After you have been logged out in the browser,Press 'Continue' to authenticate "
+                                                      " for other account"))
+        == KMessageBox::Continue){
+        m_talker->doOAuth();
+    }
 
 }
 

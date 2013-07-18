@@ -68,7 +68,7 @@ private:
 
     QLabel*                     m_headerLbl;
     QLabel*                     m_userNameDisplayLbl;
-    KPushButton*                m_logout;
+    KPushButton*                m_changeUserBtn;
 
     KComboBox*                  m_albumsCoB;
     KPushButton*                m_newAlbumBtn;
