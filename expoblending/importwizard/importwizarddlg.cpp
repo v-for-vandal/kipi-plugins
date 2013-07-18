@@ -39,8 +39,6 @@
 #include <libkipi/interface.h>
 
 // Locale incudes
-
-#include "aboutdata.h"
 #include "aboutdata.h"
 #include "intropage.h"
 #include "itemspage.h"

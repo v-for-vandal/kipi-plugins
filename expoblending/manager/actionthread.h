@@ -43,7 +43,6 @@
 
 // Local includes
 
-#include "actions.h"
 #include "enfusesettings.h"
 #include "actions.h"
 #include "kpmetadata.h"
@@ -64,18 +63,23 @@ public:
 
     explicit ActionThread(QObject* const parent);
     ~ActionThread();
-
-    void setEnfuseVersion(const double version);
+    
     void setPreProcessingSettings(bool align, const RawDecodingSettings& settings);
+    void setEnfuseVersion(const double version);
+    void startPreProcessing(const KUrl::List& inUrls,
+                                      bool align, const RawDecodingSettings& rawSettings,
+                                      const QString& alignPath);
     void loadProcessed(const KUrl& url);
     void identifyFiles(const KUrl::List& urlList);
-    void preProcessFiles(const KUrl::List& urlList, const QString& alignPath, 
-			 ItemUrlsMap& preProcessedMap, const RawDecodingSettings& rawSettings,     
-			 bool align);
+    void preProcessFiles(const KUrl::List& urlList, const QString& alignPath); 
     void enfusePreview(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                        const EnfuseSettings& settings, const QString& enfusePath);
     void enfuseFinal(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                      const EnfuseSettings& settings, const QString& enfusePath);
+    void startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedMap,
+                                      bool align, const RawDecodingSettings& rawSettings,
+                                      const QString& alignPath, QString& errors);
+
 
     void cancel();
 
@@ -87,6 +91,7 @@ public:
 Q_SIGNALS:
 
     void starting(const KIPIExpoBlendingPlugin::ActionData& ad);
+    void stepFinished(const KIPIExpoBlendingPlugin::ActionData& ad);
     void finished(const KIPIExpoBlendingPlugin::ActionData& ad);
     
 private Q_SLOTS:

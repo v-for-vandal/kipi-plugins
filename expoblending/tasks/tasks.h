@@ -1,5 +1,5 @@
 /* ============================================================
- * 
+ *
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
@@ -8,7 +8,7 @@
  *
  * Copyright (C) 2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
- *
+ * 
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
@@ -21,51 +21,11 @@
  *
  * ============================================================ */
 
-#include "task.h"
+#ifndef TASKS_H
+#define TASKS_H
 
-// Qt includes
+#include "preprocesstask.h"
+#include "generictask.h"
 
-#include <QFileInfo>
+#endif /* TASKS_H */
 
-// KDE includes
-
-#include <klocale.h>
-
-// LibKDcraw includes
-
-#include <libkdcraw/kdcraw.h>
-
-namespace KIPIExpoBlendingPlugin
-{
-
-Task::Task(QObject* const parent, Action action, const KUrl::List& workDir)
-    : Job(parent), action(action), successFlag(false), isAbortedFlag(false), tmpListDir(workDir)
-{
-}
-
-Task::Task(QObject* const parent, Action action, const KUrl& workDir)
-    : Job(parent), action(action), successFlag(false), isAbortedFlag(false), tmpDir(workDir)
-{
-}
-
-Task::~Task()
-{
-}
-
-bool Task::success() const
-{
-    return successFlag;
-}
-
-void Task::requestAbort()
-{
-    isAbortedFlag = true;
-}
-
-QString Task::getProcessError(KProcess& proc)
-{
-    QString std = proc.readAll();
-    return (i18n("Cannot run %1:\n\n %2", proc.program()[0], std));
-}
-
-}  // namespace KIPIExpoBlendingPlugin

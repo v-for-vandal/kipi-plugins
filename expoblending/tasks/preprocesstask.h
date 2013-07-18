@@ -3,10 +3,11 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2012-03-15
- * Description : a plugin to create panorama by fusion of several images.
+ * Date        : 2009-11-13
+ * Description : a plugin to blend bracketed images.
  *
  * Copyright (C) 2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
+ * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -29,6 +30,12 @@
 
 // KDE includes
 
+#include <klocale.h>
+#include <kdebug.h>
+#include <kstandarddirs.h>
+#include <ktempdir.h>
+
+
 #include <threadweaver/Job.h>
 
 // LibKDcraw includes
@@ -49,21 +56,30 @@ class PreProcessTask : public Task
 
 public:
 
-    const int                   id;
-
-private:
-
-    const KUrl                  fileUrl;
+    int                         id;
+   
     ItemPreprocessedUrls* const preProcessedUrl;
+    const KUrl                  fileUrl;
     const RawDecodingSettings   settings;
+   
+    KUrl::List          	urls;
+    QString             	binaryPath;
+    bool 			align;
+   
+    KProcess*           	enfuseProcess;
+    KProcess*           	alignProcess;
+    
     QPointer<KDcraw>            rawProcess;
+    
 
 public:
 
     PreProcessTask(QObject* const parent, const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
-                   const KUrl& sourceUrl, const RawDecodingSettings& rawSettings);
+                               const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
+			       const KUrl::List& fileUrl,const QString& alignPath, const bool align);
     PreProcessTask(const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
-                   const KUrl& sourceUrl, const RawDecodingSettings& rawSettings);
+                               const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
+			       const KUrl::List& fileUrl,const QString& alignPath, const bool align);
     ~PreProcessTask();
 
     void requestAbort();
@@ -74,10 +90,14 @@ protected:
 
 private:
 
+    bool enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
+                                        bool align, const QString& alignPath, QString& errors);
     bool computePreview(const KUrl& inUrl);
+    bool computePreview(const KUrl& inUrl, KUrl& outUrl, KTempDir* preprocessingTmpDir);
     bool convertRaw();
+    QString getProcessError(KProcess* const proc) const;
 };
 
-}  // namespace KIPIPanoramaPlugin
+}  // namespace KIPIExpoBlendingPlugin
 
 #endif /* PREPROCESSTASK_H */

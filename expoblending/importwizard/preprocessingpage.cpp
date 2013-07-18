@@ -105,11 +105,11 @@ PreProcessingPage::PreProcessingPage(Manager* const mngr, KAssistantDialog* cons
     d->title->setWordWrap(true);
     d->title->setOpenExternalLinks(true);
     d->alignCheckBox = new QCheckBox(i18n("Align bracketed images"), vbox);
-    d->alignCheckBox = new QCheckBox(i18n("RAW Demosaicking"), vbox);
+    
     KConfig config("kipirc");
     KConfigGroup group = config.group(QString("ExpoBlending Settings"));
     d->alignCheckBox->setChecked(group.readEntry("Auto Alignment", true));
-    d->alignCheckBox->setChecked(group.readEntry("Raw demosaicing", false));
+    
     
     QLabel* space1   = new QLabel(vbox);
     KHBox* hbox      = new KHBox(vbox);
@@ -152,7 +152,7 @@ PreProcessingPage::~PreProcessingPage()
     KConfig config("kipirc");
     KConfigGroup group = config.group(QString("ExpoBlending Settings"));
     group.writeEntry("Auto Alignment", d->alignCheckBox->isChecked());
-    group.writeEntry("RAW Demosaicking", d->alignCheckBox->isChecked());
+   
 
     config.sync();
 
@@ -190,7 +190,7 @@ void PreProcessingPage::process()
     connect(d->mngr->thread(), SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
             this, SLOT(slotAction(KIPIExpoBlendingPlugin::ActionData)));
 
-    d->mngr->thread()->setPreProcessingSettings(d->alignCheckBox->isChecked(), d->mngr->rawDecodingSettings()); //###### RAW DEMOSAICKING
+    d->mngr->thread()->setPreProcessingSettings(d->alignCheckBox->isChecked(), d->mngr->rawDecodingSettings()); 
     d->mngr->thread()->preProcessFiles(d->mngr->itemsList(), d->mngr->alignBinary().path()); 
     if (!d->mngr->thread()->isRunning())
         d->mngr->thread()->start();

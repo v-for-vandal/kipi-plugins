@@ -43,7 +43,6 @@
 #include <kstandarddirs.h>
 #include <ktempdir.h>
 
-//####################### THREADWEAVER LIBRARIES ##########################
 #include <threadweaver/ThreadWeaver.h>
 #include <threadweaver/JobCollection.h>
 #include <threadweaver/DependencyPolicy.h>
@@ -69,22 +68,24 @@ namespace KIPIExpoBlendingPlugin
 
 class ActionThread::ActionThreadPriv
 {
+  
 public:
 
     ActionThreadPriv()
+        : preprocessingTmpDir(0)
     {
         align               = true;
         cancel              = false;
         enfuseVersion4x     = true;
         preprocessingTmpDir = 0;
     }
-
-   
   
     bool                             cancel;
     bool                             align;
     bool                             enfuseVersion4x;
 
+    RawDecodingSettings 	     rawDecodingSettings;
+    
     KTempDir*                        preprocessingTmpDir;
 
   
@@ -94,9 +95,24 @@ public:
      */
     KUrl::List                       enfuseTmpUrls;
     QMutex                           enfuseTmpUrlsMutex;
+    QMutex 			     mutex;
+    QWaitCondition                   condVar;
 
+    QList<Task*>                     todo;
+
+    KProcess*                        enfuseProcess;
+    KProcess*                        alignProcess;
+   
+    void cleanPreprocessingTmpDir()
+    {
+        if (preprocessingTmpDir)
+        {
+            preprocessingTmpDir->unlink();
+            delete preprocessingTmpDir;
+            preprocessingTmpDir = 0;
+        }
+    }
     
-    // ####################### SAME AS PANORAMA ################################
     void cleanAlignTmpDir()
     {
         if (preprocessingTmpDir)
@@ -106,31 +122,32 @@ public:
             preprocessingTmpDir = 0;
         }
     }
+    
 };
 
-// ########################### SAME AS PANORAMA ####################
+
 ActionThread::ActionThread(QObject* const parent)
     : RActionThreadBase(parent), d(new ActionThreadPriv)
 {
     qRegisterMetaType<ActionData>();
-}
+}    
+
 ActionThread::~ActionThread()
 {
 
     kDebug() << "ActionThread shutting down."
              << "Canceling all actions and waiting for them";
 
-    /*cancel the thread
+    //cancel the thread
     cancel();
-    wait for the thread to finish
+    //wait for the thread to finish
     wait();
-    */
     
     kDebug() << "Thread finished";
 
     d->cleanAlignTmpDir();
 
-   // cleanUpResultFiles();
+    cleanUpResultFiles();         
 
     delete d;
 }
@@ -140,15 +157,17 @@ void ActionThread::setEnfuseVersion(const double version)
     d->enfuseVersion4x = (version >= 4.0);
 }
 
+void ActionThread::setPreProcessingSettings(bool align, const RawDecodingSettings& settings)
+{
+    d->align               = align;
+    d->rawDecodingSettings = settings;
+}
 
 void ActionThread::identifyFiles(const KUrl::List& urlList)
-{
-
-  
+{ 
     JobCollection* const jobs = new JobCollection();
     
    
-    
     for (KUrl::List::const_iterator it = urlList.constBegin(); it != urlList.constEnd(); ++it)
     {
 	
@@ -156,7 +175,7 @@ void ActionThread::identifyFiles(const KUrl::List& urlList)
 	KUrl::List tempList;
 	tempList.append(url);
 	
-        Task* const t = new Task(this, tempList, IDENTIFY);
+        GenericTask* const t = new GenericTask(this, tempList, IDENTIFY);
 
 	connect(t, SIGNAL(started(ThreadWeaver::Job*)),
                 this, SLOT(slotStarting(ThreadWeaver::Job*)));
@@ -175,11 +194,11 @@ void ActionThread::loadProcessed(const KUrl& url)
 {
   
     JobCollection* const jobs = new JobCollection();
-     KUrl::List tempList;
+    KUrl::List tempList;
     
     tempList.append(url);
     
-    Task* const t = new Task(this, tempList , LOAD);
+    GenericTask* const t = new GenericTask(this, tempList , LOAD);
    
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
@@ -191,19 +210,15 @@ void ActionThread::loadProcessed(const KUrl& url)
     appendJob(jobs);
 }
 
-
-//#####################   SAME AS GENERATE PANORAMA PREVIEW ##################
 void ActionThread::enfusePreview(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                                  const EnfuseSettings& settings, const QString& enfusePath)
 {
   
     JobCollection   *jobs  = new JobCollection();
    
-    Task* const t = new Task(this, alignedUrls, ENFUSEPREVIEW);
-    
-    t->outputUrl              = outputUrl;
-    t->enfuseSettings         = settings;
-    t->binaryPath             = enfusePath;
+    GenericTask* const t = new GenericTask(this, alignedUrls, ENFUSEPREVIEW,
+					   outputUrl, settings, enfusePath, d->enfuseVersion4x); 
+     
 
     
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
@@ -223,12 +238,9 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
   
     JobCollection   *jobs  = new JobCollection();
     
-    Task* const t = new Task(this, alignedUrls, ENFUSEFINAL);
-    
-    t->outputUrl              = outputUrl;
-    t->enfuseSettings         = settings;
-    t->binaryPath             = enfusePath;
-    
+    GenericTask* const t = new GenericTask(this, alignedUrls, ENFUSEFINAL,
+					   outputUrl, settings, enfusePath, d->enfuseVersion4x); 
+     
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
     connect(t, SIGNAL(done(ThreadWeaver::Job*)),
@@ -241,37 +253,51 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
    
 }
 
-// ####################### SAME AS PANORAMA #################################
-
-
-
-void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& alignPath, 
-				   ItemUrlsMap& preProcessedMap,
-                                   const RawDecodingSettings& rawSettings,
-                                   bool align)
+void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& alignPath)
 {
-    
-    d->cleanAlignTmpDir();
+    startPreProcessing( urlList, d->align, d->rawDecodingSettings, alignPath);
+}
 
+void ActionThread::startPreProcessing(const KUrl::List& inUrls,
+                                      bool align, const RawDecodingSettings& rawSettings,
+                                      const QString& alignPath)
+{
+    d->cleanPreprocessingTmpDir();
+
+    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-expoblending-tmp-") +
+                                                       QString::number(QDateTime::currentDateTime().toTime_t()));
+
+    d->preprocessingTmpDir = new KTempDir(prefix);
+
+    ItemUrlsMap preProcessedMap;
     JobCollection       *jobs           = new JobCollection();
 
+    // TODO: try to append these jobs as a JobCollection inside a JobSequence
     int id = 0;
     
+    QVector<PreProcessTask*> preProcessingTasks;
     
-    Task* const t = new Task(this, urlList, PREPROCESSING);
-  
-    t->rawDecodingSettings = rawSettings ;
-    t->align = align ;
-    t->binaryPath = alignPath ;
+    foreach (const KUrl& file, inUrls)
+    {
+        preProcessedMap.insert(file, ItemPreprocessedUrls());
 
-    connect(t, SIGNAL(started(ThreadWeaver::Job*)),
+        PreProcessTask *t = new PreProcessTask(d->preprocessingTmpDir->name(),
+                                               id++,
+                                               preProcessedMap[file],
+                                               file,
+                                               rawSettings,
+					       inUrls,
+					       alignPath,
+					       align);
+
+        connect(t, SIGNAL(started(ThreadWeaver::Job*)),
                 this, SLOT(slotStarting(ThreadWeaver::Job*)));
-    connect(t, SIGNAL(done(ThreadWeaver::Job*)),
+        connect(t, SIGNAL(done(ThreadWeaver::Job*)),
                 this, SLOT(slotStepDone(ThreadWeaver::Job*)));
-    
-    jobs->addJob(t);
-    appendJob(jobs);
-    
+
+        preProcessingTasks.append(t);
+        jobs->addJob(t);
+    }
 }
 
 void ActionThread::slotStarting(Job* j)
@@ -313,8 +339,6 @@ void ActionThread::slotDone(Job* j)
     ((QObject*) t)->deleteLater();
 }
 
-
-/*
 void ActionThread::cancel()
 {
     QMutexLocker lock(&d->mutex);
@@ -329,9 +353,8 @@ void ActionThread::cancel()
 
     
     d->condVar.wakeAll();
-}*/
+}
 
-/*
 void ActionThread::cleanUpResultFiles()
 {
     // Cleanup all tmp files created by Enfuse process.
@@ -343,6 +366,6 @@ void ActionThread::cleanUpResultFiles()
     }
     d->enfuseTmpUrls.clear();
 }
-*/
+
 
 }  // namespace KIPIExpoBlendingPlugin
