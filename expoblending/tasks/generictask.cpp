@@ -23,7 +23,7 @@
  *
  * ============================================================ */
 
-#include "generictask.h"
+#include "generictask.moc"
 
 // C++ includes
 
