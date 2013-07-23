@@ -19,8 +19,8 @@
  *
  * ============================================================ */
 
-#ifndef FB_TALKER_H
-#define FB_TALKER_H
+#ifndef GD_TALKER_H
+#define GD_TALKER_H
 
 //Qt includes
 
@@ -37,8 +37,6 @@
 //local includes
 
 #include "gditem.h"
-
-class QDomElement;
 
 namespace KIPIGoogleDrivePlugin{
 
