@@ -60,14 +60,14 @@ GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const
     : Task(parent, action, fileUrl), urls(fileUrl), action(action)
 {}
 
-GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
+GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, const KUrl outputUrl, 
+			 const EnfuseSettings settings, const QString alignPath, bool version)
     : Task(parent, action, fileUrl), urls(fileUrl), action(action), outputUrl(outputUrl), enfuseSettings(settings), 
 	   binaryPath(alignPath), enfuseVersion4x(version)
 {}
 
-GenericTask::GenericTask(const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
+GenericTask::GenericTask(const KUrl::List& fileUrl, const Action& action, const KUrl outputUrl, 
+			 const EnfuseSettings settings, const QString alignPath, bool version)
     : Task(0, action, fileUrl), urls(fileUrl),action(action), outputUrl(outputUrl), enfuseSettings(settings), 
 	   binaryPath(alignPath), enfuseVersion4x(version)
 {}
@@ -98,7 +98,7 @@ void GenericTask::run()
                 case IDENTIFY:
                 {
                     // Identify Exposure.
-
+                  
                     QString avLum;
 
                     if (!urls.isEmpty())

@@ -82,10 +82,10 @@ protected:
 public:
 
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action);
-    GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl,
-			         const EnfuseSettings& settings, const QString& alignPath, bool version);
-    GenericTask(const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl,
-			         const EnfuseSettings& settings, const QString& alignPath, bool version);
+    GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, const KUrl outputUrl, 
+			 const EnfuseSettings settings, const QString alignPath, bool version);
+    GenericTask(const KUrl::List& fileUrl, const Action& action, const KUrl outputUrl, 
+			 const EnfuseSettings settings, const QString alignPath, bool version);
 
     ~GenericTask();
 

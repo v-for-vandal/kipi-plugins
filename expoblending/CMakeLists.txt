@@ -5,7 +5,19 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/importwizard
                     ${CMAKE_CURRENT_SOURCE_DIR}/manager
                     ${CMAKE_CURRENT_SOURCE_DIR}/plugin
                     ${CMAKE_CURRENT_SOURCE_DIR}/tasks
+                    
                    )
+
+# NOTE: OpenMP under MacOSX do not support multithreading.
+IF(OPENMP_FOUND AND NOT APPLE)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    IF("${OpenMP_CXX_FLAGS}" STREQUAL "-fopenmp" )
+        SET(OPENMP_LDFLAGS "-lgomp")
+    ENDIF("${OpenMP_CXX_FLAGS}" STREQUAL "-fopenmp" )
+    IF("${OpenMP_CXX_FLAGS}" STREQUAL "-xopenmp" )
+        SET(OPENMP_LDFLAGS "-xopenmp")
+    ENDIF("${OpenMP_CXX_FLAGS}" STREQUAL "-xopenmp" )
+ENDIF(OPENMP_FOUND AND NOT APPLE)
 
 INSTALL(DIRECTORY pics
         DESTINATION ${DATA_INSTALL_DIR}/kipiplugin_expoblending
@@ -48,6 +60,7 @@ TARGET_LINK_LIBRARIES(libexpoblending
                       ${KIPI_LIBRARIES}
                       ${KEXIV2_LIBRARIES}
                       ${KDCRAW_LIBRARIES}
+                      ${OPENMP_LDFLAGS}
                       kipiplugins
                      )
 

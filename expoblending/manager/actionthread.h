@@ -9,7 +9,6 @@
  * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
  * Copyright (C) 2009-2011 by Johannes Wienke <languitar at semipol dot de>
  * Copyright (C) 2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
- * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -34,7 +33,10 @@
 
 #include <kurl.h>
 #include <kprocess.h>
+
+#include <threadweaver/ThreadWeaver.h>
 #include <threadweaver/JobCollection.h>
+#include <threadweaver/DependencyPolicy.h>
 
 // LibKDcraw includes
 
@@ -63,23 +65,17 @@ public:
 
     explicit ActionThread(QObject* const parent);
     ~ActionThread();
-    
-    void setPreProcessingSettings(bool align, const RawDecodingSettings& settings);
+
     void setEnfuseVersion(const double version);
-    void startPreProcessing(const KUrl::List& inUrls,
-                                      bool align, const RawDecodingSettings& rawSettings,
-                                      const QString& alignPath);
+    void setPreProcessingSettings(bool align, const RawDecodingSettings& settings);
     void loadProcessed(const KUrl& url);
     void identifyFiles(const KUrl::List& urlList);
-    void preProcessFiles(const KUrl::List& urlList, const QString& alignPath); 
+    void convertRawFiles(const KUrl::List& urlList);
+    void preProcessFiles(const KUrl::List& urlList, const QString& alignPath);
     void enfusePreview(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                        const EnfuseSettings& settings, const QString& enfusePath);
     void enfuseFinal(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                      const EnfuseSettings& settings, const QString& enfusePath);
-    void startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedMap,
-                                      bool align, const RawDecodingSettings& rawSettings,
-                                      const QString& alignPath, QString& errors);
-
 
     void cancel();
 
@@ -101,7 +97,25 @@ private Q_SLOTS:
     void slotStarting(ThreadWeaver::Job* j);
 
 
-  
+private:
+
+    void    run();
+
+    bool    startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
+                               bool  align, const RawDecodingSettings& settings,
+                               const QString& alignPath, QString& errors);
+    bool    computePreview(const KUrl& inUrl, KUrl& outUrl);
+    bool    convertRaw(const KUrl& inUrl, KUrl& outUrl, const RawDecodingSettings& settings);
+
+    bool    startEnfuse(const KUrl::List& inUrls, KUrl& outUrl,
+                        const EnfuseSettings& settings,
+                        const QString& enfusePath, QString& errors);
+
+    QString getProcessError(KProcess* const proc) const;
+
+    float   getAverageSceneLuminance(const KUrl& url);
+    bool    getXmpRational(const char* xmpTagName, long& num, long& den, KPMetadata& meta);
+
 private:
 
     class ActionThreadPriv;
