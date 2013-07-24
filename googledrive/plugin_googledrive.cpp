@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-26
  * Description : a kipi plugin to import/export images to Google Drive web service
  *
  *

@@ -3,9 +3,7 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
- *
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General

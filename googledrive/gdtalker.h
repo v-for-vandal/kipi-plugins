@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
  *
  *
@@ -26,7 +25,6 @@
 
 #include <QList>
 #include <QString>
-#include <QTime>
 #include <QObject>
 #include <QStringList>
 

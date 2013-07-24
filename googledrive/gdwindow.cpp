@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
  *
  *
@@ -119,13 +118,13 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     //-------------------------------------------------------------------------
 
     m_talker = new GDTalker(this);
-    kDebug() << "111";
+
     connect(m_talker,SIGNAL(signalBusy(bool)),
             this,SLOT(slotBusy(bool)));
-    kDebug() << "112";
+
     connect(m_talker,SIGNAL(signalAccessTokenFailed(int,QString)),
             this,SLOT(slotAccessTokenFailed(int,QString)));
-    kDebug() << "113";
+
     connect(m_talker,SIGNAL(signalAccessTokenObtained()),
             this,SLOT(slotAccessTokenObtained()));
 
@@ -134,10 +133,10 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     connect(m_talker,SIGNAL(signalListAlbumsFailed(QString)),
             this,SLOT(slotListAlbumsFailed(QString)));
-    kDebug() << "114";
+
     connect(m_talker,SIGNAL(signalListAlbumsDone(QList<QPair<QString,QString> >)),
             this,SLOT(slotListAlbumsDone(QList<QPair<QString,QString> >)));
-    kDebug() << "115";
+
     connect(m_talker,SIGNAL(signalCreateFolderFailed(QString)),
             this,SLOT(slotCreateFolderFailed(QString)));
 
@@ -152,7 +151,6 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     readSettings();
     buttonStateChange(false);
-    kDebug() << "116";
     m_talker->doOAuth();
 }
 
@@ -228,7 +226,6 @@ void GDWindow::slotListAlbumsDone(const QList<QPair<QString,QString> >& list){
         }
     }
     buttonStateChange(true);
-    kDebug() << "calling xxyy";
     m_talker->getUserName();
 
 }
@@ -252,7 +249,6 @@ void GDWindow::slotBusy(bool val)
 void GDWindow::slotStartTransfer(){
     m_widget->m_imgList->clearProcessedStatus();
 
-    //m_transferQueue = m_widget->m_imgList->m_imageUrls();
 
     if(m_widget->m_imgList->imageUrls().isEmpty()){
         return;
@@ -274,15 +270,12 @@ void GDWindow::slotStartTransfer(){
     m_imagesTotal = m_transferQueue.count();
     m_imagesCount = 0;
 
-    m_progressDlg    = new KProgressDialog(this, i18n("Transfer Progress"));
-    m_progressDlg->setMinimumDuration(0);
-    m_progressDlg->setModal(true);
-    m_progressDlg->setAutoReset(true);
-    m_progressDlg->setAutoClose(true);
-    m_progressDlg->progressBar()->setFormat(i18n("%v / %m"));
-
-    connect(m_progressDlg, SIGNAL(cancelClicked()),
-            this, SLOT(slotTransferCancel()));
+    m_widget->progressBar()->setFormat(i18n("%v / %m"));
+    m_widget->progressBar()->setMaximum(m_imagesTotal);
+    m_widget->progressBar()->setValue(0);
+    m_widget->progressBar()->show();
+    m_widget->progressBar()->progressScheduled(i18n("GoogleDrive export"), true, true);
+    m_widget->progressBar()->progressThumbnailChanged(KIcon("kipi").pixmap(22, 22));
 
     uploadNextPhoto();
 }
@@ -290,8 +283,8 @@ void GDWindow::slotStartTransfer(){
 void GDWindow::uploadNextPhoto(){
     kDebug() << "in upload nextphoto " << m_transferQueue.count();
     if(m_transferQueue.isEmpty()){
-        kDebug() << "empty";
-        m_progressDlg->hide();
+        m_widget->progressBar()->hide();
+        m_widget->progressBar()->progressCompleted();
         return;
     }
 
@@ -309,44 +302,35 @@ void GDWindow::uploadNextPhoto(){
         slotAddPhotoFailed("");
         return;
     }
-    /*else{
-        //m_progressDlg->setLabelText(i18n("Uploading file %1", m_transferQueue.first().path()));
-        slotAddPhotoSucceeded();
-        return;
-    }*/
 }
 
 void GDWindow::slotAddPhotoFailed(const QString& msg)
 {
-    kDebug() << "In slotAddPhotoFailed";
     if (KMessageBox::warningContinueCancel(this, i18n("Failed to upload photo to Google Drive. %1\nDo you want to continue?",msg))
         != KMessageBox::Continue)
     {
         m_transferQueue.clear();
-        m_progressDlg->hide();
-        kDebug() << "In slotAddPhotoFailed 1";
-        // refresh the thumbnails
-        //slotTagSelected();
+        m_widget->progressBar()->hide();
     }
     else
     {
-        kDebug() << "In slotAddPhotoFailed 2";
         m_transferQueue.pop_front();
         m_imagesTotal--;
-        m_progressDlg->progressBar()->setMaximum(m_imagesTotal);
-        m_progressDlg->progressBar()->setValue(m_imagesCount);
+        m_widget->progressBar()->setMaximum(m_imagesTotal);
+        m_widget->progressBar()->setValue(m_imagesCount);
         uploadNextPhoto();
     }
 }
 
 void GDWindow::slotAddPhotoSucceeded(){
-    kDebug() << "In slotAddPhotoSucceeded";
     // Remove photo uploaded from the list
     m_widget->m_imgList->removeItemByUrl(m_transferQueue.first().first);
+    kDebug() << "In slotAddPhotoSucceeded1";
     m_transferQueue.pop_front();
     m_imagesCount++;
-    m_progressDlg->progressBar()->setMaximum(m_imagesTotal);
-    m_progressDlg->progressBar()->setValue(m_imagesCount);
+    kDebug() << "In slotAddPhotoSucceeded2" << m_imagesCount;
+    m_widget->progressBar()->setMaximum(m_imagesTotal);
+    m_widget->progressBar()->setValue(m_imagesCount);
     uploadNextPhoto();
 }
 
@@ -357,7 +341,6 @@ void GDWindow::slotImageListChanged(){
 void GDWindow::slotNewAlbumRequest(){
     if (m_albumDlg->exec() == QDialog::Accepted)
     {
-        kDebug() << "Calling New Album method";
         GDFolder newFolder;
         m_albumDlg->getAlbumTitle(newFolder);
         m_currentAlbumId = m_widget->m_albumsCoB->itemData(m_widget->m_albumsCoB->currentIndex()).toString();
@@ -366,7 +349,6 @@ void GDWindow::slotNewAlbumRequest(){
 }
 
 void GDWindow::slotReloadAlbumsRequest(){
-    kDebug() << "Reload albums request";
     m_talker->listFolders();
 }
 
@@ -388,11 +370,9 @@ void GDWindow::slotListAlbumsFailed(const QString& msg){
 void GDWindow::slotCreateFolderFailed(const QString& msg){
     kDebug() << "In slotCreateFolderFailed";
     KMessageBox::error(this, i18n("GoogleDrive Call Failed: %1\n", msg));
-    //return;
 }
 
 void GDWindow::slotCreateFolderSucceeded(){
-    kDebug() << "In slotCreateFolderSucceeded";
     m_talker->listFolders();
 }
 

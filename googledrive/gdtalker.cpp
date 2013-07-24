@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
  *
  *
@@ -27,8 +26,6 @@
 //Qt includes
 
 #include <QByteArray>
-#include <QDomDocument>
-#include <QDomElement>
 #include <QtAlgorithms>
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -117,7 +114,6 @@ void GDTalker::doOAuth(){
     window->setMainWidget(main);
 
     if(window->exec() == QDialog::Accepted){
-        kDebug() << "In doOauth";
         m_code = textbox->text();
     }
     if(m_code != "0"){
@@ -126,16 +122,7 @@ void GDTalker::doOAuth(){
 }
 
 void GDTalker::getAccessToken(){
-    /*QString a = "https://accounts.google.com/o/oauth2/token?";
-    a += "scope=";
-    a += m_scope.toAscii();
-    a += "&response_type=";
-    a += m_response_type.toAscii();
-    a += "&token_uri=";
-    a += m_token_uri.toAscii();
-    KUrl url(a.toAscii());*/
-    KUrl url("https://accounts.google.com/o/oauth2/token?");/* + "scope=" + m_scope.toAscii() + "&response_type=" + m_response_type.toAscii() +
-      //       "&token_uri=" + m_token_uri.toAscii());*/
+    KUrl url("https://accounts.google.com/o/oauth2/token?");
     url.addQueryItem("scope",m_scope.toAscii());
     url.addQueryItem("response_type",m_response_type.toAscii());
     url.addQueryItem("token_uri",m_token_uri.toAscii());
@@ -150,8 +137,6 @@ void GDTalker::getAccessToken(){
     postData += m_redirect_uri.toAscii();
     postData += "&grant_type=authorization_code";
 
-    //kDebug() << "In access token" << url;
-    //kDebug() << "In access token" << postData;
     KIO::TransferJob* job = KIO::http_post(url,postData,KIO::HideProgressInfo);
     job->addMetaData("content-type","Content-Type: application/x-www-form-urlencoded");
 
@@ -171,7 +156,6 @@ void GDTalker::getUserName(){
     KUrl url("https://www.googleapis.com/drive/v2/about");
     url.addQueryItem("scope",m_scope);
     url.addQueryItem("access_token",m_access_token);
-    kDebug() << "in user name";
     QString auth = "Authorization: " + m_bearer_access_token.toAscii();
 
     KIO::TransferJob* job = KIO::get(url,KIO::NoReload,KIO::HideProgressInfo);
@@ -190,20 +174,15 @@ void GDTalker::getUserName(){
 
 void GDTalker::listFolders(){
     KUrl url("https://www.googleapis.com/drive/v2/files?q=mimeType = 'application/vnd.google-apps.folder'");
-    //KUrl url("https://www.googleapis.com/drive/v2/files");
-    //url.addQueryItem(QString("q").toAscii(),QString("mimeType = 'application/vnd.google-apps.folder'").toAscii());
     QString auth = "Authorization: " + m_bearer_access_token.toAscii();
     kDebug() << auth;
     KIO::TransferJob* job = KIO::get(url,KIO::NoReload,KIO::HideProgressInfo);
     job->addMetaData("content-type","Content-Type: application/json");
-    //job->addMetaData("Authorization","Authorization: "+m_bearer_access_token.toAscii());
-    //job->addMetaData(QString("Authorization").toAscii(),m_bearer_access_token.toAscii());
     job->addMetaData("customHTTPHeader",auth.toAscii());
     connect(job,SIGNAL(data(KIO::Job*,QByteArray)),
             this,SLOT(data(KIO::Job*,QByteArray)));
     connect(job,SIGNAL(result(KJob*)),
             this,SLOT(slotResult(KJob*)));
-    kDebug() << "in list folders";
     m_state = GD_LISTFOLDERS;
     m_job = job;
     m_buffer.resize(0);
@@ -235,13 +214,10 @@ void GDTalker::createFolder(const QString& title,const QString& id){
     KIO::TransferJob* job = KIO::http_post(url,data,KIO::HideProgressInfo);
     job->addMetaData("content-type","Content-Type: application/json");
     job->addMetaData("customHTTPHeader",auth.toAscii());
-    //job->addMetaData("authorization","Authorization: "+m_bearer_access_token.toAscii());
-    //job->addMetaData("Authorization",m_bearer_access_token.toAscii());
     connect(job,SIGNAL(data(KIO::Job*,QByteArray)),
             this,SLOT(data(KIO::Job*,QByteArray)));
     connect(job,SIGNAL(result(KJob*)),
             this,SLOT(slotResult(KJob*)));
-    kDebug() << "in create folder";
     m_state = GD_CREATEFOLDER;
     m_job = job;
     m_buffer.resize(0);
@@ -253,7 +229,6 @@ bool GDTalker::addPhoto(const QString& imgPath,const GDPhoto& info,const QString
         m_job->kill();
         m_job = 0;
     }
-    kDebug() << "in addphoto begin";
     emit signalBusy(true);
     MPForm form;
     form.addPair(KUrl(imgPath).fileName(),info.description,imgPath,id);
@@ -297,7 +272,6 @@ bool GDTalker::addPhoto(const QString& imgPath,const GDPhoto& info,const QString
     job->addMetaData("content-type",form.contentType());
     job->addMetaData("content-length","Content-Length:"+form.getFileSize());
     job->addMetaData("customHTTPHeader",auth.toAscii());
-    //job->addMetaData("authorization","Authorization:"+m_bearer_access_token);
     job->addMetaData("host","Host:www.googleapis.com");
 
     connect(job,SIGNAL(data(KIO::Job*,QByteArray)),
@@ -368,7 +342,6 @@ void GDTalker::slotResult(KJob* kjob){
 void GDTalker::parseResponseAccessToken(const QByteArray& data){
     m_access_token = getValue(data,"access_token");
     if(getValue(data,"error") == "invalid_grant"){
-        kDebug() << "in error";
         doOAuth();
         return;
     }
@@ -378,8 +351,6 @@ void GDTalker::parseResponseAccessToken(const QByteArray& data){
 }
 
 void GDTalker::parseResponseUserName(const QByteArray& data){
-    qDebug() << "1234";
-
     QJson::Parser parser;
 
     bool ok;
@@ -388,20 +359,18 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
     QVariant result = parser.parse(data, &ok);
 
     if(!ok){
-        kDebug() << "here";
         emit signalBusy(false);
         return;
     }
     QVariantMap rlist = result.toMap();
-    qDebug() << "x " << rlist.size();
-    QList<QString> a = rlist.uniqueKeys();
+    qDebug() << "size " << rlist.size();
+    QList<QString> keys = rlist.uniqueKeys();
 
     QString temp;
     for(int i=0;i<rlist.size();i++){
-        //qDebug() << i << " " << a[i] << " " << rlist[a[i]] << endl;
-        if(a[i] == "name"){
-            kDebug() << "inside:" << rlist[a[i]].value<QString>();
-            temp = rlist[a[i]].value<QString>();
+        if(keys[i] == "name"){
+            kDebug() << "inside:" << rlist[keys[i]].value<QString>();
+            temp = rlist[keys[i]].value<QString>();
             break;
         }
     }
@@ -413,7 +382,6 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
 void GDTalker::parseResponseListFolders(const QByteArray& data){
     QJson::Parser parser;
     bool ok;
-    kDebug() << "in parser:";
     QVariant result = parser.parse(data,&ok);
     if(!ok){
         emit signalBusy(false);
@@ -439,7 +407,6 @@ void GDTalker::parseResponseListFolders(const QByteArray& data){
             }
         }
     }
-    kDebug() << "in parser1:" << list.size();
     emit signalBusy(false);
     emit signalListAlbumsDone(list);
 }

@@ -3,9 +3,7 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
- *
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -51,10 +49,10 @@ GDNewAlbum::GDNewAlbum(QWidget* const parent):KDialog(parent){
     //--------------------------------------------------
 
     m_titleEdt = new KLineEdit;
-    m_titleEdt->setWhatsThis("This is folder that will be created");
+    m_titleEdt->setWhatsThis("This is title of folder that will be created");
 
     QFormLayout* const albumBoxLayout = new QFormLayout;
-    albumBoxLayout->addRow(i18nc("album edit","Title:"),m_titleEdt);
+    albumBoxLayout->addRow(i18nc("folder edit","Title:"),m_titleEdt);
     albumBoxLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     albumBoxLayout->setSpacing(KDialog::spacingHint());
     albumBoxLayout->setMargin(KDialog::spacingHint());

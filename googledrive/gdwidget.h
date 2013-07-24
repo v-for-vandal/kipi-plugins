@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
  *
  *
@@ -57,10 +56,10 @@ public:
 
     void updateLabels(const QString& name = "", const QString& url = "");
     KIPIPlugins::KPImagesList* imagesList() const;
+    KIPIPlugins::KPProgressWidget* progressBar() const;
 
 private Q_SLOTS:
-    //void slotReloadAlbumsRequest();
-    //void slotResizeChecked();
+    void slotResizeChecked();
 
 private:
     KIPIPlugins::KPImagesList* m_imgList;
@@ -77,6 +76,8 @@ private:
     QCheckBox*                  m_resizeChB;
     QSpinBox*                   m_dimensionSpB;
     QSpinBox*                   m_imageQualitySpB;
+
+    KIPIPlugins::KPProgressWidget* m_progressBar;
 
 friend class GDWindow;
 };

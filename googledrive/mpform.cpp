@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
  *
  *
@@ -58,7 +57,7 @@ void MPForm::finish(){
     str += m_boundary;
     str += "--";
     m_buffer.append(str.toAscii());
-    kDebug() << "fin:" << m_buffer;
+    kDebug() << "finish:" << m_buffer;
 }
 
 void MPForm::addPair(const QString &name,const QString &description,const QString &path,const QString &id){
@@ -92,9 +91,6 @@ void MPForm::addPair(const QString &name,const QString &description,const QStrin
 bool MPForm::addFile(const QString &path){
     QString str;
     kDebug() << "in addfile" << path;
-    //str += "--";
-    //str += m_boundary;
-    //str += "\r\n";
 
     KMimeType::Ptr ptr = KMimeType::findByUrl(path);
     QString mime = ptr->name();

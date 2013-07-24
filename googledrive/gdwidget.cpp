@@ -3,7 +3,6 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2008-12-28
  * Description : a kipi plugin to export images to Google-Drive web service
  *
  *
@@ -49,6 +48,8 @@
 // Local includes
 
 #include "kpimageslist.h"
+#include "kpprogresswidget.h"
+
 
 namespace KIPIGoogleDrivePlugin{
 
@@ -149,12 +150,17 @@ GoogleDriveWidget::GoogleDriveWidget(QWidget* const parent):QWidget(parent){
     optionsBoxLayout->setSpacing(KDialog::spacingHint());
     optionsBoxLayout->setMargin(KDialog::spacingHint());
 
+    m_progressBar = new KIPIPlugins::KPProgressWidget(settingsBox);
+    m_progressBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    m_progressBar->hide();
+
     //------------------------------------------------------
 
     settingsBoxLayout->addWidget(m_headerLbl);
     settingsBoxLayout->addWidget(accountBox);
     settingsBoxLayout->addWidget(albBox);
     settingsBoxLayout->addWidget(optionsBox);
+    settingsBoxLayout->addWidget(m_progressBar);
     settingsBoxLayout->setSpacing(KDialog::spacingHint());
     settingsBoxLayout->setMargin(KDialog::spacingHint());
 
@@ -169,10 +175,8 @@ GoogleDriveWidget::GoogleDriveWidget(QWidget* const parent):QWidget(parent){
 
     //-------------------------------------------------------
 
-   // connect(m_reloadAlbumsBtn,SIGNAL(clicked()),
-     //       this,SLOT(slotReloadAlbumsRequest));
-  //  connect(m_resizeChB,SIGNAL(clicked()),
-    //        this,SLOT(slotResizeChecked()));
+    connect(m_resizeChB,SIGNAL(clicked()),
+        this,SLOT(slotResizeChecked()));
 
 }
 
@@ -188,7 +192,7 @@ void GoogleDriveWidget::updateLabels(const QString& name, const QString& url)
         web = url;
 
     m_headerLbl->setText(QString("<b><h2><a href='%1'>"
-                                 "<font color=\"#3B5998\">drive.google.com</font>"
+                                 "<font color=\"#3B5998\">Google Drive</font>"
                                  "</a></h2></b>").arg(web));
     if (name.isEmpty())
     {
@@ -204,14 +208,14 @@ KIPIPlugins::KPImagesList* GoogleDriveWidget::imagesList() const{
     return m_imgList;
 }
 
-
-/*
-void GoogleDriveWidget::slotReloadAlbumsRequest(){
-
-}
-
 void GoogleDriveWidget::slotResizeChecked(){
-
+    m_dimensionSpB->setEnabled(m_resizeChB->isChecked());
+    m_imageQualitySpB->setEnabled(m_resizeChB->isChecked());
 }
-*/
+
+KIPIPlugins::KPProgressWidget* GoogleDriveWidget::progressBar() const
+{
+    return m_progressBar;
+}
+
 }
