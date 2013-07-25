@@ -84,6 +84,13 @@ GDTalker::~GDTalker()
         m_job->kill();
 }
 
+bool GDTalker::authenticated(){
+    if(m_access_token.isEmpty()){
+        return false;
+    }
+    return true;
+}
+
 void GDTalker::doOAuth(){
     KUrl url("https://accounts.google.com/o/oauth2/auth");
     url.addQueryItem("scope",m_scope);
@@ -113,8 +120,13 @@ void GDTalker::doOAuth(){
     main->setLayout(layout);
     window->setMainWidget(main);
 
-    if(window->exec() == QDialog::Accepted){
+    if(window->exec() == QDialog::Accepted && !(textbox->text().isEmpty())){
+        kDebug() << "1";
         m_code = textbox->text();
+    }
+    if(textbox->text().isEmpty()){
+        kDebug() << "3";
+        emit signalTextBoxEmpty();
     }
     if(m_code != "0"){
         getAccessToken();
@@ -341,7 +353,7 @@ void GDTalker::slotResult(KJob* kjob){
 
 void GDTalker::parseResponseAccessToken(const QByteArray& data){
     m_access_token = getValue(data,"access_token");
-    if(getValue(data,"error") == "invalid_grant"){
+    if(getValue(data,"error") == "invalid_request" || getValue(data,"error") == "invalid_grant"){
         doOAuth();
         return;
     }
@@ -354,7 +366,7 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
     QJson::Parser parser;
 
     bool ok;
-
+    kDebug() << "in parseResponseUserName";
     // json is a QString containing the data to convert
     QVariant result = parser.parse(data, &ok);
 
@@ -362,6 +374,7 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
         emit signalBusy(false);
         return;
     }
+    kDebug() << "in parseResponseUserName2";
     QVariantMap rlist = result.toMap();
     qDebug() << "size " << rlist.size();
     QList<QString> keys = rlist.uniqueKeys();
@@ -388,6 +401,7 @@ void GDTalker::parseResponseListFolders(const QByteArray& data){
         emit signalListAlbumsFailed(i18n("Failed to list Folders"));
         return;
     }
+    kDebug() << "in parseResponseListFolders";
     QVariantMap rMap = result.toMap();
     QList<QPair<QString,QString> > list;
     list.append(qMakePair(m_rootid,m_rootfoldername));
@@ -452,9 +466,11 @@ void GDTalker::parseResponseAddPhoto(const QByteArray& data){
     }
     emit signalBusy(false);
     if(!success){
+        kDebug() << "failed upload";
         emit signalAddPhotoFailed(i18n("Failed to Upload Photo"));
     }
     else{
+        kDebug() << "success upload";
         emit signalAddPhotoSucceeded();
     }
 }

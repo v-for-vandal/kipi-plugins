@@ -122,6 +122,9 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(m_talker,SIGNAL(signalBusy(bool)),
             this,SLOT(slotBusy(bool)));
 
+    connect(m_talker,SIGNAL(signalTextBoxEmpty()),
+            this,SLOT(slotTextBoxEmpty()));
+
     connect(m_talker,SIGNAL(signalAccessTokenFailed(int,QString)),
             this,SLOT(slotAccessTokenFailed(int,QString)));
 
@@ -151,6 +154,7 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     readSettings();
     buttonStateChange(false);
+
     m_talker->doOAuth();
 }
 
@@ -246,12 +250,37 @@ void GDWindow::slotBusy(bool val)
     }
 }
 
+void GDWindow::slotTextBoxEmpty(){
+    kDebug() << "in slotTextBoxEmpty";
+    KMessageBox::error(this, i18n("Text Box is Empty, Please Enter code from browser to textbox. To complete authentication press"
+                                  " Change Account or start-upload button to authenticate again"));
+        kDebug() << "11";
+        //m_talker->doOAuth();
+
+}
+
 void GDWindow::slotStartTransfer(){
     m_widget->m_imgList->clearProcessedStatus();
 
 
     if(m_widget->m_imgList->imageUrls().isEmpty()){
+        if (KMessageBox::warningContinueCancel(this, i18n("No Image Selected. Cannot upload.Continue by selecting image "))
+            == KMessageBox::Continue){
+             return;
+        }
         return;
+
+    }
+
+    if(!(m_talker->authenticated())){
+        if (KMessageBox::warningContinueCancel(this, i18n("Authentication failed. Press Continue to authenticate"))
+            == KMessageBox::Continue){
+            m_talker->doOAuth();
+            return;
+        }
+        else{
+            return;
+        }
     }
 
     typedef QPair<KUrl, GDPhoto> Pair;
@@ -283,7 +312,7 @@ void GDWindow::slotStartTransfer(){
 void GDWindow::uploadNextPhoto(){
     kDebug() << "in upload nextphoto " << m_transferQueue.count();
     if(m_transferQueue.isEmpty()){
-        m_widget->progressBar()->hide();
+        //m_widget->progressBar()->hide();
         m_widget->progressBar()->progressCompleted();
         return;
     }

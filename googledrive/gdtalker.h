@@ -58,6 +58,7 @@ Q_SIGNALS:
     void signalAddPhotoFailed(const QString& msg);
     void signalAddPhotoSucceeded();
     void signalSetUserName(const QString& msg);
+    void signalTextBoxEmpty();
 
 private Q_SLOTS:
 
@@ -71,7 +72,7 @@ public:
     void listFolders();
     void createFolder(const QString& title,const QString& id);
     bool addPhoto(const QString& imgPath,const GDPhoto& info,const QString& id,bool rescale,int maxDim,int imageQuality);
-
+    bool authenticated();
     void cancel();
 
     QString getValue(const QString &,const QString &);
