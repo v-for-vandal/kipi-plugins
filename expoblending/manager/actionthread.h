@@ -34,14 +34,9 @@
 #include <kurl.h>
 #include <kprocess.h>
 
-#include <threadweaver/ThreadWeaver.h>
-#include <threadweaver/JobCollection.h>
-#include <threadweaver/DependencyPolicy.h>
-
 // LibKDcraw includes
 
 #include <libkdcraw/rawdecodingsettings.h>
-#include <libkdcraw/ractionthreadbase.h>
 
 // Local includes
 
@@ -57,7 +52,7 @@ namespace KIPIExpoBlendingPlugin
 
 class ActionData;
 
-class ActionThread : public RActionThreadBase
+class ActionThread : public QThread
 {
     Q_OBJECT
 
@@ -87,15 +82,7 @@ public:
 Q_SIGNALS:
 
     void starting(const KIPIExpoBlendingPlugin::ActionData& ad);
-    void stepFinished(const KIPIExpoBlendingPlugin::ActionData& ad);
     void finished(const KIPIExpoBlendingPlugin::ActionData& ad);
-    
-private Q_SLOTS:
-
-    void slotDone(ThreadWeaver::Job* j);
-    void slotStepDone(ThreadWeaver::Job* j);
-    void slotStarting(ThreadWeaver::Job* j);
-
 
 private:
 

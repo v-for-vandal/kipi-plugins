@@ -50,12 +50,6 @@
 #include <kstandarddirs.h>
 #include <ktempdir.h>
 
-
-#include <threadweaver/ThreadWeaver.h>
-#include <threadweaver/JobCollection.h>
-#include <threadweaver/DependencyPolicy.h>
-
-
 // LibKDcraw includes
 
 #include <libkdcraw/kdcraw.h>
@@ -64,8 +58,6 @@
 
 #include "kpwriteimage.h"
 #include "kpversion.h"
-#include "task.h"
-#include "tasks.h"
 
 namespace KIPIExpoBlendingPlugin
 {
@@ -139,7 +131,7 @@ public:
 };
 
 ActionThread::ActionThread(QObject* const parent)
-            : RActionThreadBase(parent), d(new ActionThreadPriv)
+            : QThread(parent), d(new ActionThreadPriv)
 {
     qRegisterMetaType<ActionData>();
 }
@@ -188,73 +180,6 @@ void ActionThread::setPreProcessingSettings(bool align, const RawDecodingSetting
 }
 
 void ActionThread::identifyFiles(const KUrl::List& urlList)
-{ 
-    JobCollection* const jobs = new JobCollection();
-    
-    KUrl url;
-    KUrl::List tempList;
-    
-    for (KUrl::List::const_iterator it = urlList.constBegin(); it != urlList.constEnd(); ++it)
-    {
-	
-	url = *it;
-	tempList.append(url);
-	
-        GenericTask* const t = new GenericTask(this, tempList, IDENTIFY);
-
-	connect(t, SIGNAL(started(ThreadWeaver::Job*)),
-                this, SLOT(slotStarting(ThreadWeaver::Job*)));
-       
-	connect(t, SIGNAL(done(ThreadWeaver::Job*)),
-                this, SLOT(slotStepDone(ThreadWeaver::Job*)));
-
-      
-        jobs->addJob(t);
-	tempList.clear();
-    }
-    appendJob(jobs);    
-}
-
-void ActionThread::slotStarting(Job* j)
-{
-    Task *t = static_cast<Task*>(j);
-
-    ActionData ad;
-    ad.starting     = true;
-    ad.action       = t->action;
-
-    emit starting(ad);
-}
-
-void ActionThread::slotStepDone(Job* j)
-{
-    Task *t = static_cast<Task*>(j);
-
-    ActionData ad;
-    ad.starting     = false;
-    ad.action       = t->action;
-    
-
-    emit stepFinished(ad);
-
-    ((QObject*) t)->deleteLater();
-}
-
-void ActionThread::slotDone(Job* j)
-{
-    Task *t = static_cast<Task*>(j);
-
-    ActionData ad;
-    ad.starting     = false;
-    ad.action       = t->action;
-   
-    emit finished(ad);
-
-    ((QObject*) t)->deleteLater();
-}
-
-/*
-void ActionThread::identifyFiles(const KUrl::List& urlList)
 {
     foreach(const KUrl& url, urlList)
     {
@@ -267,7 +192,7 @@ void ActionThread::identifyFiles(const KUrl::List& urlList)
         d->condVar.wakeAll();
     }
 }
-*/
+
 void ActionThread::loadProcessed(const KUrl& url)
 {
     ActionThreadPriv::Task* t = new ActionThreadPriv::Task;
