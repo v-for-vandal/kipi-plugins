@@ -68,4 +68,11 @@ QString Task::getProcessError(KProcess& proc)
     return (i18n("Cannot run %1:\n\n %2", proc.program()[0], std));
 }
 
+void Task::slotCancel()
+{
+    cancel = true;
+    //d->dngProcessor.cancel();
+}
+
+
 }  // namespace KIPIExpoBlendingPlugin

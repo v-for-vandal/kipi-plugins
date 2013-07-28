@@ -47,6 +47,8 @@ public:
     QString      errString;
     const Action action;
     
+    bool cancel;
+    
 
 protected:
 
@@ -69,7 +71,15 @@ Q_SIGNALS:
     void starting(const KIPIExpoBlendingPlugin::ActionData& ad);
     void finished(const KIPIExpoBlendingPlugin::ActionData& ad);
     void stepFinished(const KIPIExpoBlendingPlugin::ActionData& ad);
+    
+    void signalStarting(const KIPIExpoBlendingPlugin::ActionData& ad);
+    void signalFinished(const KIPIExpoBlendingPlugin::ActionData& ad);
 
+
+public Q_SLOTS:
+
+    void slotCancel();
+    
 protected:
 
     static QString getProcessError(KProcess& proc);

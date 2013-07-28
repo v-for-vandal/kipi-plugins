@@ -24,7 +24,7 @@
  * ============================================================ */
 
 #include "generictask.moc"
-
+#include <iostream>
 // C++ includes
 
 #include <cmath>
@@ -32,7 +32,7 @@
 // Qt includes
 
 #include <QFileInfo>
-#include <QMessageBox>
+
 // Under Win32, log2f is not defined...
 #ifdef _WIN32
 #define log2f(x) (logf(x)*1.4426950408889634f)
@@ -53,6 +53,7 @@
 #include "actions.h"
 #include "kpmetadata.h"
 
+using namespace std;
 namespace KIPIExpoBlendingPlugin
 {
   
@@ -88,33 +89,39 @@ void GenericTask::requestAbort()
 
 void GenericTask::run()
 {
-    switch (action)
-    {
-		case IDENTIFY:
-		{
-		// Identify Exposure.
+    cancel = false;
     
-		    QString avLum;
+    if (!cancel)
+    {
+ 
+            switch (action)
+            {
+                case IDENTIFY:
+                {
+                    // Identify Exposure.
 
-		    if (!urls.isEmpty())
-		    {
-			float val = getAverageSceneLuminance(urls[0].toLocalFile());
-			if (val != -1){
-			    avLum.setNum(log2f(val), 'g', 2);
-			}
-		    }
+                    QString avLum;
+                    float val;
+                    if (!urls.isEmpty())
+                    {
+                        val = getAverageSceneLuminance(urls[0].toLocalFile());
+                        if (val != -1)
+                            avLum.setNum(log2f(val), 'g', 2);
+                    }
+                    
                     ActionData ad;
                     ad.action  = action;
                     ad.inUrls  = urls;
                     ad.message = avLum.isEmpty() ? i18n("unknown") : avLum;
                     ad.success = avLum.isEmpty();
+	
                     emit finished(ad);
-		   
-                    break;
+		    break;
                 }
 		
                 case LOAD:
                 {
+		 
                     ActionData ad1;
                     ad1.action   = LOAD;
                     ad1.inUrls   = urls;
@@ -225,7 +232,7 @@ void GenericTask::run()
                     break;
                 }
             }
-        
+        }
     
 }
 
