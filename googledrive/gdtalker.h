@@ -59,6 +59,7 @@ Q_SIGNALS:
     void signalAddPhotoSucceeded();
     void signalSetUserName(const QString& msg);
     void signalTextBoxEmpty();
+    void signalRefreshTokenObtained(const QString& msg);
 
 private Q_SLOTS:
 
@@ -68,6 +69,7 @@ private Q_SLOTS:
 public:
     void doOAuth();
     void getAccessToken();
+    void getAccessTokenFromRefreshToken(const QString& msg);
     void getUserName();
     void listFolders();
     void createFolder(const QString& title,const QString& id);
@@ -87,6 +89,7 @@ private:
     void parseResponseCreateFolder(const QByteArray& data);
     void parseResponseAddPhoto(const QByteArray& data);
     void parseResponseUserName(const QByteArray& data);
+    void parseResponseRefreshToken(const QByteArray& data);
 
 private:
     enum State{
@@ -94,7 +97,8 @@ private:
         GD_CREATEFOLDER,
         GD_ADDPHOTO,
         GD_ACCESSTOKEN,
-        GD_USERNAME
+        GD_USERNAME,
+        GD_REFRESHTOKEN
     };
 
 private:
@@ -106,6 +110,7 @@ private:
     QString m_client_id;
     QString m_client_secret;
     QString m_access_token;
+    QString m_refresh_token;
     QString m_code;
 
     QString m_token_uri;

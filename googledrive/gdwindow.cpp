@@ -131,6 +131,9 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(m_talker,SIGNAL(signalAccessTokenObtained()),
             this,SLOT(slotAccessTokenObtained()));
 
+    connect(m_talker,SIGNAL(signalRefreshTokenObtained(QString)),
+            this,SLOT(slotRefreshTokenObtained(QString)));
+
     connect(m_talker,SIGNAL(signalSetUserName(QString)),
             this,SLOT(slotSetUserName(QString)));
 
@@ -154,8 +157,12 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     readSettings();
     buttonStateChange(false);
-
-    m_talker->doOAuth();
+    if(refresh_token.isEmpty()){
+        m_talker->doOAuth();
+    }
+    else{
+        m_talker->getAccessTokenFromRefreshToken(refresh_token);
+    }
 }
 
 GDWindow::~GDWindow(){
@@ -175,7 +182,7 @@ void GDWindow::readSettings(){
     KConfigGroup grp = config.group("Google Drive Settings");
 
     m_currentAlbumId = grp.readEntry("Current Album",QString());
-
+    refresh_token = grp.readEntry("refresh_token");
     if (grp.readEntry("Resize", false))
     {
         m_widget->m_resizeChB->setChecked(true);
@@ -200,7 +207,7 @@ void GDWindow::readSettings(){
 void GDWindow::writeSettings(){
     KConfig config("kipirc");
     KConfigGroup grp = config.group("Google Drive Settings");
-
+    grp.writeEntry("refresh_token",refresh_token);
     grp.writeEntry("Current Album",m_currentAlbumId);
     grp.writeEntry("Resize",          m_widget->m_resizeChB->isChecked());
     grp.writeEntry("Maximum Width",   m_widget->m_dimensionSpB->value());
@@ -388,6 +395,11 @@ void GDWindow::slotAccessTokenFailed(int errCode,const QString& errMsg){
 
 void GDWindow::slotAccessTokenObtained(){
     kDebug() << "acc : 111";
+    m_talker->listFolders();
+}
+
+void GDWindow::slotRefreshTokenObtained(const QString& msg){
+    refresh_token = msg;
     m_talker->listFolders();
 }
 

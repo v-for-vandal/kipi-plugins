@@ -192,8 +192,10 @@ void GoogleDriveWidget::updateLabels(const QString& name, const QString& url)
         web = url;
 
     m_headerLbl->setText(QString("<b><h2><a href='%1'>"
-                                 "<font color=\"#3B5998\">Google Drive</font>"
+                                 "<font color=\"#9ACD32\">Google Drive</font>"
                                  "</a></h2></b>").arg(web));
+
+
     if (name.isEmpty())
     {
         m_userNameDisplayLbl->clear();

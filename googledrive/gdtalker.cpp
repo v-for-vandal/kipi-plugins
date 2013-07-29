@@ -163,6 +163,32 @@ void GDTalker::getAccessToken(){
     emit signalBusy(true);
 }
 
+void GDTalker::getAccessTokenFromRefreshToken(const QString& msg){
+    KUrl url("https://accounts.google.com/o/oauth2/token");
+
+    QByteArray postData;
+    postData = "&client_id=";
+    postData += m_client_id.toAscii();
+    postData += "&client_secret=";
+    postData += m_client_secret.toAscii();
+    postData += "&refresh_token=";
+    postData += msg.toAscii();
+    postData += "&grant_type=refresh_token";
+
+    KIO::TransferJob* job = KIO::http_post(url,postData,KIO::HideProgressInfo);
+    job->addMetaData("content-type","Content-Type: application/x-www-form-urlencoded");
+
+    connect(job,SIGNAL(data(KIO::Job*,QByteArray)),
+            this,SLOT(data(KIO::Job*,QByteArray)));
+    connect(job,SIGNAL(result(KJob*)),
+            this,SLOT(slotResult(KJob*)));
+
+    m_state = GD_REFRESHTOKEN;
+    m_job = job;
+    m_buffer.resize(0);
+    emit signalBusy(true);
+
+}
 
 void GDTalker::getUserName(){
     KUrl url("https://www.googleapis.com/drive/v2/about");
@@ -346,12 +372,29 @@ void GDTalker::slotResult(KJob* kjob){
             kDebug() << "In GD_USERNAME";// << m_buffer;
             parseResponseUserName(m_buffer);
             break;
+        case (GD_REFRESHTOKEN):
+            kDebug() << "In GD_REFRESHTOKEN" << m_buffer;
+            parseResponseRefreshToken(m_buffer);
+            break;
         default:
             break;
     }
 }
 
 void GDTalker::parseResponseAccessToken(const QByteArray& data){
+    m_access_token = getValue(data,"access_token");
+    m_refresh_token = getValue(data,"refresh_token");
+    if(getValue(data,"error") == "invalid_request" || getValue(data,"error") == "invalid_grant"){
+        doOAuth();
+        return;
+    }
+    m_bearer_access_token = "Bearer " + m_access_token;
+    kDebug() << "In parse GD_ACCESSTOKEN" << m_bearer_access_token << "  " << data;
+    //emit signalAccessTokenObtained();
+    emit signalRefreshTokenObtained(m_refresh_token);
+}
+
+void GDTalker::parseResponseRefreshToken(const QByteArray& data){
     m_access_token = getValue(data,"access_token");
     if(getValue(data,"error") == "invalid_request" || getValue(data,"error") == "invalid_grant"){
         doOAuth();
