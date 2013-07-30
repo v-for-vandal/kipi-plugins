@@ -431,6 +431,7 @@ void GDWindow::slotUserChangeRequest(){
     if (KMessageBox::warningContinueCancel(this, i18n("After you have been logged out in the browser,Press 'Continue' to authenticate "
                                                       " for other account"))
         == KMessageBox::Continue){
+        refresh_token = "";
         m_talker->doOAuth();
     }
 
