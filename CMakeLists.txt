@@ -12,7 +12,7 @@ SET(KIPIPLUGINS_MINOR_VERSION "3")
 SET(KIPIPLUGINS_PATCH_VERSION "0")
 
 # kipi-plugins release date
-SET (KIPIPLUGINS_RELEASE_DATE "2013-06-30")
+SET (KIPIPLUGINS_RELEASE_DATE "2013-05-19")
 
 # Suffix to add at end of version string. Usual values are:
 # "-git"   : alpha code unstable from git. Do not use in production
@@ -21,7 +21,7 @@ SET (KIPIPLUGINS_RELEASE_DATE "2013-06-30")
 # "-beta3" : beta3 release.
 # "-rc"    : release candidate.
 # ""       : final relase. Can be used in production.
-SET(KIPIPLUGINS_SUFFIX_VERSION "-beta3")
+SET(KIPIPLUGINS_SUFFIX_VERSION "-beta1")
 
 # =======================================================
 # Set env. variables accordinly.
@@ -163,7 +163,7 @@ MACRO_OPTIONAL_FIND_PACKAGE(KdepimLibs)                                  # For C
 MACRO_OPTIONAL_FIND_PACKAGE(QCA2)                                        # For Shwup and YandexFotki.
 MACRO_OPTIONAL_FIND_PACKAGE(KSane)                                       # For AcquireImages.
 MACRO_OPTIONAL_FIND_PACKAGE(OpenCV)                                      # For RemoveRedEyes.
-MACRO_OPTIONAL_FIND_PACKAGE(QJSON)                                       # For Debian Screenshots Facebook,GoogleDrive  and Imgur.
+MACRO_OPTIONAL_FIND_PACKAGE(QJSON)                                       # For Debian Screenshots Facebook,GoogleDrive,Dropbox and Imgur.
 MACRO_OPTIONAL_FIND_PACKAGE(KGeoMap)                                     # For GPSSync.
 MACRO_OPTIONAL_FIND_PACKAGE(Mediawiki)                                   # For Mediawiki.
 MACRO_OPTIONAL_FIND_PACKAGE(LibKVkontakte)                               # For VKontakte.
@@ -331,6 +331,7 @@ PRINT_PLUGIN_COMPILE_STATUS("Debian Screenshots" QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("Facebook"           QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("Imgur"              QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("GoogleDrive"        QJSON_FOUND)
+PRINT_PLUGIN_COMPILE_STATUS("Dropbox"        QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("VKontakte"          LIBKVKONTAKTE_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("IpodExport"         IPOD_FOUND AND GLIB2_FOUND AND GOBJECT_FOUND AND GDK_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("Calendar"           KDEPIMLIBS_FOUND)
@@ -434,7 +435,7 @@ IF(KIPIPLUGINS_CAN_BE_COMPILED)
     ADD_SUBDIRECTORY(photolayoutseditor)
     ADD_SUBDIRECTORY(dlnaexport)
     ADD_SUBDIRECTORY(jalbumexport)
-
+        
     # Plugin not yet ready for production
     #ADD_SUBDIRECTORY(photivointegration)
 
@@ -461,7 +462,8 @@ IF(KIPIPLUGINS_CAN_BE_COMPILED)
         ADD_SUBDIRECTORY(debianscreenshots)
         ADD_SUBDIRECTORY(facebook)
         ADD_SUBDIRECTORY(imgurexport)
-   	ADD_SUBDIRECTORY(googledrive)
+        ADD_SUBDIRECTORY(googledrive)
+	ADD_SUBDIRECTORY(dropbox)
     ENDIF(QJSON_FOUND)
 
     IF(LIBKVKONTAKTE_FOUND)
