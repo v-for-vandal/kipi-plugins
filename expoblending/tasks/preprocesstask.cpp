@@ -39,6 +39,9 @@
 #include "kpversion.h"
 #include "kpwriteimage.h"
 
+#include <iostream>
+
+using namespace std;
 using namespace KIPIPlugins;
 
 namespace KIPIExpoBlendingPlugin
@@ -46,18 +49,18 @@ namespace KIPIExpoBlendingPlugin
 
 PreProcessTask::PreProcessTask(QObject* const parent, const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
                                const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
-			       const KUrl::List& fileUrl,const QString& alignPath, const bool align)
-    : Task(parent, PREPROCESS_INPUT, workDir), id(id), preProcessedUrl(&targetUrls),
+			       const KUrl::List& inUrls,const QString& alignPath, const bool align)
+    : Task(parent, PREPROCESSING, workDir), id(id), preProcessedUrl(&targetUrls),
       fileUrl(sourceUrl), settings(rawSettings),
-      urls(fileUrl),binaryPath(alignPath), align(align)
+      urls(inUrls),binaryPath(alignPath), align(align)
 {}
 
 PreProcessTask::PreProcessTask(const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
                                const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
-			       const KUrl::List& fileUrl,const QString& alignPath, const bool align)
-    : Task(0, PREPROCESS_INPUT, workDir), id(id), preProcessedUrl(&targetUrls),
+			       const KUrl::List& inUrls,const QString& alignPath, const bool align)
+    : Task(0, PREPROCESSING, workDir), id(id), preProcessedUrl(&targetUrls),
       fileUrl(sourceUrl), settings(rawSettings),
-      urls(fileUrl),binaryPath(alignPath), align(align)
+      urls(inUrls),binaryPath(alignPath), align(align)
 {}
 
 PreProcessTask::~PreProcessTask()
@@ -75,7 +78,8 @@ void PreProcessTask::requestAbort()
 
 void PreProcessTask::run()
 {
-    if (KPMetadata::isRawFile(fileUrl))
+    
+  if (KPMetadata::isRawFile(fileUrl))
     {
         preProcessedUrl->preprocessedUrl = tmpDir;
 
@@ -92,14 +96,13 @@ void PreProcessTask::run()
     }
 
     preProcessedUrl->previewUrl          = tmpDir;
-
+    
+    /*
     if (!computePreview(preProcessedUrl->preprocessedUrl))
     {
         successFlag = false;
         return;
-    }
-
-    successFlag = true;
+    }*/
     
     ItemUrlsMap preProcessedUrlsMap;
     QString     errors;
@@ -109,7 +112,7 @@ void PreProcessTask::run()
       successFlag = false;
       return;
     }
-    
+    successFlag = true;
     return;
 }
 
@@ -167,7 +170,7 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
             preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(alignedUrl, previewUrl));
             i++;
         }
-
+           
         for (QMap<KUrl, ItemPreprocessedUrls>::const_iterator it = preProcessedUrlsMap.constBegin() ; it != preProcessedUrlsMap.constEnd(); ++it)
         {
             kDebug() << "Pre-processed output urls map: " << it.key() << " , "
@@ -211,6 +214,7 @@ bool PreProcessTask::computePreview(const KUrl& inUrl)
     outUrl.setFileName(fi.completeBaseName().replace('.', '_') + QString("-preview.jpg"));
 
     QImage img;
+    
     if (img.load(inUrl.toLocalFile()))
     {
         QImage preview = img.scaled(1280, 1024, Qt::KeepAspectRatio);
@@ -231,6 +235,7 @@ bool PreProcessTask::computePreview(const KUrl& inUrl)
     {
         errString = i18n("Input image cannot be loaded for preview generation");
     }
+    
     return false;
 }
 

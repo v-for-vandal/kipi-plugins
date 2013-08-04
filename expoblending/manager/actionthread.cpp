@@ -25,7 +25,10 @@
 
 #include "actionthread.moc"
 
-
+// Under Win32, log2f is not defined...
+#ifdef _WIN32
+#define log2f(x) (logf(x)*1.4426950408889634f)
+#endif
 // Qt includes
 
 #include <QMutex>
@@ -64,9 +67,6 @@
 #include "kpversion.h"
 #include "kpwriteimage.h"
 
-#include <iostream>
-
-using namespace std;
 using namespace ThreadWeaver;
 using namespace KIPIPlugins;
 
@@ -197,6 +197,29 @@ void ActionThread::identifyFiles(const KUrl::List& urlList)
     
 }
 
+void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& alignPath)
+{
+    JobCollection* const jobs = new JobCollection();
+    d->urls = urlList;
+    
+    GenericTask* const t = new GenericTask(this, d->urls, PREPROCESSING, d->rawDecodingSettings, d->align, alignPath);
+
+    connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
+    
+    connect(t, SIGNAL(started(ThreadWeaver::Job*)),
+	    this, SLOT(slotStarting(ThreadWeaver::Job*)));
+ 
+    connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
+	    this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+
+    connect(t, SIGNAL(done(ThreadWeaver::Job*)),
+	    this, SLOT(slotStepDone(ThreadWeaver::Job*)));
+      
+    jobs->addJob(t);
+    appendJob(jobs);
+}
+
 void ActionThread::loadProcessed(const KUrl& url)
 {
   
@@ -207,8 +230,8 @@ void ActionThread::loadProcessed(const KUrl& url)
     
     GenericTask* const t = new GenericTask(this, tempList , LOAD);
    
-    connect(t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
-            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
+    connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
     
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
@@ -234,8 +257,6 @@ void ActionThread::enfusePreview(const KUrl::List& alignedUrls, const KUrl& outp
 					   outputUrl, settings, enfusePath, d->enfuseVersion4x); 
      
 
-    connect(t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
-            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
     
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
@@ -280,53 +301,6 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
    
 }
 
-void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& alignPath)
-{
-    startPreProcessing( urlList, d->align, d->rawDecodingSettings, alignPath);
-}
-
-void ActionThread::startPreProcessing(const KUrl::List& inUrls,
-                                      bool align, const RawDecodingSettings& rawSettings,
-                                      const QString& alignPath)
-{
-    d->cleanPreprocessingTmpDir();
-
-    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-expoblending-tmp-") +
-                                                       QString::number(QDateTime::currentDateTime().toTime_t()));
-
-    d->preprocessingTmpDir = new KTempDir(prefix);
-
-    ItemUrlsMap preProcessedMap;
-    JobCollection       *jobs           = new JobCollection();
-
-    // TODO: try to append these jobs as a JobCollection inside a JobSequence
-    int id = 0;
-    
-    QVector<PreProcessTask*> preProcessingTasks;
-    
-    foreach (const KUrl& file, inUrls)
-    {
-        preProcessedMap.insert(file, ItemPreprocessedUrls());
-
-        PreProcessTask *t = new PreProcessTask(d->preprocessingTmpDir->name(),
-                                               id++,
-                                               preProcessedMap[file],
-                                               file,
-                                               rawSettings,
-					       inUrls,
-					       alignPath,
-					       align);
-
-        connect(t, SIGNAL(started(ThreadWeaver::Job*)),
-                this, SLOT(slotStarting(ThreadWeaver::Job*)));
-	
-	connect(t, SIGNAL(done(ThreadWeaver::Job*)),
-                this, SLOT(slotStepDone(ThreadWeaver::Job*)));
-
-        preProcessingTasks.append(t);
-        jobs->addJob(t);
-    }
-}
 void ActionThread::slotStarting(Job* j)
 {
     Task *t = static_cast<Task*>(j);
@@ -334,7 +308,8 @@ void ActionThread::slotStarting(Job* j)
     ActionData ad;
     ad.starting     = true;
     ad.action       = t->action;
-
+    ad.id	    = -1;
+    
     emit starting(ad);
 }
 
@@ -345,6 +320,9 @@ void ActionThread::slotStepDone(Job* j)
     ActionData ad;
     ad.starting     = false;
     ad.action       = t->action;
+    ad.id           = -1;
+    ad.success      = t->success();
+    ad.message      = t->errString;
     
     emit stepFinished(ad);
 
@@ -358,6 +336,8 @@ void ActionThread::slotDone(Job* j)
     ActionData ad;
     ad.starting     = false;
     ad.action       = t->action;
+    ad.success      = t->success();
+    ad.message      = t->errString;
    
     emit finished(ad);
 

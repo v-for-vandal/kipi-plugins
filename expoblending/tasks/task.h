@@ -52,10 +52,10 @@ public:
 
 protected:
 
-    bool         successFlag;
-    bool         isAbortedFlag;
-    const KUrl::List   tmpListDir;
-    const KUrl   tmpDir;
+    bool         		successFlag;
+    bool         		isAbortedFlag;
+    const KUrl::List   		tmpListDir;
+    const KUrl   		tmpDir;
     
 public:
 
@@ -76,9 +76,6 @@ Q_SIGNALS:
     void signalFinished(const KIPIExpoBlendingPlugin::ActionData& ad);
 
 
-public Q_SLOTS:
-
-    void slotCancel();
     
 protected:
 

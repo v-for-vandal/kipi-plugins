@@ -33,12 +33,14 @@
 #include <kmenu.h>
 #include <klocale.h>
 #include <kpushbutton.h>
-
+#include <kdebug.h>
 // LibKIPI includes
 
 #include <libkipi/interface.h>
 
 // Locale incudes
+
+#include "aboutdata.h"
 #include "aboutdata.h"
 #include "intropage.h"
 #include "itemspage.h"

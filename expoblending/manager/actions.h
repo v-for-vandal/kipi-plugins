@@ -45,7 +45,6 @@ enum Action
 {
     NONE = 0,
     IDENTIFY,
-    PREPROCESS_INPUT,
     PREPROCESSING,
     ENFUSEPREVIEW,
     ENFUSEFINAL,
@@ -82,6 +81,7 @@ public:
         starting = false;
         success  = false;
         action = NONE;
+	id = 0;
     }
 
     bool           starting;
@@ -97,6 +97,8 @@ public:
     EnfuseSettings enfuseSettings;
 
     ItemUrlsMap    preProcessedUrlsMap;
+    
+    int            id;
 
     Action         action;
 };

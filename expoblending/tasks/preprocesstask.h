@@ -76,10 +76,10 @@ public:
 
     PreProcessTask(QObject* const parent, const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
                                const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
-			       const KUrl::List& fileUrl,const QString& alignPath, const bool align);
+			       const KUrl::List& inUrls,const QString& alignPath, const bool align);
     PreProcessTask(const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
                                const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
-			       const KUrl::List& fileUrl,const QString& alignPath, const bool align);
+			       const KUrl::List& inUrls,const QString& alignPath, const bool align);
     ~PreProcessTask();
 
     void requestAbort();

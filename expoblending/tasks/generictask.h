@@ -31,6 +31,7 @@
 
 #include <threadweaver/Job.h>
 #include <kprocess.h>
+#include <ktempdir.h>
 
 
 #include "task.h"
@@ -58,20 +59,24 @@ class GenericTask : public Task
     
 public:
     
-    bool                cancel;
+    bool                		cancel;
 
-    KUrl::List          urls;
-    Action              action;
-    KUrl                outputUrl;
-    EnfuseSettings      enfuseSettings;	
-    QString             binaryPath;
-    bool 		enfuseVersion4x;
+    KUrl::List          		urls;
+    Action              		action;
+    KUrl                		outputUrl;
+    EnfuseSettings      		enfuseSettings;
+    const RawDecodingSettings   	settings;
+    bool 				align;
+    QString             		binaryPath;
+    bool 				enfuseVersion4x;
+   
     
-    KProcess*           enfuseProcess;
-    KProcess*           alignProcess;
+    KProcess*           		enfuseProcess;
+    KProcess*           		alignProcess;
     
-    QString      	errString;
-     
+    QString      			errString;
+    
+    KTempDir*                        	preprocessingTmpDir;
 
 protected:
 
@@ -82,6 +87,8 @@ protected:
 public:
 
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action);
+    GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
+			 const RawDecodingSettings& rawSettings, const bool align, const QString& alignPath);
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl,
 			         const EnfuseSettings& settings, const QString& alignPath, bool version);
     GenericTask(const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl,
@@ -99,7 +106,12 @@ public:
                                const EnfuseSettings& settings,
                                const QString& enfusePath, QString& errors);
     
-    
+    bool startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
+                                      bool align, const RawDecodingSettings& settings,
+                                      const QString& alignPath, QString& errors);
+    bool computePreview(const KUrl& inUrl, KUrl& outUrl);
+    bool convertRaw(const KUrl& inUrl, KUrl& outUrl, const RawDecodingSettings& settings);
+    void cleanAlignTmpDir();
 
 Q_SIGNALS:
 
