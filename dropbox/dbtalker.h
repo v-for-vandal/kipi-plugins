@@ -44,6 +44,7 @@ public:
 public:
     void obtain_req_token();
     void doOAuth();
+    bool authenticated();
     void getAccessToken();
     void continueWithAccessToken(const QString& msg1,const QString& msg2,const QString& msg3);
     void getUserName();
@@ -66,6 +67,7 @@ Q_SIGNALS:
     void signalCreateFolderSucceeded();
     void signalAddPhotoFailed(const QString& msg);
     void signalAddPhotoSucceeded();
+    void signalTextBoxEmpty();
 
 private Q_SLOTS:
     void data(KIO::Job* job,const QByteArray& data);

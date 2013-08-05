@@ -77,6 +77,8 @@ DBTalker::DBTalker(QWidget* const parent){
     nonce = generateNonce(8);
     timestamp = QDateTime::currentMSecsSinceEpoch()/1000;
     m_root = "dropbox";
+    m_job = 0;
+    m_state = DB_REQ_TOKEN;
     //list.append(qMakePair("/","root"));
 }
 
@@ -115,6 +117,13 @@ void DBTalker::obtain_req_token(){
     emit signalBusy(true);
 }
 
+bool DBTalker::authenticated(){
+    if(!m_oauthToken.isEmpty()){
+        return true;
+    }
+    return false;
+}
+
 void DBTalker::continueWithAccessToken(const QString& msg1,const QString& msg2,const QString& msg3){
     m_oauthToken = msg1;
     m_oauthTokenSecret = msg2;
@@ -151,9 +160,12 @@ void DBTalker::doOAuth(){
 
     dialog->setMainWidget(mainWidget);
 
+
     if(dialog->exec() == QDialog::Accepted){
+        kDebug() << "1";
         getAccessToken();
     }
+
 }
 
 void DBTalker::getAccessToken(){

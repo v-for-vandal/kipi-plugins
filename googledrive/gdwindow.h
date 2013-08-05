@@ -81,6 +81,7 @@ private Q_SLOTS:
     void slotNewAlbumRequest();
     void slotReloadAlbumsRequest();
     void slotStartTransfer();
+//    void slotChangeProgressBar();
 
     void slotBusy(bool);
     void slotTextBoxEmpty();

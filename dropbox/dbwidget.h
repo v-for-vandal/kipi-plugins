@@ -65,7 +65,7 @@ private Q_SLOTS:
 
 private:
     KIPIPlugins::KPImagesList* m_imgList;
-    KIPI::UploadWidget*        m_uploadWidget;
+    //KIPI::UploadWidget*        m_uploadWidget;
 
     QLabel*                     m_headerLbl;
     QLabel*                     m_userNameDisplayLbl;

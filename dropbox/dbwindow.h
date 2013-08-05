@@ -94,6 +94,7 @@ private Q_SLOTS:
     void slotAddPhotoFailed(const QString& msg);
     void slotAddPhotoSucceeded();
     void slotTransferCancel();
+    void slotTextBoxEmpty();
 
 private:
 

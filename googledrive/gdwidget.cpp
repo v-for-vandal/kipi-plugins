@@ -178,6 +178,8 @@ GoogleDriveWidget::GoogleDriveWidget(QWidget* const parent):QWidget(parent){
     connect(m_resizeChB,SIGNAL(clicked()),
         this,SLOT(slotResizeChecked()));
 
+    connect(m_imgList,SIGNAL(signalImageListChanged()),
+            this,SLOT(slotImageListChanged()));
 }
 
 GoogleDriveWidget::~GoogleDriveWidget(){
@@ -219,5 +221,9 @@ KIPIPlugins::KPProgressWidget* GoogleDriveWidget::progressBar() const
 {
     return m_progressBar;
 }
-
+/*
+void GoogleDriveWidget::slotImageListChanged(){
+    emit imageListChanged();
+}
+*/
 }

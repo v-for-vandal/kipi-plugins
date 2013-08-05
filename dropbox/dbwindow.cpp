@@ -122,6 +122,9 @@ DBWindow::DBWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(m_talker,SIGNAL(signalBusy(bool)),
             this,SLOT(slotBusy(bool)));
 
+    connect(m_talker,SIGNAL(signalTextBoxEmpty()),
+            this,SLOT(slotTextBoxEmpty()));
+
     connect(m_talker,SIGNAL(signalAccessTokenFailed(int,QString)),
             this,SLOT(slotAccessTokenFailed(int,QString)));
     kDebug() << "113";
@@ -169,6 +172,8 @@ DBWindow::~DBWindow(){
 void DBWindow::reactivate()
 {
     m_widget->imagesList()->loadImagesFromCurrentSelection();
+    m_widget->progressBar()->hide();
+
     show();
 }
 
@@ -256,8 +261,35 @@ void DBWindow::slotBusy(bool val)
     }
 }
 
+void DBWindow::slotTextBoxEmpty(){
+    kDebug() << "in slotTextBoxEmpty";
+    KMessageBox::error(this, i18n("Text Box is Empty, Please Enter code from browser to textbox. To complete authentication press"
+                                  " Change Account or start-upload button to authenticate again"));
+
+}
+
 void DBWindow::slotStartTransfer(){
     m_widget->m_imgList->clearProcessedStatus();
+
+    if(m_widget->m_imgList->imageUrls().isEmpty()){
+        if (KMessageBox::warningContinueCancel(this, i18n("No Image Selected. Cannot upload.Continue by selecting image "))
+            == KMessageBox::Continue){
+             return;
+        }
+        return;
+
+    }
+
+    if(!(m_talker->authenticated())){
+        if (KMessageBox::warningContinueCancel(this, i18n("Authentication failed. Press Continue to authenticate"))
+            == KMessageBox::Continue){
+            m_talker->obtain_req_token();
+            return;
+        }
+        else{
+            return;
+        }
+    }
 
     m_transferQueue = m_widget->m_imgList->imageUrls();
 

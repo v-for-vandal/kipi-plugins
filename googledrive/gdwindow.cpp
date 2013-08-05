@@ -100,6 +100,9 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(this,SIGNAL(user1Clicked()),
             this,SLOT(slotStartTransfer()));
 
+   // connect(m_widget,SIGNAL(imageListChanged()),
+     //       this,SLOT(slotChangeProgressBar()));
+
     KPAboutData* const about = new KPAboutData(ki18n("Google Drive Export"),0,
                                                KAboutData::License_GPL,
                                                ki18n("A Kipi-plugin to export images "
@@ -174,6 +177,8 @@ GDWindow::~GDWindow(){
 void GDWindow::reactivate()
 {
     m_widget->imagesList()->loadImagesFromCurrentSelection();
+    m_widget->progressBar()->hide();
+
     show();
 }
 
@@ -315,6 +320,10 @@ void GDWindow::slotStartTransfer(){
 
     uploadNextPhoto();
 }
+/*
+void GDWindow::slotChangeProgressBar(){
+    m_widget->progressBar()->hide();
+}*/
 
 void GDWindow::uploadNextPhoto(){
     kDebug() << "in upload nextphoto " << m_transferQueue.count();

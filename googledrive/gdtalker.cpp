@@ -75,6 +75,9 @@ GDTalker::GDTalker(QWidget* const parent){
     m_code            = "0";
     m_rootid          = "root";
     m_rootfoldername  = "GoogleDrive Root";
+    m_job = 0;
+    continuePos = 0;
+    m_state = GD_ACCESSTOKEN;
 }
 
 GDTalker::~GDTalker()

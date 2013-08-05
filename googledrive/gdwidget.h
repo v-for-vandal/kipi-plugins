@@ -58,12 +58,16 @@ public:
     KIPIPlugins::KPImagesList* imagesList() const;
     KIPIPlugins::KPProgressWidget* progressBar() const;
 
+Q_SIGNALS:
+    //void imageListChanged();
+
 private Q_SLOTS:
     void slotResizeChecked();
+    //void slotImageListChanged();
 
 private:
     KIPIPlugins::KPImagesList* m_imgList;
-    KIPI::UploadWidget*        m_uploadWidget;
+    //KIPI::UploadWidget*        m_uploadWidget;
 
     QLabel*                     m_headerLbl;
     QLabel*                     m_userNameDisplayLbl;
