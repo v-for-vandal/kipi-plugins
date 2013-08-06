@@ -352,6 +352,11 @@ bool GenericTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preP
         args << "-a";
         args << "aligned";
 
+	foreach(const KUrl& url, inUrls)
+        {
+            args << url.toLocalFile();
+        }
+        
         alignProcess->setProgram(args);
 
         kDebug() << "Align command line: " << alignProcess->program();

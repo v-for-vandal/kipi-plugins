@@ -97,12 +97,12 @@ void PreProcessTask::run()
 
     preProcessedUrl->previewUrl          = tmpDir;
     
-    /*
+    
     if (!computePreview(preProcessedUrl->preprocessedUrl))
     {
         successFlag = false;
         return;
-    }*/
+    }
     
     ItemUrlsMap preProcessedUrlsMap;
     QString     errors;
