@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "preprocesstask.h"
+#include "preprocesstask.moc"
 
 // Qt includes
 
@@ -31,7 +31,9 @@
 
 #include <klocale.h>
 #include <kdebug.h>
+#include <klocale.h>
 #include <kstandarddirs.h>
+#include <kdebug.h>
 #include <ktempdir.h>
 // Local includes
 
@@ -39,95 +41,126 @@
 #include "kpversion.h"
 #include "kpwriteimage.h"
 
-#include <iostream>
-
-using namespace std;
 using namespace KIPIPlugins;
 
 namespace KIPIExpoBlendingPlugin
 {
 
-PreProcessTask::PreProcessTask(QObject* const parent, const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
-                               const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
-			       const KUrl::List& inUrls,const QString& alignPath, const bool align)
-    : Task(parent, PREPROCESSING, workDir), id(id), preProcessedUrl(&targetUrls),
-      fileUrl(sourceUrl), settings(rawSettings),
-      urls(inUrls),binaryPath(alignPath), align(align)
+PreProcessTask::PreProcessTask(QObject* const parent, const KUrl::List& inUrls, 
+			       const RawDecodingSettings& rawSettings, const bool align,
+			       const QString& alignPath)
+    : Task(parent, PREPROCESSING, inUrls), urls(inUrls), settings(rawSettings),
+      align(align), binaryPath(alignPath)
 {}
 
-PreProcessTask::PreProcessTask(const KUrl& workDir, int id, ItemPreprocessedUrls& targetUrls,
-                               const KUrl& sourceUrl, const RawDecodingSettings& rawSettings, 
-			       const KUrl::List& inUrls,const QString& alignPath, const bool align)
-    : Task(0, PREPROCESSING, workDir), id(id), preProcessedUrl(&targetUrls),
-      fileUrl(sourceUrl), settings(rawSettings),
-      urls(inUrls),binaryPath(alignPath), align(align)
+PreProcessTask::PreProcessTask(const KUrl::List& inUrls, 
+			       const RawDecodingSettings& rawSettings, const bool align,
+			       const QString& alignPath)
+    : Task(0, PREPROCESSING, inUrls), urls(inUrls), settings(rawSettings),
+      align(align), binaryPath(alignPath)
 {}
 
 PreProcessTask::~PreProcessTask()
 {}
 
-void PreProcessTask::requestAbort()
-{
-    Task::requestAbort();
-
-    if (!rawProcess.isNull())
-    {
-        rawProcess->cancel();
-    }
-}
-
 void PreProcessTask::run()
 {
-    
-  if (KPMetadata::isRawFile(fileUrl))
-    {
-        preProcessedUrl->preprocessedUrl = tmpDir;
+    ActionData ad1;
+    ad1.action   = PREPROCESSING;
+    ad1.inUrls   = urls;
+    ad1.starting = true;
+    emit starting(ad1);
 
-        if (!convertRaw())
-        {
-            successFlag = false;
-            return;
-        }
-    }
-    else
-    {
-        // NOTE: in this case, preprocessed Url is the original file Url.
-        preProcessedUrl->preprocessedUrl = fileUrl;
-    }
-
-    preProcessedUrl->previewUrl          = tmpDir;
-    
-    
-    if (!computePreview(preProcessedUrl->preprocessedUrl))
-    {
-        successFlag = false;
-        return;
-    }
-    
     ItemUrlsMap preProcessedUrlsMap;
     QString     errors;
+
+    cancel = false;
+    bool result  = startPreProcessing(urls, preProcessedUrlsMap, align, settings, binaryPath, errors);
+
+    ActionData ad2;
+    ad2.action              = PREPROCESSING;
+    ad2.inUrls              = urls;
+    ad2.preProcessedUrlsMap = preProcessedUrlsMap;
+    ad2.success             = result;
+    ad2.message             = errors;
+    emit finished(ad2);
     
-    if(!enfuseAlign(urls, preProcessedUrlsMap, align, binaryPath, errors))
-    {
-      successFlag = false;
-      return;
-    }
-    successFlag = true;
-    return;
 }
 
-bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
-                                        bool align, const QString& alignPath, QString& errors)
+bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
+                                      bool align, const RawDecodingSettings& settings,
+                                      const QString& alignPath, QString& errors)
 {
-  
     QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-expoblending-preprocessing-tmp-") +
                                                        QString::number(QDateTime::currentDateTime().toTime_t()));
-    KTempDir* preprocessingTmpDir = new KTempDir(prefix);
+
+    //cleanAlignTmpDir();
+
+    preprocessingTmpDir = new KTempDir(prefix);
+
+    volatile bool error = false;
+
+    KUrl::List mixedUrls;
     
+    for (int i = 0; i < inUrls.size(); ++i)
+    {
+
+        if (error)
+        {
+            continue;
+        }
+
+        KUrl url = inUrls.at(i);
+
+        if (KPMetadata::isRawFile(url.toLocalFile()))
+        {
+            KUrl preprocessedUrl, previewUrl;
+
+            if (!convertRaw(url, preprocessedUrl, settings))
+            {
+		successFlag = false;
+                error = true;
+                continue;
+            }
+
+            if (!computePreview(preprocessedUrl, previewUrl))
+            {
+	        successFlag = false;
+                error = true;
+                continue;
+            }
+            mixedUrls.append(preprocessedUrl);
+            // In case of alignment is not performed.
+            preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(preprocessedUrl, previewUrl));
+
+
+        }
+        else
+        {
+            // NOTE: in this case, preprocessed Url is original file Url.
+            KUrl previewUrl;
+            if (!computePreview(url, previewUrl))
+            {
+	        successFlag = false;
+                error = true;
+                continue;
+            }
+            mixedUrls.append(url);
+            // In case of alignment is not performed.
+            preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(url, previewUrl));
+
+	}
+    }
+
+    if (error)
+    {
+        successFlag = false;
+        return false;
+    }
+
     if (align)
     {
         // Re-align images
-
         alignProcess = new KProcess;
         alignProcess->clearProgram();
         alignProcess->setWorkingDirectory(preprocessingTmpDir->name());
@@ -139,11 +172,11 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
         args << "-a";
         args << "aligned";
 
-        foreach(const KUrl& url, inUrls)
+	foreach(const KUrl& url, mixedUrls)
         {
             args << url.toLocalFile();
         }
-
+        
         alignProcess->setProgram(args);
 
         kDebug() << "Align command line: " << alignProcess->program();
@@ -152,6 +185,7 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
 
         if (!alignProcess->waitForFinished(-1))
         {
+	    successFlag = false;  
             errors = getProcessError(alignProcess);
             return false;
         }
@@ -164,13 +198,15 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
         {
             KUrl previewUrl;
             KUrl alignedUrl = KUrl(preprocessingTmpDir->name() + temp.sprintf("aligned%04i", i) + QString(".tif"));
-            if (!computePreview(alignedUrl, previewUrl, preprocessingTmpDir))
+            if (!computePreview(alignedUrl, previewUrl))
+	    {
+	        successFlag = false;
                 return false;
-
+	    }
             preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(alignedUrl, previewUrl));
             i++;
         }
-           
+
         for (QMap<KUrl, ItemPreprocessedUrls>::const_iterator it = preProcessedUrlsMap.constBegin() ; it != preProcessedUrlsMap.constEnd(); ++it)
         {
             kDebug() << "Pre-processed output urls map: " << it.key() << " , "
@@ -181,7 +217,10 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
         kDebug() << "Align exit code      : "         << alignProcess->exitCode();
 
         if (alignProcess->exitStatus() != QProcess::NormalExit)
+	{
+	    successFlag = false;
             return false;
+	}
 
         if (alignProcess->exitCode() == 0)
         {
@@ -190,6 +229,7 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
         }
 
         errors = getProcessError(alignProcess);
+	successFlag = false;
         return false;
     }
     else
@@ -205,41 +245,17 @@ bool PreProcessTask::enfuseAlign(const KUrl::List& inUrls, ItemUrlsMap& preProce
     }
 }
 
-
-bool PreProcessTask::computePreview(const KUrl& inUrl)
+void PreProcessTask::cleanAlignTmpDir()
 {
-    KUrl& outUrl = preProcessedUrl->previewUrl;
-
-    QFileInfo fi(inUrl.toLocalFile());
-    outUrl.setFileName(fi.completeBaseName().replace('.', '_') + QString("-preview.jpg"));
-
-    QImage img;
-    
-    if (img.load(inUrl.toLocalFile()))
+    if (preprocessingTmpDir)
     {
-        QImage preview = img.scaled(1280, 1024, Qt::KeepAspectRatio);
-        bool saved     = preview.save(outUrl.toLocalFile(), "JPEG");
-        // save exif information also to preview image for auto rotation
-        if (saved)
-        {
-            KPMetadata metaIn(inUrl.toLocalFile());
-            KPMetadata metaOut(outUrl.toLocalFile());
-            metaOut.setImageOrientation(metaIn.getImageOrientation());
-            metaOut.setImageDimensions(QSize(preview.width(), preview.height()));
-            metaOut.applyChanges();
-        }
-        kDebug() << "Preview Image url: " << outUrl << ", saved: " << saved;
-        return saved;
+	preprocessingTmpDir->unlink();
+        delete preprocessingTmpDir;
+        preprocessingTmpDir = 0;
     }
-    else
-    {
-        errString = i18n("Input image cannot be loaded for preview generation");
-    }
-    
-    return false;
 }
 
-bool PreProcessTask::computePreview(const KUrl& inUrl, KUrl& outUrl, KTempDir* preprocessingTmpDir)
+bool PreProcessTask::computePreview(const KUrl& inUrl, KUrl& outUrl)
 {
     outUrl = preprocessingTmpDir->name();
     QFileInfo fi(inUrl.toLocalFile());
@@ -264,18 +280,14 @@ bool PreProcessTask::computePreview(const KUrl& inUrl, KUrl& outUrl, KTempDir* p
     return false;
 }
 
-
-bool PreProcessTask::convertRaw()
+bool PreProcessTask::convertRaw(const KUrl& inUrl, KUrl& outUrl, const RawDecodingSettings& settings)
 {
-    const KUrl& inUrl = fileUrl;
-    KUrl &outUrl      = preProcessedUrl->preprocessedUrl;
-
     int        width, height, rgbmax;
     QByteArray imageData;
 
-    rawProcess = new KDcraw;
-    bool decoded = rawProcess->decodeRAWImage(inUrl.toLocalFile(), settings, imageData, width, height, rgbmax);
-    delete rawProcess;
+    QPointer<KDcraw> rawdec = new KDcraw;
+
+    bool decoded = rawdec->decodeRAWImage(inUrl.toLocalFile(), settings, imageData, width, height, rgbmax);
 
     if (decoded)
     {
@@ -284,7 +296,7 @@ bool PreProcessTask::convertRaw()
         unsigned short tmp16[3];
 
         // Set RGB color components.
-        for (int i = 0 ; !isAbortedFlag && (i < width * height) ; ++i)
+        for (int i = 0 ; !cancel && (i < width * height) ; ++i)
         {
             // Swap Red and Blue and re-ajust color component values
             tmp16[0] = (unsigned short)((sptr[5]*256 + sptr[4]) * factor);      // Blue
@@ -294,49 +306,29 @@ bool PreProcessTask::convertRaw()
             sptr += 6;
         }
 
-        if (isAbortedFlag)
-        {
-            errString = i18n("Operation canceled.");
-            return false;
-        }
-
-        KPMetadata metaIn, metaOut;
-        metaIn.load(inUrl.toLocalFile());
-        KPMetadata::MetaDataMap m = metaIn.getExifTagsDataList(QStringList("Photo"), true);
-        KPMetadata::MetaDataMap::iterator it;
-        for (it = m.begin(); it != m.end(); ++it)
-        {
-            metaIn.removeExifTag(it.key().toAscii().data(), false);
-        }
-        metaOut.setData(metaIn.data());
-        metaOut.setImageProgramId(QString("Kipi-plugins"), QString(kipiplugins_version));
-        metaOut.setImageDimensions(QSize(width, height));
-        metaOut.setExifTagString("Exif.Image.DocumentName", inUrl.fileName());
-        metaOut.setXmpTagString("Xmp.tiff.Make",  metaOut.getExifTagString("Exif.Image.Make"));
-        metaOut.setXmpTagString("Xmp.tiff.Model", metaOut.getExifTagString("Exif.Image.Model"));
-        metaOut.setImageOrientation(KPMetadata::ORIENTATION_NORMAL);
+        KPMetadata meta;
+        meta.load(inUrl.toLocalFile());
+        meta.setImageProgramId(QString("Kipi-plugins"), QString(kipiplugins_version));
+        meta.setImageDimensions(QSize(width, height));
+        meta.setExifTagString("Exif.Image.DocumentName", inUrl.fileName());
+        meta.setXmpTagString("Xmp.tiff.Make",  meta.getExifTagString("Exif.Image.Make"));
+        meta.setXmpTagString("Xmp.tiff.Model", meta.getExifTagString("Exif.Image.Model"));
+        meta.setImageOrientation(KPMetadata::ORIENTATION_NORMAL);
 
         QByteArray prof = KPWriteImage::getICCProfilFromFile(settings.outputColorSpace);
 
         KPWriteImage wImageIface;
-        wImageIface.setCancel(&isAbortedFlag);
-        wImageIface.setImageData(imageData, width, height, true, false, prof, metaOut);
+        wImageIface.setCancel(&cancel);
+        wImageIface.setImageData(imageData, width, height, true, false, prof, meta);
+        outUrl = preprocessingTmpDir->name();
         QFileInfo fi(inUrl.toLocalFile());
-        outUrl.setFileName(fi.completeBaseName().replace('.', '_') + QString(".tif"));
+        outUrl.setFileName(QString(".") + fi.completeBaseName().replace('.', '_') + QString(".tif"));
 
         if (!wImageIface.write2TIFF(outUrl.toLocalFile()))
-        {
-            errString = i18n("Tiff image creation failed.");
             return false;
-        }
-        else
-        {
-            metaOut.save(outUrl.toLocalFile());
-        }
     }
     else
     {
-        errString = i18n("Raw file conversion failed.");
         return false;
     }
 
@@ -344,6 +336,7 @@ bool PreProcessTask::convertRaw()
 
     return true;
 }
+
 QString PreProcessTask::getProcessError(KProcess* const proc) const
 {
     if (!proc) return QString();
@@ -352,4 +345,4 @@ QString PreProcessTask::getProcessError(KProcess* const proc) const
     return (i18n("Cannot run %1:\n\n %2", proc->program()[0], std));
 }
 
-}  // namespace KIPIExpoBlendingPlugin
+} // namespace KIPIExpoBlendingPlugin

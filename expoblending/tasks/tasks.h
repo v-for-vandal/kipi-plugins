@@ -26,6 +26,8 @@
 
 #include "preprocesstask.h"
 #include "generictask.h"
+#include "enfusepreviewtask.h"
+#include "enfusefinaltask.h"
 
 #endif /* TASKS_H */
 

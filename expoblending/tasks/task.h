@@ -46,9 +46,6 @@ public:
 
     QString      errString;
     const Action action;
-    
-    bool cancel;
-    
 
 protected:
 

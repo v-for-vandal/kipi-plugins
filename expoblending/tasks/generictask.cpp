@@ -68,523 +68,71 @@ GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const
     : Task(parent, action, fileUrl), urls(fileUrl), action(action)
 {}
 
-GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
-			 const RawDecodingSettings& rawSettings, const bool align, const QString& alignPath)
-    : Task(parent, action, fileUrl), urls(fileUrl), action(action),  
-	   settings(rawSettings), align(align), binaryPath(alignPath)
-{}
-
-GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
-    : Task(parent, action, fileUrl), urls(fileUrl), action(action), outputUrl(outputUrl), enfuseSettings(settings), 
-	   binaryPath(alignPath), enfuseVersion4x(version)
-{}
-
-GenericTask::GenericTask(const KUrl::List& fileUrl, const Action& action, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
-    : Task(0, action, fileUrl), urls(fileUrl),action(action), outputUrl(outputUrl), enfuseSettings(settings), 
-	   binaryPath(alignPath), enfuseVersion4x(version)
-{}
-
 GenericTask::~GenericTask()
 {}
 
-bool GenericTask::success() const
-{
-    return successFlag;
-}
-
-void GenericTask::requestAbort()
-{
-    isAbortedFlag = true;
-}
-
 void GenericTask::run()
 {
-    cancel = false;
     
-    if (!cancel)
+    switch (action)
     {
- 
-            switch (action)
-            {
-                case IDENTIFY:
-                {
-                    // Identify Exposure.
+        case IDENTIFY:
+        {
+	    // Identify Exposure.
 
-                    QString avLum;
-                    float val;
-                    if (!urls.isEmpty())
-                    {
-                        val = getAverageSceneLuminance(urls[0].toLocalFile());
-                        if (val != -1)
-                            avLum.setNum(log2f(val), 'g', 2);
-                    }
+	    QString avLum;
+            float val;
+            if (!urls.isEmpty())
+            {
+                val = getAverageSceneLuminance(urls[0].toLocalFile());
+                if (val != -1)
+                    avLum.setNum(log2f(val), 'g', 2);
+            }
                     
-                    ActionData ad;
-                    ad.action  = action;
-                    ad.inUrls  = urls;
-                    ad.message = avLum.isEmpty() ? i18n("unknown") : avLum;
-                    ad.success = avLum.isEmpty();
+            ActionData ad;
+            ad.action  = action;
+            ad.inUrls  = urls;
+            ad.message = avLum.isEmpty() ? i18n("unknown") : avLum;
+            ad.success = avLum.isEmpty();
 	
-                    emit finished(ad);
-		    break;
-                }
-                
-                case PREPROCESSING:
-                {
-                    ActionData ad1;
-                    ad1.action   = PREPROCESSING;
-                    ad1.inUrls   = urls;
-                    ad1.starting = true;
-                    emit starting(ad1);
-
-                    ItemUrlsMap preProcessedUrlsMap;
-                    QString     errors;
-
-                    bool result  = startPreProcessing(urls, preProcessedUrlsMap, align, settings, binaryPath, errors);
-
-                    ActionData ad2;
-                    ad2.action              = PREPROCESSING;
-                    ad2.inUrls              = urls;
-                    ad2.preProcessedUrlsMap = preProcessedUrlsMap;
-                    ad2.success             = result;
-                    ad2.message             = errors;
-                    emit finished(ad2);
-                    break;
-                }
+            emit finished(ad);
+	    break;
+        }
 		
-                case LOAD:
-                {
+        case LOAD:
+        {
 		 
-                    ActionData ad1;
-                    ad1.action   = LOAD;
-                    ad1.inUrls   = urls;
-                    ad1.starting = true;
-                    emit starting(ad1);
+            ActionData ad1;
+            ad1.action   = LOAD;
+            ad1.inUrls   = urls;
+            ad1.starting = true;
+            emit starting(ad1);
 
-                    QImage image;
-                    bool result  = image.load(urls[0].toLocalFile());
+            QImage image;
+            bool result  = image.load(urls[0].toLocalFile());
 
-                    // rotate image
-                    if (result)
-                    {
-                        KPMetadata meta(urls[0].toLocalFile());
-                        meta.rotateExifQImage(image, meta.getImageOrientation());
-                    }
-
-                    ActionData ad2;
-                    ad2.action         = LOAD;
-                    ad2.inUrls         = urls;
-                    ad2.success        = result;
-                    ad2.image          = image;
-                    emit finished(ad2);
-                    break;
-                }
-
-                case ENFUSEPREVIEW:
-                {
-                    ActionData ad1;
-                    ad1.action         = ENFUSEPREVIEW;
-                    ad1.inUrls         = urls;
-                    ad1.starting       = true;
-                    ad1.enfuseSettings = enfuseSettings;
-                    emit starting(ad1);
-
-                    QString errors;
-                    KUrl    destUrl         = outputUrl;
-                    EnfuseSettings settings = enfuseSettings;
-                    settings.outputFormat   = KPSaveSettingsWidget::OUTPUT_JPEG;    // JPEG for preview: fast and small.
-                    bool result             = startEnfuse(urls, destUrl, settings, binaryPath, errors);
-
-                    kDebug() << "Preview result was: " << result;
-
-                    // preserve exif information for auto rotation
-                    if (result)
-                    {
-                        KPMetadata metaIn(urls[0].toLocalFile());
-                        KPMetadata metaOut(destUrl.toLocalFile());
-                        metaOut.setImageOrientation(metaIn.getImageOrientation());
-                        metaOut.applyChanges();
-                    }
-
-                    ActionData ad2;
-                    ad2.action         = ENFUSEPREVIEW;
-                    ad2.inUrls         = urls;
-                    ad2.outUrls        = KUrl::List() << destUrl;
-                    ad2.success        = result;
-                    ad2.message        = errors;
-                    ad2.enfuseSettings = enfuseSettings;
-                    emit finished(ad2);
-                    break;
-                }
-
-                case ENFUSEFINAL:
-                {
-                    ActionData ad1;
-                    ad1.action         = ENFUSEFINAL;
-                    ad1.inUrls         = urls;
-                    ad1.starting       = true;
-                    ad1.enfuseSettings = enfuseSettings;
-                    emit starting(ad1);
-
-                    KUrl    destUrl = outputUrl;
-                    bool    result  = false;
-                    QString errors;
-
-                    result = startEnfuse(urls, destUrl, enfuseSettings, binaryPath, errors);
-
-                    // We will take first image metadata from stack to restore Exif, Iptc, and Xmp.
-                    KPMetadata meta;
-                    meta.load(urls[0].toLocalFile());
-                    result = result & meta.setXmpTagString("Xmp.kipi.EnfuseInputFiles", enfuseSettings.inputImagesList(), false);
-                    result = result & meta.setXmpTagString("Xmp.kipi.EnfuseSettings", enfuseSettings.asCommentString().replace('\n', " ; "), false);
-                    meta.setImageDateTime(QDateTime::currentDateTime());
-                    if (enfuseSettings.outputFormat != KPSaveSettingsWidget::OUTPUT_JPEG)
-                    {
-                        QImage img;
-                        if (img.load(destUrl.toLocalFile()))
-                            meta.setImagePreview(img.scaled(1280, 1024, Qt::KeepAspectRatio));
-                    }
-                    meta.save(destUrl.toLocalFile());
-
-                    
-
-                    ActionData ad2;
-                    ad2.action         = ENFUSEFINAL;
-                    ad2.inUrls         = urls;
-                    ad2.outUrls        = KUrl::List() << destUrl;
-                    ad2.success        = result;
-                    ad2.message        = errors;
-                    ad2.enfuseSettings = enfuseSettings;
-                    emit finished(ad2);
-                    break;
-                }
-
-                default:
-                {
-                    qCritical() << "Unknown action specified" << endl;
-                    break;
-                }
-            }
-        }
-    
-}
-
-void GenericTask::cleanAlignTmpDir()
-{
-    if (preprocessingTmpDir)
-    {
-	preprocessingTmpDir->unlink();
-        delete preprocessingTmpDir;
-        preprocessingTmpDir = 0;
-    }
-}
-
-bool GenericTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
-                                      bool align, const RawDecodingSettings& settings,
-                                      const QString& alignPath, QString& errors)
-{
-    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-expoblending-preprocessing-tmp-") +
-                                                       QString::number(QDateTime::currentDateTime().toTime_t()));
-
-    cleanAlignTmpDir();
-
-    preprocessingTmpDir = new KTempDir(prefix);
-
-    volatile bool error = false;
-
-    for (int i = 0; i < inUrls.size(); ++i)
-    {
-
-        if (error)
-        {
-            continue;
-        }
-
-        KUrl url = inUrls.at(i);
-
-        if (KPMetadata::isRawFile(url.toLocalFile()))
-        {
-            KUrl preprocessedUrl, previewUrl;
-
-            if (!convertRaw(url, preprocessedUrl, settings))
+            // rotate image
+            if (result)
             {
-                error = true;
-                continue;
+                KPMetadata meta(urls[0].toLocalFile());
+                meta.rotateExifQImage(image, meta.getImageOrientation());
             }
 
-            if (!computePreview(preprocessedUrl, previewUrl))
-            {
-                error = true;
-                continue;
-            }
-
+            ActionData ad2;
+            ad2.action         = LOAD;
+            ad2.inUrls         = urls;
+            ad2.success        = result;
+            ad2.image          = image;
+            emit finished(ad2);
+            break;
         }
-        else
+              
+        default:
         {
-            // NOTE: in this case, preprocessed Url is original file Url.
-            KUrl previewUrl;
-            if (!computePreview(url, previewUrl))
-            {
-                error = true;
-                continue;
-            }
-	}
-    }
-
-    if (error)
-    {
-        return false;
-    }
-
-    if (align)
-    {
-        // Re-align images
-        alignProcess = new KProcess;
-        alignProcess->clearProgram();
-        alignProcess->setWorkingDirectory(preprocessingTmpDir->name());
-        alignProcess->setOutputChannelMode(KProcess::MergedChannels);
-
-        QStringList args;
-        args << alignPath;
-        args << "-v";
-        args << "-a";
-        args << "aligned";
-
-	foreach(const KUrl& url, inUrls)
-        {
-            args << url.toLocalFile();
+            qCritical() << "Unknown action specified" << endl;
+            break;
         }
-        
-        alignProcess->setProgram(args);
-
-        kDebug() << "Align command line: " << alignProcess->program();
-
-        alignProcess->start();
-
-        if (!alignProcess->waitForFinished(-1))
-        {
-            errors = getProcessError(alignProcess);
-            return false;
-        }
-
-        uint    i=0;
-        QString temp;
-        preProcessedUrlsMap.clear();
-
-        foreach(const KUrl& url, inUrls)
-        {
-            KUrl previewUrl;
-            KUrl alignedUrl = KUrl(preprocessingTmpDir->name() + temp.sprintf("aligned%04i", i) + QString(".tif"));
-            if (!computePreview(alignedUrl, previewUrl))
-                return false;
-            preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(alignedUrl, previewUrl));
-            i++;
-        }
-
-        for (QMap<KUrl, ItemPreprocessedUrls>::const_iterator it = preProcessedUrlsMap.constBegin() ; it != preProcessedUrlsMap.constEnd(); ++it)
-        {
-            kDebug() << "Pre-processed output urls map: " << it.key() << " , "
-                                                          << it.value().preprocessedUrl << " , "
-                                                          << it.value().previewUrl << " ; ";
-        }
-        kDebug() << "Align exit status    : "         << alignProcess->exitStatus();
-        kDebug() << "Align exit code      : "         << alignProcess->exitCode();
-
-        if (alignProcess->exitStatus() != QProcess::NormalExit)
-            return false;
-
-        if (alignProcess->exitCode() == 0)
-        {
-            // Process finished successfully !
-            return true;
-        }
-
-        errors = getProcessError(alignProcess);
-        return false;
-    }
-    else
-    {
-        for (QMap<KUrl, ItemPreprocessedUrls>::const_iterator it = preProcessedUrlsMap.constBegin() ; it != preProcessedUrlsMap.constEnd(); ++it)
-        {
-            kDebug() << "Pre-processed output urls map: " << it.key() << " , "
-                                                          << it.value().preprocessedUrl << " , "
-                                                          << it.value().previewUrl << " ; ";
-        }
-        kDebug() << "Alignment not performed.";
-        return true;
-    }
-}
-
-bool GenericTask::computePreview(const KUrl& inUrl, KUrl& outUrl)
-{
-    outUrl = preprocessingTmpDir->name();
-    QFileInfo fi(inUrl.toLocalFile());
-    outUrl.setFileName(QString(".") + fi.completeBaseName().replace('.', '_') + QString("-preview.jpg"));
-
-    QImage img;
-    if (img.load(inUrl.toLocalFile()))
-    {
-        QImage preview = img.scaled(1280, 1024, Qt::KeepAspectRatio);
-        bool saved     = preview.save(outUrl.toLocalFile(), "JPEG");
-        // save exif information also to preview image for auto rotation
-        if (saved)
-        {
-            KPMetadata metaIn(inUrl.toLocalFile());
-            KPMetadata metaOut(outUrl.toLocalFile());
-            metaOut.setImageOrientation(metaIn.getImageOrientation());
-            metaOut.applyChanges();
-        }
-        kDebug() << "Preview Image url: " << outUrl << ", saved: " << saved;
-        return saved;
-    }
-    return false;
-}
-
-bool GenericTask::convertRaw(const KUrl& inUrl, KUrl& outUrl, const RawDecodingSettings& settings)
-{
-    int        width, height, rgbmax;
-    QByteArray imageData;
-
-    QPointer<KDcraw> rawdec = new KDcraw;
-
-    bool decoded = rawdec->decodeRAWImage(inUrl.toLocalFile(), settings, imageData, width, height, rgbmax);
-
-    if (decoded)
-    {
-        uchar* sptr  = (uchar*)imageData.data();
-        float factor = 65535.0 / rgbmax;
-        unsigned short tmp16[3];
-
-        // Set RGB color components.
-        for (int i = 0 ; !cancel && (i < width * height) ; ++i)
-        {
-            // Swap Red and Blue and re-ajust color component values
-            tmp16[0] = (unsigned short)((sptr[5]*256 + sptr[4]) * factor);      // Blue
-            tmp16[1] = (unsigned short)((sptr[3]*256 + sptr[2]) * factor);      // Green
-            tmp16[2] = (unsigned short)((sptr[1]*256 + sptr[0]) * factor);      // Red
-            memcpy(&sptr[0], &tmp16[0], 6);
-            sptr += 6;
-        }
-
-        KPMetadata meta;
-        meta.load(inUrl.toLocalFile());
-        meta.setImageProgramId(QString("Kipi-plugins"), QString(kipiplugins_version));
-        meta.setImageDimensions(QSize(width, height));
-        meta.setExifTagString("Exif.Image.DocumentName", inUrl.fileName());
-        meta.setXmpTagString("Xmp.tiff.Make",  meta.getExifTagString("Exif.Image.Make"));
-        meta.setXmpTagString("Xmp.tiff.Model", meta.getExifTagString("Exif.Image.Model"));
-        meta.setImageOrientation(KPMetadata::ORIENTATION_NORMAL);
-
-        QByteArray prof = KPWriteImage::getICCProfilFromFile(settings.outputColorSpace);
-
-        KPWriteImage wImageIface;
-        wImageIface.setCancel(&cancel);
-        wImageIface.setImageData(imageData, width, height, true, false, prof, meta);
-        outUrl = preprocessingTmpDir->name();
-        QFileInfo fi(inUrl.toLocalFile());
-        outUrl.setFileName(QString(".") + fi.completeBaseName().replace('.', '_') + QString(".tif"));
-
-        if (!wImageIface.write2TIFF(outUrl.toLocalFile()))
-            return false;
-    }
-    else
-    {
-        return false;
-    }
-
-    kDebug() << "Convert RAW output url: " << outUrl;
-
-    return true;
-}
-
-
-bool GenericTask::startEnfuse(const KUrl::List& inUrls, KUrl& outUrl,
-                               const EnfuseSettings& settings,
-                               const QString& enfusePath, QString& errors)
-{
-    QString comp;
-    QString ext = KPSaveSettingsWidget::extensionForFormat(settings.outputFormat);
-
-    if (ext == QString(".tif"))
-        comp = QString("--compression=DEFLATE");
-
-    outUrl.setFileName(QString(".kipi-expoblending-tmp-") + QString::number(QDateTime::currentDateTime().toTime_t()) + ext);
-
-    enfuseProcess = new KProcess;
-    enfuseProcess->clearProgram();
-    enfuseProcess->setOutputChannelMode(KProcess::MergedChannels);
-    QStringList args;
-    args << enfusePath;
-
-    if (!settings.autoLevels)
-    {
-        args << "-l";
-        args << QString::number(settings.levels);
-    }
-
-    if (settings.ciecam02)
-        args << "-c";
-
-    if (!comp.isEmpty())
-        args << comp;
-
-    if (settings.hardMask)
-    {
-        if (enfuseVersion4x)
-            args << "--hard-mask";
-        else
-            args << "--HardMask";
-    }
-
-    if (enfuseVersion4x)
-    {
-        args << QString("--exposure-weight=%1").arg(settings.exposure);
-        args << QString("--saturation-weight=%1").arg(settings.saturation);
-        args << QString("--contrast-weight=%1").arg(settings.contrast);
-    }
-    else
-    {
-        args << QString("--wExposure=%1").arg(settings.exposure);
-        args << QString("--wSaturation=%1").arg(settings.saturation);
-        args << QString("--wContrast=%1").arg(settings.contrast);
-    }
-
-    args << "-v";
-    args << "-o";
-    args << outUrl.toLocalFile();
-
-    foreach(const KUrl& url, inUrls)
-        args << url.toLocalFile();
-
-    enfuseProcess->setProgram(args);
-
-    kDebug() << "Enfuse command line: " << enfuseProcess->program();
-
-    enfuseProcess->start();
-
-    if (!enfuseProcess->waitForFinished(-1))
-    {
-        errors = getProcessError(enfuseProcess);
-        return false;
-    }
-
-    kDebug() << "Enfuse output url: "  << outUrl;
-    kDebug() << "Enfuse exit status: " << enfuseProcess->exitStatus();
-    kDebug() << "Enfuse exit code:   " << enfuseProcess->exitCode();
-
-    if (enfuseProcess->exitStatus() != QProcess::NormalExit)
-        return false;
-
-    if (enfuseProcess->exitCode() == 0)
-    {
-        // Process finished successfully !
-        return true;
-    }
-
-    errors = getProcessError(enfuseProcess);
-    return false;
+    }     
 }
 
 QString GenericTask::getProcessError(KProcess* const proc) const
@@ -762,7 +310,7 @@ bool GenericTask::getXmpRational(const char* xmpTagName, long& num, long& den, K
             return true;
         }
     }
-
+    successFlag = false;
     return false;
 }
 

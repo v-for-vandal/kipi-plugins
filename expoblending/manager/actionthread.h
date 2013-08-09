@@ -67,13 +67,10 @@ class ActionThread : public RActionThreadBase
 public:
 
     explicit ActionThread(QObject* const parent);
-    //~ActionThread();
+    ~ActionThread();
     
     void setPreProcessingSettings(bool align, const RawDecodingSettings& settings);
     void setEnfuseVersion(const double version);
-    void startPreProcessing(const KUrl::List& inUrls,
-                                      bool align, const RawDecodingSettings& rawSettings,
-                                      const QString& alignPath);
     void loadProcessed(const KUrl& url);
     void identifyFiles(const KUrl::List& urlList);
     void preProcessFiles(const KUrl::List& urlList, const QString& alignPath); 
@@ -81,13 +78,9 @@ public:
                        const EnfuseSettings& settings, const QString& enfusePath);
     void enfuseFinal(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                      const EnfuseSettings& settings, const QString& enfusePath);
-    void startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedMap,
-                                      bool align, const RawDecodingSettings& rawSettings,
-                                      const QString& alignPath, QString& errors);
-
 
     void cancel();
-
+    
     /**
      * Clean up all temporary results produced so far.
      */

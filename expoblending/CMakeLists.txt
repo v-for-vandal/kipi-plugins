@@ -42,6 +42,8 @@ SET(expoblending_common_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/tasks/task.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tasks/preprocesstask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tasks/generictask.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tasks/enfusepreviewtask.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tasks/enfusefinaltask.cpp
    )
 
 # Adjust flag for static lib and 64 bits computers using -fPIC for GCC compiler (B.K.O: #269903)

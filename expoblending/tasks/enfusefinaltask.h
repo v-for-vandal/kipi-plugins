@@ -1,14 +1,16 @@
 /* ============================================================
- *
+ * 
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2009-11-13
+ * Date        : 2013-06-28
  * Description : a plugin to blend bracketed images.
  *
+ * Copyright (C) 2009-2011 by Gilles Caulier <caulier dot gilles at gmail dot com>
+ * Copyright (C) 2009-2011 by Johannes Wienke <languitar at semipol dot de>
  * Copyright (C) 2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
- *
+ * 
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
@@ -21,54 +23,52 @@
  *
  * ============================================================ */
 
-#ifndef PREPROCESSTASK_H
-#define PREPROCESSTASK_H
 
-// Qt includes
-
-#include <QPointer>
+#ifndef ENFUSEFINALTASK_H
+#define ENFUSEFINALTASK_H
 
 // KDE includes
 
-#include <klocale.h>
-#include <kdebug.h>
-#include <kstandarddirs.h>
+#include <threadweaver/Job.h>
+#include <kprocess.h>
 #include <ktempdir.h>
 
 
-#include <threadweaver/Job.h>
-
-// LibKDcraw includes
-
-#include <libkdcraw/kdcraw.h>
-
-// Local includes
-
 #include "task.h"
 
+#include <libkdcraw/kdcraw.h>
+#include <libkdcraw/rawdecodingsettings.h>
+
+//Local includes
+#include "enfusesettings.h"
+#include "actions.h"
+#include "kpmetadata.h"
+
+
+using namespace KIPIPlugins;
 using namespace KDcrawIface;
 
 namespace KIPIExpoBlendingPlugin
 {
 
-class PreProcessTask : public Task
+class EnfuseFinalTask : public Task
 {
-    Q_OBJECT
-         
+  
+   Q_OBJECT
+   
+    
 public:
-   
+
     KUrl::List          		urls;
-    const RawDecodingSettings   	settings;
-   
-    bool 				align;
+    KUrl                		outputUrl;
+    EnfuseSettings      		enfuseSettings;
     QString             		binaryPath;
-    bool 				cancel;
+    bool 				enfuseVersion4x;
     
     KProcess*           		enfuseProcess;
-    KProcess*           		alignProcess;
     
     KTempDir*                        	preprocessingTmpDir;
-   
+
 protected:
 
     bool         successFlag;
@@ -76,33 +76,32 @@ protected:
     const KUrl   tmpDir;
 
 public:
+    EnfuseFinalTask(QObject* const parent, const KUrl::List& fileUrl, const KUrl& outputUrl,
+			         const EnfuseSettings& settings, const QString& alignPath, bool version);
+    EnfuseFinalTask(const KUrl::List& fileUrl, const KUrl& outputUrl,
+			         const EnfuseSettings& settings, const QString& alignPath, bool version);
 
-    PreProcessTask(QObject* const parent, const KUrl::List& inUrls, 
-		   const RawDecodingSettings& rawSettings, const bool align,
-	           const QString& alignPath);
-    PreProcessTask(const KUrl::List& inUrls, const RawDecodingSettings& rawSettings, 
-		   const bool align, const QString& alignPath);   
-    ~PreProcessTask();
+    ~EnfuseFinalTask();
+
+    void setEnfuseVersion(const double version);
+    bool startEnfuse(const KUrl::List& inUrls, KUrl& outUrl,
+                               const EnfuseSettings& settings,
+                               const QString& enfusePath, QString& errors);
     
-    bool startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
-                                      bool align, const RawDecodingSettings& settings,
-                                      const QString& alignPath, QString& errors);
-    void cleanAlignTmpDir();
-    bool computePreview(const KUrl& inUrl, KUrl& outUrl);
-    bool convertRaw(const KUrl& inUrl, KUrl& outUrl, const RawDecodingSettings& settings);
-    QString getProcessError(KProcess* const proc) const;
 
 Q_SIGNALS:
 
     void starting(const KIPIExpoBlendingPlugin::ActionData& ad);
     void finished(const KIPIExpoBlendingPlugin::ActionData& ad);
 
+
 protected:
 
-    void run();
-    
+    void run() ;
+    QString getProcessError(KProcess* const proc) const;
+        
 };
 
 }  // namespace KIPIExpoBlendingPlugin
 
-#endif /* PREPROCESSTASK_H */
+#endif /* ENFUSEFINALTASK_H */

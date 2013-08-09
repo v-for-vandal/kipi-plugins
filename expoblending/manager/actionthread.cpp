@@ -79,7 +79,6 @@ class ActionThread::ActionThreadPriv
 public:
 
     ActionThreadPriv()
-        : preprocessingTmpDir(0)
     {
         align               = true;
         cancel              = false;
@@ -95,31 +94,7 @@ public:
     
     KTempDir*                        preprocessingTmpDir;
 
-  
-    /**
-     * List of results files produced by enfuse that may need cleaning.
-     * Only access this through the provided mutex.
-     */
-    KUrl::List                       enfuseTmpUrls;
     KUrl::List                       urls;
-    QMutex                           enfuseTmpUrlsMutex;
-    QMutex 			     mutex;
-    QWaitCondition                   condVar;
-
-    QList<Task*>                     todo;
-
-    KProcess*                        enfuseProcess;
-    KProcess*                        alignProcess;
-   
-    void cleanPreprocessingTmpDir()
-    {
-        if (preprocessingTmpDir)
-        {
-            preprocessingTmpDir->unlink();
-            delete preprocessingTmpDir;
-            preprocessingTmpDir = 0;
-        }
-    }
     
     void cleanAlignTmpDir()
     {
@@ -139,7 +114,7 @@ ActionThread::ActionThread(QObject* const parent)
 {
     qRegisterMetaType<ActionData>();
 }    
-/*
+
 ActionThread::~ActionThread()
 {
 
@@ -153,13 +128,16 @@ ActionThread::~ActionThread()
     
     kDebug() << "Thread finished";
 
-    d->cleanAlignTmpDir();
-
-    cleanUpResultFiles();         
+    d->cleanAlignTmpDir();        
 
     delete d;
 }
-*/
+
+void ActionThread::cleanUpResultFiles()
+{
+    
+}
+
 void ActionThread::setEnfuseVersion(const double version)
 {
     d->enfuseVersion4x = (version >= 4.0);
@@ -202,7 +180,7 @@ void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& ali
     JobCollection* const jobs = new JobCollection();
     d->urls = urlList;
     
-    GenericTask* const t = new GenericTask(this, d->urls, PREPROCESSING, d->rawDecodingSettings, d->align, alignPath);
+    PreProcessTask* const t = new PreProcessTask(this, d->urls, d->rawDecodingSettings, d->align, alignPath);
 
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
 	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
@@ -253,11 +231,13 @@ void ActionThread::enfusePreview(const KUrl::List& alignedUrls, const KUrl& outp
   
     JobCollection   *jobs  = new JobCollection();
    
-    GenericTask* const t = new GenericTask(this, alignedUrls, ENFUSEPREVIEW,
-					   outputUrl, settings, enfusePath, d->enfuseVersion4x); 
+    EnfusePreviewTask* const t = new EnfusePreviewTask(this, alignedUrls,outputUrl, 
+						       settings, enfusePath, d->enfuseVersion4x); 
      
-
     
+    connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
+
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
   
@@ -269,7 +249,6 @@ void ActionThread::enfusePreview(const KUrl::List& alignedUrls, const KUrl& outp
    
     
     jobs->addJob(t);
-
     appendJob(jobs);
 }
 
@@ -279,8 +258,8 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
   
     JobCollection   *jobs  = new JobCollection();
     
-    GenericTask* const t = new GenericTask(this, alignedUrls, ENFUSEFINAL,
-					   outputUrl, settings, enfusePath, d->enfuseVersion4x); 
+    EnfuseFinalTask* const t = new EnfuseFinalTask(this, alignedUrls, outputUrl, 
+						   settings, enfusePath, d->enfuseVersion4x); 
     
     connect(t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
             this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
@@ -296,7 +275,6 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
    
     
     jobs->addJob(t);
-
     appendJob(jobs);
    
 }
@@ -346,30 +324,7 @@ void ActionThread::slotDone(Job* j)
 
 void ActionThread::cancel()
 {
-    QMutexLocker lock(&d->mutex);
-    d->todo.clear();
-    d->cancel = true;
-
-    if (d->enfuseProcess)
-        d->enfuseProcess->kill();
-
-    if (d->alignProcess)
-        d->alignProcess->kill();
-
-    
-    d->condVar.wakeAll();
-}
-
-void ActionThread::cleanUpResultFiles()
-{
-    // Cleanup all tmp files created by Enfuse process.
-    QMutexLocker(&d->enfuseTmpUrlsMutex);
-    foreach(const KUrl& url, d->enfuseTmpUrls)
-    {
-        kDebug() << "Removing temp file " << url.toLocalFile();
-        KTempDir::removeDir(url.toLocalFile());
-    }
-    d->enfuseTmpUrls.clear();
+    d->cancel = true;  
 }
 
 
