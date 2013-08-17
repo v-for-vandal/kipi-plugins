@@ -52,11 +52,14 @@
 #include "xmpkeywords.h"
 #include "xmporigin.h"
 #include "xmpproperties.h"
+#include "xmpvideospecs.h"
 #include "xmpstatus.h"
 #include "xmpsubjects.h"
 #include "kpimageinfo.h"
 #include "kphostsettings.h"
 #include "kpmetadata.h"
+#include <iostream>
+using namespace std;
 
 using namespace KIPIPlugins;
 
@@ -74,6 +77,7 @@ public:
         isReadOnly      = false;
         page_content    = 0;
         page_properties = 0;
+	page_videospecs = 0;
         page_subjects   = 0;
         page_keywords   = 0;
         page_categories = 0;
@@ -88,6 +92,7 @@ public:
         creditsPage     = 0;
         statusPage      = 0;
         propertiesPage  = 0;
+	videospecsPage  = 0;
         dlg             = 0;
     }
 
@@ -106,6 +111,7 @@ public:
     KPageWidgetItem*     page_credits;
     KPageWidgetItem*     page_status;
     KPageWidgetItem*     page_properties;
+    KPageWidgetItem*     page_videospecs;
 
     KUrl::List           urls;
 
@@ -119,6 +125,7 @@ public:
     XMPCredits*          creditsPage;
     XMPStatus*           statusPage;
     XMPProperties*       propertiesPage;
+    XMPVideospecs*       videospecsPage;
 
     MetadataEditDialog*  dlg;
 };
@@ -175,6 +182,12 @@ XMPEditWidget::XMPEditWidget(MetadataEditDialog* const parent)
     d->page_properties->setHeader(i18n("<qt>Status Properties<br/>"
                       "<i>Use this panel to record workflow properties</i></qt>"));
     d->page_properties->setIcon(KIcon("draw-freehand"));
+    
+    d->videospecsPage  = new XMPVideospecs(this);
+    d->page_videospecs = addPage(d->videospecsPage, i18n("Videospecs"));
+    d->page_videospecs->setHeader(i18n("<qt>Status Properties<br/>"
+                      "<i>Use this panel to record workflow properties</i></qt>"));
+    d->page_videospecs->setIcon(KIcon("video-x-generic"));    
 
     // ------------------------------------------------------------
 
@@ -224,7 +237,6 @@ void XMPEditWidget::readSettings()
     d->contentPage->setCheckedSyncEXIFComment(group.readEntry("All Sync EXIF Comment", true));
     d->originPage->setCheckedSyncHOSTDate(group.readEntry("All Sync Host Date", true));
     d->originPage->setCheckedSyncEXIFDate(group.readEntry("All Sync EXIF Date", true));
-
     KConfigGroup group2 = config.group(QString("All XMP Edit Dialog"));
 }
 

@@ -96,7 +96,7 @@ void Plugin_GPSSync::setupActions()
     setDefaultCategory(ImagesPlugin);
 
     m_action_geolocation = new KAction(this);
-    m_action_geolocation->setText(i18n("Geo-location"));
+    m_action_geolocation->setText(i18n("Geo-location.."));
     m_action_geolocation->setIcon(KIcon("applications-internet"));
     m_action_geolocation->setEnabled(false);
 
