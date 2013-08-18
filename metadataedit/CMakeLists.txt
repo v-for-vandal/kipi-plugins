@@ -39,6 +39,8 @@ SET(kipiplugin_metadataedit_PART_SRCS plugin/plugin_metadataedit.cpp
                                       xmp/xmpcredits.cpp
                                       xmp/xmpstatus.cpp
                                       xmp/xmpproperties.cpp
+                                      xmp/xmpvideospecs.cpp
+                                      xmp/xmpaudiospecs.cpp
    )
 
 KDE4_ADD_PLUGIN(kipiplugin_metadataedit ${kipiplugin_metadataedit_PART_SRCS})

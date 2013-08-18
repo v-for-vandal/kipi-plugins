@@ -53,6 +53,7 @@
 #include "xmporigin.h"
 #include "xmpproperties.h"
 #include "xmpvideospecs.h"
+#include "xmpaudiospecs.h"
 #include "xmpstatus.h"
 #include "xmpsubjects.h"
 #include "kpimageinfo.h"
@@ -77,7 +78,8 @@ public:
         isReadOnly      = false;
         page_content    = 0;
         page_properties = 0;
-	page_videospecs = 0;
+        page_videospecs = 0;
+        page_audiospecs = 0;
         page_subjects   = 0;
         page_keywords   = 0;
         page_categories = 0;
@@ -92,7 +94,8 @@ public:
         creditsPage     = 0;
         statusPage      = 0;
         propertiesPage  = 0;
-	videospecsPage  = 0;
+        videospecsPage  = 0;
+        audiospecsPage  = 0;
         dlg             = 0;
     }
 
@@ -112,6 +115,7 @@ public:
     KPageWidgetItem*     page_status;
     KPageWidgetItem*     page_properties;
     KPageWidgetItem*     page_videospecs;
+    KPageWidgetItem*     page_audiospecs;
 
     KUrl::List           urls;
 
@@ -126,6 +130,7 @@ public:
     XMPStatus*           statusPage;
     XMPProperties*       propertiesPage;
     XMPVideospecs*       videospecsPage;
+    XMPAudiospecs*       audiospecsPage;
 
     MetadataEditDialog*  dlg;
 };
@@ -185,9 +190,15 @@ XMPEditWidget::XMPEditWidget(MetadataEditDialog* const parent)
     
     d->videospecsPage  = new XMPVideospecs(this);
     d->page_videospecs = addPage(d->videospecsPage, i18n("Videospecs"));
-    d->page_videospecs->setHeader(i18n("<qt>Status Properties<br/>"
-                      "<i>Use this panel to record workflow properties</i></qt>"));
-    d->page_videospecs->setIcon(KIcon("video-x-generic"));    
+    d->page_videospecs->setHeader(i18n("<qt>Video Information<br/>"
+                      "<i>Use this panel to record Video specifications</i></qt>"));
+    d->page_videospecs->setIcon(KIcon("video-x-generic")); 
+    
+    d->audiospecsPage  = new XMPAudiospecs(this);
+    d->page_audiospecs = addPage(d->audiospecsPage, i18n("Audiospecs"));
+    d->page_audiospecs->setHeader(i18n("<qt>Audio Information<br/>"
+                      "<i>Use this panel to record Audio specifications</i></qt>"));
+    d->page_audiospecs->setIcon(KIcon("audio-x-generic"));
 
     // ------------------------------------------------------------
 
