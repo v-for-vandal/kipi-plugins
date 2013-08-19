@@ -121,13 +121,6 @@ ActionThread::~ActionThread()
     kDebug() << "ActionThread shutting down."
              << "Canceling all actions and waiting for them";
 
-    //cancel the thread
-    cancel();
-    //wait for the thread to finish
-    wait();
-    
-    kDebug() << "Thread finished";
-
     d->cleanAlignTmpDir();        
 
     delete d;
@@ -149,7 +142,7 @@ void ActionThread::setPreProcessingSettings(bool align, const RawDecodingSetting
     d->rawDecodingSettings = settings;
 }
 
-void ActionThread::identifyFiles(const KUrl::List& urlList)
+void ActionThread::identifyFiles(const KUrl::List& urlList, QString& value, KUrl& outUrl)
 {
     JobCollection* const jobs = new JobCollection();
     
@@ -158,8 +151,8 @@ void ActionThread::identifyFiles(const KUrl::List& urlList)
         d->urls.clear();
 	d->urls.append(url);
 	
-        GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY);
-
+        GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY, value, outUrl);
+	
 	connect(t, SIGNAL(started(ThreadWeaver::Job*)),
                 this, SLOT(slotStarting(ThreadWeaver::Job*)));
  
@@ -170,6 +163,7 @@ void ActionThread::identifyFiles(const KUrl::List& urlList)
                 this, SLOT(slotStepDone(ThreadWeaver::Job*)));
       
         jobs->addJob(t);
+	
     }
     appendJob(jobs);
     

@@ -46,6 +46,7 @@ extern "C"
 #include <QGridLayout>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QString>
 
 // KDE includes
 
@@ -64,6 +65,7 @@ extern "C"
 #include <kfiledialog.h>
 #include <kio/renamedialog.h>
 #include <kde_file.h>
+#include <kurl.h>
 
 // LibKIPI includes
 
@@ -129,6 +131,9 @@ public:
     Manager*              mngr;
 
     bool                  firstImageDisplayed;
+    
+    QString       value;
+    KUrl          outUrl;
 };
 
 ExpoBlendingDlg::ExpoBlendingDlg(Manager* const mngr, QWidget* const parent)
@@ -298,7 +303,7 @@ void ExpoBlendingDlg::slotAddItems(const KUrl::List& urls)
 {
     if (!urls.empty())
     {
-        d->mngr->thread()->identifyFiles(urls);
+        d->mngr->thread()->identifyFiles(urls, d->value, d->outUrl);
         if (!d->mngr->thread()->isRunning())
             d->mngr->thread()->start();
     }

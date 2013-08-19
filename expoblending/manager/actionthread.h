@@ -36,6 +36,7 @@
 #include <kprocess.h>
 
 #include <threadweaver/ThreadWeaver.h>
+
 #include <threadweaver/JobCollection.h>
 #include <threadweaver/DependencyPolicy.h>
 
@@ -72,7 +73,7 @@ public:
     void setPreProcessingSettings(bool align, const RawDecodingSettings& settings);
     void setEnfuseVersion(const double version);
     void loadProcessed(const KUrl& url);
-    void identifyFiles(const KUrl::List& urlList);
+    void identifyFiles(const KUrl::List& urlList, QString& value, KUrl& outUrl);
     void preProcessFiles(const KUrl::List& urlList, const QString& alignPath); 
     void enfusePreview(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                        const EnfuseSettings& settings, const QString& enfusePath);

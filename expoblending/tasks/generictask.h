@@ -58,6 +58,8 @@ public:
     
     KUrl::List          		urls;
     Action              		action;
+    QString*                            message;
+    KUrl*                               inUrl;
   
 protected:
 
@@ -68,6 +70,8 @@ protected:
 public:
 
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action);
+    GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
+			 QString& value, KUrl& outUrl);
     ~GenericTask();
 
     void setEnfuseVersion(const double version);
