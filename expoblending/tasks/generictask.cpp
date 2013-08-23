@@ -69,12 +69,9 @@ GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const
 {}
 
 GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
-			 QString& value, KUrl& outUrl)
-    : Task(parent, action, fileUrl), urls(fileUrl), action(action), message(&value), inUrl(&outUrl)
-{
-  message = new QString();
-  inUrl = new KUrl();
-}
+			 EvValueUrls& targetUrls)
+    : Task(parent, action, fileUrl), urls(fileUrl), action(action), exposureValuesUrl(&targetUrls)
+{}
   
 GenericTask::~GenericTask()
 {}
@@ -103,9 +100,9 @@ void GenericTask::run()
             ad.message = avLum.isEmpty() ? i18n("unknown") : avLum;
             ad.success = avLum.isEmpty();
 	
-	    *message = avLum.isEmpty() ? i18n("unknown") : avLum;
-	    *inUrl = urls[0];
-	   
+	    exposureValuesUrl->outputUrl = urls[0];
+	    exposureValuesUrl->exposure_value = avLum.isEmpty() ? i18n("unknown") : avLum;
+	    
             emit finished(ad);
 	    break;
         }

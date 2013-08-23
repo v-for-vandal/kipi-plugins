@@ -56,10 +56,9 @@ class GenericTask : public Task
    
 public:
     
-    KUrl::List          		urls;
-    Action              		action;
-    QString*                            message;
-    KUrl*                               inUrl;
+    KUrl::List        urls;
+    Action            action;
+    EvValueUrls*      exposureValuesUrl;
   
 protected:
 
@@ -71,7 +70,7 @@ public:
 
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action);
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
-			 QString& value, KUrl& outUrl);
+			 EvValueUrls& targetUrls);
     ~GenericTask();
 
     void setEnfuseVersion(const double version);

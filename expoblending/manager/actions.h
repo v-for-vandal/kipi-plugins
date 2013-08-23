@@ -69,7 +69,24 @@ public:
     KUrl previewUrl;                   // The JPEG preview version, accordingly of preprocessedUrl constent.
 };
 
+struct EvValueUrls
+{
+  EvValueUrls() {};
+  EvValueUrls(const KUrl& outUrl, const QString& message)
+  {
+      outputUrl = outUrl;
+      exposure_value = message;
+  };
+  
+  virtual ~EvValueUrls() {};
+  
+  KUrl        outputUrl;
+  QString     exposure_value;
+  
+};  
+  
 typedef QMap<KUrl, ItemPreprocessedUrls> ItemUrlsMap;   // Map between original Url and processed temp Urls.
+typedef QMap<KUrl, EvValueUrls> EvUrlsMap;   // Map between original Url and EV processed Urls.
 
 class ActionData
 {

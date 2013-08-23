@@ -66,8 +66,7 @@ public:
 
     Manager*      mngr;
     
-    QString       value;
-    KUrl          outUrl;
+    EvUrlsMap     exposureValues;
 };
 
 ItemsPage::ItemsPage(Manager* const mngr, KAssistantDialog* const dlg)
@@ -123,7 +122,7 @@ void ItemsPage::slotAddItems(const KUrl::List& urls)
 {
     if (!urls.empty())
     {
-        d->mngr->thread()->identifyFiles(urls, d->value, d->outUrl);
+        d->mngr->thread()->identifyFiles(urls, d->mngr->exposureValuesMap());
         if (!d->mngr->thread()->isRunning())
             d->mngr->thread()->start();
     }
@@ -157,9 +156,8 @@ void ItemsPage::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
         switch (ad.action)
         {
             case(IDENTIFY):
-            {
-	        //qDebug()<<"Hello"<<d->outUrl<<d->value;
-                setIdentity(d->outUrl, d->value);
+	    {
+                //setIdentity(d->mngr->exposureValuesMap[ad.inUrls[0]]->outputUrl, d->exposureValues->exposure_value);
                 break;
             }
             default:

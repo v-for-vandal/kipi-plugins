@@ -57,6 +57,8 @@ public:
     KUrl::List             inputUrls;
 
     ItemUrlsMap            preProcessedUrlsMap;
+    
+    EvUrlsMap              exposureValuesUrlsMap;
 
     RawDecodingSettings    rawDecodingSettings;
 
@@ -150,9 +152,19 @@ void Manager::setPreProcessedMap(const ItemUrlsMap& urls)
     d->preProcessedUrlsMap = urls;
 }
 
+void Manager::setExposureValuesMap(const EvUrlsMap& urls)
+{
+    d->exposureValuesUrlsMap = urls;
+}
+
 ItemUrlsMap Manager::preProcessedMap() const
 {
     return d->preProcessedUrlsMap;
+}
+
+EvUrlsMap& Manager::exposureValuesMap() const
+{
+    return d->exposureValuesUrlsMap;
 }
 
 ActionThread* Manager::thread() const

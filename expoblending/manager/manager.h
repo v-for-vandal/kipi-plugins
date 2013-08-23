@@ -78,7 +78,9 @@ public:
     RawDecodingSettings rawDecodingSettings() const;
 
     void setPreProcessedMap(const ItemUrlsMap& urls);
+    void setExposureValuesMap(const EvUrlsMap& urls);
     ItemUrlsMap preProcessedMap() const;
+    EvUrlsMap& exposureValuesMap() const;
 
     ActionThread* thread() const;
     AlignBinary&  alignBinary() const;

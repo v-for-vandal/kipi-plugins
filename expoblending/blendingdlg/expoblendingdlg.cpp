@@ -132,8 +132,6 @@ public:
 
     bool                  firstImageDisplayed;
     
-    QString       value;
-    KUrl          outUrl;
 };
 
 ExpoBlendingDlg::ExpoBlendingDlg(Manager* const mngr, QWidget* const parent)
@@ -303,7 +301,7 @@ void ExpoBlendingDlg::slotAddItems(const KUrl::List& urls)
 {
     if (!urls.empty())
     {
-        d->mngr->thread()->identifyFiles(urls, d->value, d->outUrl);
+        d->mngr->thread()->identifyFiles(urls, d->mngr->exposureValuesMap());
         if (!d->mngr->thread()->isRunning())
             d->mngr->thread()->start();
     }

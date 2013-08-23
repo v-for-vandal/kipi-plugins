@@ -142,7 +142,7 @@ void ActionThread::setPreProcessingSettings(bool align, const RawDecodingSetting
     d->rawDecodingSettings = settings;
 }
 
-void ActionThread::identifyFiles(const KUrl::List& urlList, QString& value, KUrl& outUrl)
+void ActionThread::identifyFiles(const KUrl::List& urlList, EvUrlsMap& exposureValuesMap)
 {
     JobCollection* const jobs = new JobCollection();
     
@@ -151,7 +151,9 @@ void ActionThread::identifyFiles(const KUrl::List& urlList, QString& value, KUrl
         d->urls.clear();
 	d->urls.append(url);
 	
-        GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY, value, outUrl);
+	exposureValuesMap.insert(url, EvValueUrls());
+	
+        GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY, exposureValuesMap[url]);
 	
 	connect(t, SIGNAL(started(ThreadWeaver::Job*)),
                 this, SLOT(slotStarting(ThreadWeaver::Job*)));
