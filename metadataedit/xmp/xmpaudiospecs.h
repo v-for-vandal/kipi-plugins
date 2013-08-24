@@ -27,6 +27,7 @@
 
 #include <QWidget>
 #include <QByteArray>
+#include <QGridLayout>
 
 namespace KIPIMetadataEditPlugin
 {
@@ -42,6 +43,9 @@ public:
 
     void applyMetadata(QByteArray& xmpData);
     void readMetadata(QByteArray& xmpData);
+    
+public:
+    QGridLayout* grid;
 
 Q_SIGNALS:
 

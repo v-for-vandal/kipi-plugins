@@ -27,7 +27,7 @@
 
 #include <QCheckBox>
 #include <QPushButton>
-#include <QGridLayout>
+
 
 // KDE includes
 
@@ -45,6 +45,9 @@
 // LibKDcraw includes
 
 #include <libkdcraw/squeezedcombobox.h>
+
+// libkexiv2 includes
+#include <libkexiv2/standardvideotags.h>
 
 // Local includes
 
@@ -67,35 +70,37 @@ public:
 
     XMPAudiospecsPriv()
     {
-        codecCB             = 0;
+        sampleRateCheck     = 0;
+        compressorCheck     = 0;
+        
+        sampleRateLE        = 0;
+        compressorLE        = 0;
         compressorCB        = 0;
+
+        lastposition  = 0;
     }
-    QCheckBox*       codecCheck;
+    QCheckBox*       sampleRateCheck;
     QCheckBox*       compressorCheck;
     
+    KLineEdit*       sampleRateLE;
+    KLineEdit*       compressorLE;
     KComboBox*       compressorCB;
-    KComboBox*       codecCB;
+    
+    int lastposition;
 };
 
 XMPAudiospecs::XMPAudiospecs(QWidget* const parent)
     : QWidget(parent), d(new XMPAudiospecsPriv)
 {
-    QGridLayout* grid = new QGridLayout(this);
+    grid = new QGridLayout(this);
  
-    d->codecCheck = new QCheckBox(i18n("Codec:"));
-    d->codecCB = new KComboBox(this);
-    d->compressorCheck = new QCheckBox(i18n("Compressor:"));
-    d->compressorCB = new KComboBox(this);
+    d->sampleRateCheck = new QCheckBox(i18n("SampleRate:"));
+    d->sampleRateLE = new KLineEdit(this);
     
-    grid->addWidget(d->codecCheck,                        1, 0, 1, 1);
-    grid->addWidget(d->codecCB,                           1, 1, 1, 2);
-    grid->addWidget(d->compressorCheck,                   2, 0, 1, 1);
-    grid->addWidget(d->compressorCB,                      2, 1, 1, 2);
-    
-    grid->setRowStretch(5, 10);
-    grid->setColumnStretch(2, 10);
-    grid->setMargin(0);
-    grid->setSpacing(KDialog::spacingHint());
+    grid->addWidget(d->sampleRateCheck,                   1, 0, 1, 1);
+    grid->addWidget(d->sampleRateLE,                      1, 1, 1, 2);
+                       //                                 ^
+    d->lastposition = 1;  //...............................
 }
 
 XMPAudiospecs::~XMPAudiospecs()
@@ -105,10 +110,49 @@ XMPAudiospecs::~XMPAudiospecs()
 
 void XMPAudiospecs::readMetadata(QByteArray& xmpData)
 {
+    
+    blockSignals(true);
+    KPMetadata meta;
+    meta.setXmp(xmpData);
+    QString data = meta.getXmpTagString("Xmp.audio.SampleRate", false);
+    if (!data.isNull())
+    {
+        d->sampleRateLE->setText(data);
+    }    
+    
+    StandardVideotags *videoTags = new StandardVideotags();
+    data = meta.getXmpTagString("Xmp.video.MimeType", false);
+    if(data == "video/riff")
+    {
+        d->compressorCB = new KComboBox(this);
+        videoTags->setRiffEncodVals(d->compressorCB);
+        d->compressorCheck = new QCheckBox(i18n("Compressor:"));
+        grid->addWidget(d->compressorCheck,       d->lastposition+1,0,1,1);
+        grid->addWidget(d->compressorCB,          d->lastposition+1,1,1,2);   
+    }
+    else if(data == "video/quicktime")
+    {
+        data = meta.getXmpTagString("Xmp.audio.Compressor", false);
+        if (!data.isNull())
+        {
+            d->compressorLE = new KLineEdit(this);
+            d->compressorLE->setText(data);
+            d->compressorCheck = new QCheckBox(i18n("Compressor:"));
+            grid->addWidget(d->compressorCheck,       d->lastposition+1,0,1,1);
+            grid->addWidget(d->compressorLE,          d->lastposition+1,1,1,1);
+        }    
+    }
+    grid->setRowStretch(5, 10);
+    grid->setColumnStretch(2, 10);
+    grid->setMargin(0);
+    grid->setSpacing(KDialog::spacingHint()); 
+    blockSignals(false);
 }
 
 void XMPAudiospecs::applyMetadata(QByteArray& xmpData)
 {
+    KPMetadata meta;
+    meta.setXmp(xmpData);
 }
 
 }  // namespace KIPIMetadataEditPlugin

@@ -289,6 +289,8 @@ void XMPEditWidget::slotItemChanged()
     d->creditsPage->readMetadata(d->xmpData);
     d->statusPage->readMetadata(d->xmpData);
     d->propertiesPage->readMetadata(d->xmpData);
+    d->videospecsPage->readMetadata(d->xmpData);
+    d->audiospecsPage->readMetadata(d->xmpData);
 
     d->isReadOnly = !KPMetadata::canWriteXmp((*d->dlg->currentItem()).path());
     emit signalSetReadOnly(d->isReadOnly);
@@ -301,7 +303,8 @@ void XMPEditWidget::slotItemChanged()
     d->page_credits->setEnabled(!d->isReadOnly);
     d->page_status->setEnabled(!d->isReadOnly);
     d->page_properties->setEnabled(!d->isReadOnly);
-
+    d->page_videospecs->setEnabled(!d->isReadOnly);
+    d->page_audiospecs->setEnabled(!d->isReadOnly);
 }
 
 void XMPEditWidget::apply()
@@ -377,6 +380,12 @@ void XMPEditWidget::showPage(int page)
         case 7:
             setCurrentPage(d->page_properties);
             break;
+        case 8:
+            setCurrentPage(d->page_videospecs);
+            break;
+        case 9:
+            setCurrentPage(d->page_audiospecs);
+            break;
         default:
             setCurrentPage(d->page_content);
             break;
@@ -395,7 +404,9 @@ int XMPEditWidget::activePageIndex() const
     if (cur == d->page_categories) return 5;
     if (cur == d->page_status)     return 6;
     if (cur == d->page_properties) return 7;
-
+    if (cur == d->page_videospecs) return 8;
+    if (cur == d->page_videospecs) return 9;
+    
     return 0;
 }
 

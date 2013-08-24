@@ -27,7 +27,6 @@
 
 #include <QCheckBox>
 #include <QPushButton>
-#include <QGridLayout>
 
 // KDE includes
 
@@ -42,9 +41,8 @@
 #include <kdebug.h>
 #include <kconfiggroup.h>
 
-// LibKDcraw includes
-
-#include <libkdcraw/squeezedcombobox.h>
+// libkexiv2 includes
+#include <libkexiv2/standardvideotags.h>
 
 // Local includes
 
@@ -56,7 +54,6 @@
 #include "kpmetadata.h"
 
 using namespace KIPIPlugins;
-using namespace KDcrawIface;
 
 namespace KIPIMetadataEditPlugin
 {
@@ -68,43 +65,60 @@ public:
     XMPVideospecsPriv()
     {
         frameRateLE         = 0;
-        codecCB             = 0;
-        compressorCB        = 0;
+        codecLE             = 0;
+         
+        //FileType specific data
+        qTimeLangCB         = 0;
+
+        lastPosition        = 0;
     }
+    
     QCheckBox*       frameRateCheck;
     QCheckBox*       codecCheck;
+    QCheckBox*       qTimeLangCheck;
     QCheckBox*       compressorCheck;
+    QCheckBox*       heightCheck;
+    QCheckBox*       widthCheck;
     
-    KComboBox*       compressorCB;
-    KComboBox*       codecCB;
-
+    KComboBox*       qTimeLangCB;
+    
     KLineEdit*       frameRateLE;
+    KLineEdit*       codecLE;
+    KLineEdit*       compressorLE;
+    KLineEdit*       heightLE;
+    KLineEdit*       widthLE;
+    
+    int lastPosition;
 };
 
 XMPVideospecs::XMPVideospecs(QWidget* const parent)
     : QWidget(parent), d(new XMPVideospecsPriv)
 {
-    QGridLayout* grid = new QGridLayout(this);
- 
+    grid = new QGridLayout(this);
     d->frameRateCheck = new QCheckBox(i18n("FrameRate:"));
-    d->frameRateLE  = new KLineEdit(this);
     d->codecCheck = new QCheckBox(i18n("Codec:"));
-    d->codecCB = new KComboBox(this);
     d->compressorCheck = new QCheckBox(i18n("Compressor:"));
-    d->compressorCB = new KComboBox(this);
-    d->frameRateLE->setWhatsThis(i18n("Enter here the content synopsis."));
+    d->heightCheck = new QCheckBox(i18n("Height:"));
+    d->widthCheck = new QCheckBox(i18n("Width:"));
+    
+    d->frameRateLE  = new KLineEdit(this); 
+    d->codecLE = new KLineEdit(this);
+    d->compressorLE = new KLineEdit(this);
+    d->heightLE = new KLineEdit(this);
+    d->widthLE = new KLineEdit(this);
     
     grid->addWidget(d->frameRateCheck,                    0, 0, 1, 1);
     grid->addWidget(d->frameRateLE,                       0, 1, 1, 2);
     grid->addWidget(d->codecCheck,                        1, 0, 1, 1);
-    grid->addWidget(d->codecCB,                           1, 1, 1, 2);
+    grid->addWidget(d->codecLE,                           1, 1, 1, 2);
     grid->addWidget(d->compressorCheck,                   2, 0, 1, 1);
-    grid->addWidget(d->compressorCB,                      2, 1, 1, 2);
-    
-    grid->setRowStretch(5, 10);
-    grid->setColumnStretch(2, 10);
-    grid->setMargin(0);
-    grid->setSpacing(KDialog::spacingHint());
+    grid->addWidget(d->compressorLE,                      2, 1, 1, 2);
+    grid->addWidget(d->heightCheck,                       3, 0, 1, 1);
+    grid->addWidget(d->heightLE,                          3, 1, 1, 1);
+    grid->addWidget(d->widthCheck,                        3, 3, 1, 1);
+    grid->addWidget(d->widthLE,                           3, 4, 1, 1);
+                     //                                   ^  
+    d->lastPosition = 3;//.................................   
 }
 
 XMPVideospecs::~XMPVideospecs()
@@ -114,6 +128,59 @@ XMPVideospecs::~XMPVideospecs()
 
 void XMPVideospecs::readMetadata(QByteArray& xmpData)
 {
+    blockSignals(true);
+    KPMetadata meta;
+    meta.setXmp(xmpData);
+    
+    //Show generic metadata which exist in all video types
+    QString data = meta.getXmpTagString("Xmp.video.FrameRate", false);
+    if (!data.isNull())
+    {
+        d->frameRateLE->setText(data);
+    }
+    data = meta.getXmpTagString("Xmp.video.Codec", false);
+    if (!data.isNull())
+    {
+        d->codecLE->setText(data);
+    }
+    data = meta.getXmpTagString("Xmp.video.Compressor", false);
+    if (!data.isNull())
+    {
+        d->compressorLE->setText(data);
+    }
+    data = meta.getXmpTagString("Xmp.video.Height", false);
+    if (!data.isNull())
+    {
+        d->heightLE->setText(data);
+    }
+    data = meta.getXmpTagString("Xmp.video.Width", false);
+    if (!data.isNull())
+    {
+        d->widthLE->setText(data);
+    }
+    
+    data = meta.getXmpTagString("Xmp.video.MimeType", false);
+    
+    //Show metadata specific to file type
+    StandardVideotags *videoTags = new StandardVideotags();
+    if(data == "video/riff")
+    {
+    }
+    else if(data == "video/quicktime")
+    {
+        d->qTimeLangCheck = new QCheckBox(i18n("Language:"));
+        d->qTimeLangCB = new KComboBox(this);
+        videoTags->setQTimeLangCodes(d->qTimeLangCB);
+        grid->addWidget(d->qTimeLangCheck ,               d->lastPosition+1, 0, 1, 1);
+        grid->addWidget(d->qTimeLangCB,                   d->lastPosition+1, 1, 1, 2);
+    }
+    
+    grid->setRowStretch(5, 10);
+    grid->setColumnStretch(2, 10);
+    grid->setMargin(0);
+    grid->setSpacing(KDialog::spacingHint());
+    
+    blockSignals(false);
 }
 
 void XMPVideospecs::applyMetadata(QByteArray& xmpData)
