@@ -101,6 +101,9 @@ XMPAudiospecs::XMPAudiospecs(QWidget* const parent)
     grid->addWidget(d->sampleRateLE,                      1, 1, 1, 2);
                        //                                 ^
     d->lastposition = 1;  //...............................
+    
+    connect(d->sampleRateCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
 }
 
 XMPAudiospecs::~XMPAudiospecs()
@@ -127,6 +130,10 @@ void XMPAudiospecs::readMetadata(QByteArray& xmpData)
         d->compressorCB = new KComboBox(this);
         videoTags->setRiffEncodVals(d->compressorCB);
         d->compressorCheck = new QCheckBox(i18n("Compressor:"));
+
+        connect(d->compressorCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+
         grid->addWidget(d->compressorCheck,       d->lastposition+1,0,1,1);
         grid->addWidget(d->compressorCB,          d->lastposition+1,1,1,2);   
     }
@@ -138,6 +145,10 @@ void XMPAudiospecs::readMetadata(QByteArray& xmpData)
             d->compressorLE = new KLineEdit(this);
             d->compressorLE->setText(data);
             d->compressorCheck = new QCheckBox(i18n("Compressor:"));
+    
+            connect(d->compressorCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+
             grid->addWidget(d->compressorCheck,       d->lastposition+1,0,1,1);
             grid->addWidget(d->compressorLE,          d->lastposition+1,1,1,1);
         }    
@@ -153,6 +164,8 @@ void XMPAudiospecs::applyMetadata(QByteArray& xmpData)
 {
     KPMetadata meta;
     meta.setXmp(xmpData);
+    meta.setXmpTagString("Xmp.audio.SampleRate", d->sampleRateLE->text());
+    xmpData = meta.getXmp();
 }
 
 }  // namespace KIPIMetadataEditPlugin

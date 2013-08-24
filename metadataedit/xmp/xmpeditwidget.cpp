@@ -225,6 +225,12 @@ XMPEditWidget::XMPEditWidget(MetadataEditDialog* const parent)
 
     connect(d->statusPage, SIGNAL(signalModified()),
             this, SLOT(slotModified()));
+    
+    connect(d->videospecsPage, SIGNAL(signalModified()),
+            this, SLOT(slotModified()));
+    
+    connect(d->audiospecsPage, SIGNAL(signalModified()),
+            this, SLOT(slotModified()));
 
     // ------------------------------------------------------------
 
@@ -331,7 +337,9 @@ void XMPEditWidget::apply()
         d->creditsPage->applyMetadata(d->xmpData);
         d->statusPage->applyMetadata(d->xmpData);
         d->propertiesPage->applyMetadata(d->xmpData);
-
+        d->videospecsPage->applyMetadata(d->xmpData);
+        d->audiospecsPage->applyMetadata(d->xmpData);
+            
         KPMetadata meta;
 
         meta.load((*d->dlg->currentItem()).path());
@@ -405,7 +413,7 @@ int XMPEditWidget::activePageIndex() const
     if (cur == d->page_status)     return 6;
     if (cur == d->page_properties) return 7;
     if (cur == d->page_videospecs) return 8;
-    if (cur == d->page_videospecs) return 9;
+    if (cur == d->page_audiospecs) return 9;
     
     return 0;
 }

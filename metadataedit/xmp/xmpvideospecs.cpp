@@ -119,6 +119,21 @@ XMPVideospecs::XMPVideospecs(QWidget* const parent)
     grid->addWidget(d->widthLE,                           3, 4, 1, 1);
                      //                                   ^  
     d->lastPosition = 3;//.................................   
+    
+    connect(d->frameRateCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+    
+    connect(d->codecCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+    
+    connect(d->compressorCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+    
+    connect(d->heightCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+    
+    connect(d->widthCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
 }
 
 XMPVideospecs::~XMPVideospecs()
@@ -169,6 +184,10 @@ void XMPVideospecs::readMetadata(QByteArray& xmpData)
     else if(data == "video/quicktime")
     {
         d->qTimeLangCheck = new QCheckBox(i18n("Language:"));
+
+        connect(d->qTimeLangCheck, SIGNAL(toggled(bool)),
+            this, SIGNAL(signalModified()));
+
         d->qTimeLangCB = new KComboBox(this);
         videoTags->setQTimeLangCodes(d->qTimeLangCB);
         grid->addWidget(d->qTimeLangCheck ,               d->lastPosition+1, 0, 1, 1);
@@ -185,6 +204,14 @@ void XMPVideospecs::readMetadata(QByteArray& xmpData)
 
 void XMPVideospecs::applyMetadata(QByteArray& xmpData)
 {
+    KPMetadata meta;
+    meta.setXmp(xmpData);
+    meta.setXmpTagString("Xmp.video.FrameRate", d->frameRateLE->text());
+    meta.setXmpTagString("Xmp.video.Codec", d->codecLE->text());
+    meta.setXmpTagString("Xmp.video.Compressor", d->compressorLE->text());
+    meta.setXmpTagString("Xmp.video.Height", d->heightLE->text());
+    meta.setXmpTagString("Xmp.video.Width", d->widthLE->text());
+    xmpData = meta.getXmp();  
 }
 
 }  // namespace KIPIMetadataEditPlugin
