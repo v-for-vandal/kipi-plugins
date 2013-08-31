@@ -127,7 +127,8 @@ DBWindow::DBWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     connect(m_talker,SIGNAL(signalAccessTokenFailed(int,QString)),
             this,SLOT(slotAccessTokenFailed(int,QString)));
-    kDebug() << "113";
+    connect(m_talker,SIGNAL(signalAccessTokenFailed()),
+            this,SLOT(slotAccessTokenFailed()));
     connect(m_talker,SIGNAL(signalAccessTokenObtained(QString,QString,QString)),
             this,SLOT(slotAccessTokenObtained(QString,QString,QString)));
 
@@ -397,9 +398,15 @@ void DBWindow::slotReloadAlbumsRequest(){
     m_talker->listFolders("/");
 }
 
-void DBWindow::slotAccessTokenFailed(int errCode,const QString& errMsg){
-    KMessageBox::error(this, i18n("There seems to be %1 error: %2",errCode,errMsg));
-    return;
+void DBWindow::slotAccessTokenFailed(){
+    if (KMessageBox::warningContinueCancel(this, i18n("Authentication failed. Press Continue to authenticate"))
+        == KMessageBox::Continue){
+        m_talker->obtain_req_token();
+        return;
+    }
+    else{
+        return;
+    }
 }
 
 void DBWindow::slotAccessTokenObtained(const QString& msg1,const QString& msg2,const QString& msg3){

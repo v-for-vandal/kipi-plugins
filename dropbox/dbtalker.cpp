@@ -79,6 +79,7 @@ DBTalker::DBTalker(QWidget* const parent){
     m_root = "dropbox";
     m_job = 0;
     m_state = DB_REQ_TOKEN;
+    auth = false;
     //list.append(qMakePair("/","root"));
 }
 
@@ -111,6 +112,7 @@ void DBTalker::obtain_req_token(){
     connect(job,SIGNAL(result(KJob*)),
             this,SLOT(slotResult(KJob*)));
 
+    auth =false;
     m_state = DB_REQ_TOKEN;
     m_job = job;
     m_buffer.resize(0);
@@ -118,7 +120,9 @@ void DBTalker::obtain_req_token(){
 }
 
 bool DBTalker::authenticated(){
-    if(!m_oauthToken.isEmpty()){
+    kDebug() << "in auth " << m_oauthToken;
+    if(auth){
+        kDebug() << "in auth";
         return true;
     }
     return false;
@@ -133,6 +137,7 @@ void DBTalker::continueWithAccessToken(const QString& msg1,const QString& msg2,c
 
 void DBTalker::doOAuth(){
     KUrl url("https://api.dropbox.com/1/oauth/authorize");
+    kDebug() << "in doOAuth()" << m_oauthToken;
     url.addQueryItem("oauth_token",m_oauthToken);
 
     kDebug() << "OAuth URL: " << url;
@@ -164,6 +169,9 @@ void DBTalker::doOAuth(){
     if(dialog->exec() == QDialog::Accepted){
         kDebug() << "1";
         getAccessToken();
+    }
+    else{
+        return;
     }
 
 }
@@ -379,8 +387,8 @@ void DBTalker::slotResult(KJob* kjob){
 
     if(job->error()){
         if(m_state == DB_ACCESSTOKEN){
-            emit signalBusy(false);
-            emit signalAccessTokenFailed(job->error(),job->errorText());
+            //emit signalBusy(false);
+            //emit signalAccessTokenFailed(job->error(),job->errorText());
         }
         else if(m_state ==  DB_REQ_TOKEN){
             emit signalBusy(false);
@@ -404,7 +412,7 @@ void DBTalker::slotResult(KJob* kjob){
             parseResponseRequestToken(m_buffer);
             break;
         case (DB_ACCESSTOKEN):
-            kDebug() << "In DB_ACCESSTOKEN";// << m_buffer;
+            kDebug() << "In DB_ACCESSTOKEN" << m_buffer;
             parseResponseAccessToken(m_buffer);
             break;
         case (DB_LISTFOLDERS):
@@ -467,15 +475,24 @@ void DBTalker::parseResponseRequestToken(const QByteArray& data){
 }
 
 void DBTalker::parseResponseAccessToken(const QByteArray& data){
+    kDebug() << "in parseResponseAccessToken";
     QString temp(data);
+    if(temp.contains("error")){
+        //doOAuth();
+        emit signalBusy(false);
+        emit signalAccessTokenFailed();
+        return;
+    }
     QStringList split = temp.split("&");
-
+    kDebug() << "in parseResponseAccessToken1";
     QStringList tokenSecretList = split.at(0).split("=");
     m_oauthTokenSecret = tokenSecretList.at(1);
     QStringList tokenList = split.at(1).split("=");
     m_oauthToken = tokenList.at(1);
-
+    kDebug() << "in parseResponseAccessToken2";
     m_access_oauth_signature = m_oauth_signature + m_oauthTokenSecret;
+    auth = true;
+    emit signalBusy(false);
     emit signalAccessTokenObtained(m_oauthToken,m_oauthTokenSecret,m_access_oauth_signature);
 }
 

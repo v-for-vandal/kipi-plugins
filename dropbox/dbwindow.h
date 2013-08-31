@@ -84,7 +84,8 @@ private Q_SLOTS:
     void slotStartTransfer();
 
     void slotBusy(bool);
-    void slotAccessTokenFailed(int errCode,const QString& errMsg);
+    //void slotAccessTokenFailed(int errCode,const QString& errMsg);
+    void slotAccessTokenFailed();
     void slotAccessTokenObtained(const QString& msg1,const QString& msg2,const QString& msg3);
     void slotSetUserName(const QString& msg);
     void slotListAlbumsFailed(const QString& msg);

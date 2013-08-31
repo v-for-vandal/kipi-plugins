@@ -58,7 +58,8 @@ Q_SIGNALS:
     void signalBusy(bool val);
     //void signalAccessTokenObtained();
     void signalAccessTokenObtained(const QString& msg1,const QString& msg2,const QString& msg3);
-    void signalAccessTokenFailed(int errCode,const QString& errMsg);
+    //void signalAccessTokenFailed(int errCode,const QString& errMsg);
+    void signalAccessTokenFailed();
     void signalRequestTokenFailed(int errCode,const QString& errMsg);
     void signalSetUserName(const QString& msg);
     void signalListAlbumsFailed(const QString& msg);
@@ -102,6 +103,8 @@ private:
     QString m_oauth_version;
     QString m_oauthToken;
     QString m_oauthTokenSecret;
+    bool auth;
+
     QString m_root;
 
     State m_state;
