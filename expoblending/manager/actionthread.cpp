@@ -41,6 +41,8 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QGroupBox>
+//#include <QDebug>
+#include <qdebug.h>
 
 // KDE includes
 #include <kstandarddirs.h>
@@ -95,6 +97,7 @@ public:
     KTempDir*                        preprocessingTmpDir;
 
     KUrl::List                       urls;
+    EvUrlsMap exposureValuesMapt;
     
     void cleanAlignTmpDir()
     {
@@ -169,6 +172,22 @@ void ActionThread::identifyFiles(const KUrl::List& urlList, EvUrlsMap& exposureV
     }
     appendJob(jobs);
     
+}
+
+void ActionThread::hdrGen(const KUrl::List& urlList)
+{                     
+    JobCollection   *jobs           = new JobCollection();
+
+    HdrGenTask::Task *t = new HdrGenTask(this, urlList);
+
+    connect(t, SIGNAL(started(ThreadWeaver::Job*)),
+            this, SLOT(slotStarting(ThreadWeaver::Job*)));
+    connect(t, SIGNAL(done(ThreadWeaver::Job*)),
+            this, SLOT(slotDone(ThreadWeaver::Job*)));
+
+    jobs->addJob(t);
+
+    appendJob(jobs);
 }
 
 void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& alignPath)

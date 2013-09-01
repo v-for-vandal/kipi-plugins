@@ -99,7 +99,7 @@ ImportWizardDlg::ImportWizardDlg(Manager* const mngr, QWidget* const parent)
             this, SLOT(slotIntroPageIsValid(bool)));
 
     connect(d->itemsPage, SIGNAL(signalItemsPageIsValid(bool)),
-            this, SLOT(slotItemsPageIsValid(bool)));
+            this, SLOT(slotItemsPageIsValid(bool,EvUrlsMap)));
 
     connect(d->preProcessingPage, SIGNAL(signalPreProcessed(ItemUrlsMap)),
             this, SLOT(slotPreProcessed(ItemUrlsMap)));
@@ -109,7 +109,7 @@ ImportWizardDlg::ImportWizardDlg(Manager* const mngr, QWidget* const parent)
 
 ImportWizardDlg::~ImportWizardDlg()
 {
-    delete d;
+    delete d; 
 }
 
 Manager* ImportWizardDlg::manager() const
@@ -173,8 +173,10 @@ void ImportWizardDlg::slotPreProcessed(const ItemUrlsMap& map)
     }
 }
 
-void ImportWizardDlg::slotItemsPageIsValid(bool valid)
+void ImportWizardDlg::slotItemsPageIsValid(bool valid, const EvUrlsMap& map)
 {
+    // Exposure Values calculated.  
+    d->mngr->setExposureValuesMap(map);
     setValid(d->itemsPage->page(), valid);
 }
 

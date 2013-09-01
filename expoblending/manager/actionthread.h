@@ -79,6 +79,7 @@ public:
                        const EnfuseSettings& settings, const QString& enfusePath);
     void enfuseFinal(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                      const EnfuseSettings& settings, const QString& enfusePath);
+    void hdrGen(const KUrl::List& urlList);
 
     void cancel();
     

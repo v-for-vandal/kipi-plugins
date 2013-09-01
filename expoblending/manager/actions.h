@@ -48,7 +48,8 @@ enum Action
     PREPROCESSING,
     ENFUSEPREVIEW,
     ENFUSEFINAL,
-    LOAD
+    LOAD,
+    HDRGEN
 };
 
 class ItemPreprocessedUrls

@@ -59,6 +59,7 @@ public:
     KUrl::List        urls;
     Action            action;
     EvValueUrls*      exposureValuesUrl;
+    int* k;
   
 protected:
 

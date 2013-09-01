@@ -28,6 +28,7 @@
 #include "generictask.h"
 #include "enfusepreviewtask.h"
 #include "enfusefinaltask.h"
+#include "hdrgentask.h"
 
 #endif /* TASKS_H */
 

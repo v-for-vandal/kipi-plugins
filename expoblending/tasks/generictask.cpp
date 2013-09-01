@@ -35,6 +35,7 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QPointer>
+#include <qdebug.h>
 
 // Under Win32, log2f is not defined...
 #ifdef _WIN32
@@ -103,6 +104,7 @@ void GenericTask::run()
 	    exposureValuesUrl->outputUrl = urls[0];
 	    exposureValuesUrl->exposure_value = avLum.isEmpty() ? i18n("unknown") : avLum;
 	    
+	    //qDebug() << exposureValuesUrl->exposure_value;
             emit finished(ad);
 	    break;
         }
