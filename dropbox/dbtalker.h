@@ -26,6 +26,7 @@
 #include <QObject>
 #include <QList>
 #include <QPair>
+#include <QQueue>
 
 //kde includes
 #include <kio/job.h>
@@ -111,7 +112,8 @@ private:
 
     KIO::Job* m_job;
     QByteArray m_buffer;
-
+    QQueue<QString> queue;
+    QList<QPair<QString,QString> > list;
     //QList<QPair<QString,QString> > list;
 };
 }

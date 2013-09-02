@@ -80,7 +80,7 @@ DBTalker::DBTalker(QWidget* const parent){
     m_job = 0;
     m_state = DB_REQ_TOKEN;
     auth = false;
-    //list.append(qMakePair("/","root"));
+    list.append(qMakePair(QString("/"),QString("root")));
 }
 
 DBTalker::~DBTalker(){
@@ -491,7 +491,6 @@ void DBTalker::parseResponseAccessToken(const QByteArray& data){
     m_oauthToken = tokenList.at(1);
     kDebug() << "in parseResponseAccessToken2";
     m_access_oauth_signature = m_oauth_signature + m_oauthTokenSecret;
-    auth = true;
     emit signalBusy(false);
     emit signalAccessTokenObtained(m_oauthToken,m_oauthTokenSecret,m_access_oauth_signature);
 }
@@ -526,8 +525,8 @@ void DBTalker::parseResponseListFolders(const QByteArray& data){
         emit signalListAlbumsFailed(i18n("Failed to list Folders"));
         return;
     }
-    QList<QPair<QString,QString> > list;
-    list.append(qMakePair(QString("/"),QString("root")));
+    //QList<QPair<QString,QString> > list;
+    //list.append(qMakePair(QString("/"),QString("root")));
     QVariantMap rmap = result.toMap();
     QList<QString> a = rmap.uniqueKeys();
     for(int i=0;i<rmap.size();i++){
@@ -540,9 +539,10 @@ void DBTalker::parseResponseListFolders(const QByteArray& data){
                     if((b[i] == "is_dir") || (b[i] == "path")){
                     if(b[i] == "path" && i==4){
                         kDebug() << i << " " << b[i] << " : " << qwer[b[i]] << " " << qwer[b[i]].value<QString>() << endl;
-                        QString name = qwer[b[i]].value<QString>().section('/',-1);
+                        QString name = qwer[b[i]].value<QString>().section('/',-2);
                         kDebug() << "str " << name;
                         list.append(qMakePair(qwer[b[i]].value<QString>(),name));
+                        queue.enqueue(qwer[b[i]].value<QString>());
                         //listFolders(qwer[b[i]].value<QString>());
                         break;
                         }
@@ -551,8 +551,14 @@ void DBTalker::parseResponseListFolders(const QByteArray& data){
             }
         }
     }
+    if(!queue.isEmpty()){
+        listFolders(queue.dequeue());
+    }
+    else{
+    auth = true;
     emit signalBusy(false);
     emit signalListAlbumsDone(list);
+    }
 }
 
 void DBTalker::parseResponseCreateFolder(const QByteArray& data){

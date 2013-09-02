@@ -157,7 +157,7 @@ DBWindow::DBWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     buttonStateChange(false);
     kDebug() << "116";
     if(m_accToken.isEmpty()){
-    m_talker->obtain_req_token();
+        m_talker->obtain_req_token();
     }
     else{
         m_talker->continueWithAccessToken(m_accToken,m_accTokenSecret,m_accoauthToken);
@@ -242,7 +242,6 @@ void DBWindow::slotListAlbumsDone(const QList<QPair<QString,QString> >& list){
         }
     }
     buttonStateChange(true);
-    kDebug() << "calling xxyy";
     m_talker->getUserName();
 }
 
