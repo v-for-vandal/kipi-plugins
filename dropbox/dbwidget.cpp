@@ -177,8 +177,6 @@ DropboxWidget::DropboxWidget(QWidget* const parent):QWidget(parent){
 
     //-------------------------------------------------------
 
-   // connect(m_reloadAlbumsBtn,SIGNAL(clicked()),
-     //       this,SLOT(slotReloadAlbumsRequest));
    connect(m_resizeChB,SIGNAL(clicked()),
           this,SLOT(slotResizeChecked()));
 

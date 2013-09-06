@@ -57,9 +57,7 @@ public:
 
 Q_SIGNALS:
     void signalBusy(bool val);
-    //void signalAccessTokenObtained();
     void signalAccessTokenObtained(const QString& msg1,const QString& msg2,const QString& msg3);
-    //void signalAccessTokenFailed(int errCode,const QString& errMsg);
     void signalAccessTokenFailed();
     void signalRequestTokenFailed(int errCode,const QString& errMsg);
     void signalSetUserName(const QString& msg);
@@ -114,7 +112,6 @@ private:
     QByteArray m_buffer;
     QQueue<QString> queue;
     QList<QPair<QString,QString> > list;
-    //QList<QPair<QString,QString> > list;
 };
 }
 #endif /*DBTALKER_H*/

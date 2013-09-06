@@ -60,12 +60,10 @@ public:
     KIPIPlugins::KPProgressWidget* progressBar() const;
 
 private Q_SLOTS:
-    //void slotReloadAlbumsRequest();
     void slotResizeChecked();
 
 private:
     KIPIPlugins::KPImagesList* m_imgList;
-    //KIPI::UploadWidget*        m_uploadWidget;
 
     QLabel*                     m_headerLbl;
     QLabel*                     m_userNameDisplayLbl;

@@ -288,10 +288,8 @@ bool DBTalker::addPhoto(const QString& imgPath,const QString& uploadFolder,bool 
         m_job->kill();
         m_job = 0;
     }
-    kDebug() << "in addphoto begin";
     emit signalBusy(true);
     MPForm form;
-    //form.addPair(KUrl(imgPath).fileName(),info.description,imgPath,id);
     QString path = imgPath;
     QImage image;
     if(KPMetadata::isRawFile(imgPath)){
@@ -324,9 +322,6 @@ bool DBTalker::addPhoto(const QString& imgPath,const QString& uploadFolder,bool 
         return false;
     }
 
-    //form.finish();
-
-    //QString auth = "Authorization: " + m_bearer_access_token.toAscii();
     QString uploadPath = uploadFolder + KUrl(imgPath).fileName();
     QString m_url = QString("https://api-content.dropbox.com/1/files_put/dropbox/") + "/" +uploadPath;
     KUrl url(m_url);
@@ -365,12 +360,6 @@ void DBTalker::cancel(){
     emit signalBusy(false);
 }
 
-/*
-void DBTalker::getFoldersList(){
-    emit signalBusy(false);
-    emit signalListAlbumsDone(list);
-}*/
-
 void DBTalker::data(KIO::Job*,const QByteArray& data){
     if(data.isEmpty()){
         return;
@@ -386,18 +375,10 @@ void DBTalker::slotResult(KJob* kjob){
     KIO::Job* const job = static_cast<KIO::Job*>(kjob);
 
     if(job->error()){
-        if(m_state == DB_ACCESSTOKEN){
-            //emit signalBusy(false);
-            //emit signalAccessTokenFailed(job->error(),job->errorText());
-        }
-        else if(m_state ==  DB_REQ_TOKEN){
+        if(m_state ==  DB_REQ_TOKEN){
             emit signalBusy(false);
             emit signalRequestTokenFailed(job->error(),job->errorText());
         }
-        /*else if(m_state ==  DB_LISTFOLDERS){
-            emit signalBusy(false);
-            emit signalListFoldersFailed(job->error(),job->errorText());
-        }*/
         else{
             emit signalBusy(false);
             job->ui()->setWindow(m_parent);
@@ -442,11 +423,9 @@ void DBTalker::parseResponseAddPhoto(const QByteArray& data){
     bool ok;
     QVariant result = parser.parse(data,&ok);
     QVariantMap rmap = result.toMap();
-    //qDebug() << "x " << rmap.size();
     QList<QString> keys = rmap.uniqueKeys();
     for(int i=0;i<rmap.size();i++){
         if(keys[i] == "bytes"){
-            kDebug() << i << " " << keys[i] << " " << rmap[keys[i]].value<QString>();
             success = true;
             break;
         }
@@ -475,7 +454,6 @@ void DBTalker::parseResponseRequestToken(const QByteArray& data){
 }
 
 void DBTalker::parseResponseAccessToken(const QByteArray& data){
-    kDebug() << "in parseResponseAccessToken";
     QString temp(data);
     if(temp.contains("error")){
         //doOAuth();
@@ -484,12 +462,10 @@ void DBTalker::parseResponseAccessToken(const QByteArray& data){
         return;
     }
     QStringList split = temp.split("&");
-    kDebug() << "in parseResponseAccessToken1";
     QStringList tokenSecretList = split.at(0).split("=");
     m_oauthTokenSecret = tokenSecretList.at(1);
     QStringList tokenList = split.at(1).split("=");
     m_oauthToken = tokenList.at(1);
-    kDebug() << "in parseResponseAccessToken2";
     m_access_oauth_signature = m_oauth_signature + m_oauthTokenSecret;
     emit signalBusy(false);
     emit signalAccessTokenObtained(m_oauthToken,m_oauthTokenSecret,m_access_oauth_signature);
@@ -500,7 +476,6 @@ void DBTalker::parseResponseUserName(const QByteArray& data){
     bool ok;
     QVariant result = parser.parse(data,&ok);
     QVariantMap rmap = result.toMap();
-    //qDebug() << "x " << rmap.size();
     QList<QString> keys = rmap.uniqueKeys();
     QString temp;
     for(int i=0;i<rmap.size();i++){
@@ -567,7 +542,6 @@ void DBTalker::parseResponseCreateFolder(const QByteArray& data){
     bool ok;
     QVariant result = parser.parse(data,&ok);
     QVariantMap rmap = result.toMap();
-    //qDebug() << "x " << rmap.size();
     QList<QString> keys = rmap.uniqueKeys();
     QString temp;
     for(int i=0;i<rmap.size();i++){
