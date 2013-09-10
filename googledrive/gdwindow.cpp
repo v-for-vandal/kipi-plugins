@@ -267,6 +267,7 @@ void GDWindow::slotTextBoxEmpty(){
     KMessageBox::error(this, i18n("Text Box is Empty, Please Enter code from browser to textbox. To complete authentication press"
                                   " Change Account or start-upload button to authenticate again"));
         kDebug() << "11";
+        return;
         //m_talker->doOAuth();
 
 }
