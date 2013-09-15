@@ -29,6 +29,9 @@
 #include "enfusepreviewtask.h"
 #include "enfusefinaltask.h"
 #include "hdrgentask.h"
+#include "hdrcalibratepreviewtask.h"
+#include "hdrcalibratefinaltask.h"
+#include "cameraresponsetask.h"
 
 #endif /* TASKS_H */
 

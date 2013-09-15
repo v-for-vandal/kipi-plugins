@@ -20,8 +20,8 @@
  *
  * ============================================================ */
 
-#ifndef HDRGENTASK_H
-#define HDRGENTASK_H
+#ifndef CAMERARESPONSETASK_H
+#define CAMERARESPONSETASK_H
 
 // Qt includes
 
@@ -42,16 +42,19 @@ using namespace KDcrawIface;
 namespace KIPIExpoBlendingPlugin
 {
 
-class HdrGenTask : public Task
+class CameraResponseTask : public Task
 {
 public:
-   
-    KUrl::List          urls;      
+     
     KTempDir*           preprocessingTmpDir;
-    QString*            name;
+    QString const       name;
+    QProcess*           pfsinhdrgenProcess;
+    QProcess*           pfshdrcalibrateProcess;
+    
     PfsHdrSettings      settings;
+  
     int                 option;
-   
+    
 protected:
 
     bool         successFlag;
@@ -60,11 +63,12 @@ protected:
 
 public:
 
-    HdrGenTask(QObject* const parent, const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);
-    HdrGenTask(const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
-    ~HdrGenTask();
+    CameraResponseTask(QObject* const parent, const KUrl::List& inUrls, const QString& dirName, 
+		       const PfsHdrSettings& pfsSettings, int option);
+    CameraResponseTask(const KUrl::List& inUrls, const QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
+    ~CameraResponseTask();
     
-    bool getXmpRational(const char* xmpTagName, long& num, long& den, KPMetadata& meta);
+    bool cameraResponseCurve(const QString& name, QString& errors);
     
 protected:
 
@@ -74,4 +78,4 @@ protected:
 
 }  // namespace KIPIExpoBlendingPlugin
 
-#endif /* HDRGENTASK_H */
+#endif /* CAMERARESPONSETASK_H */

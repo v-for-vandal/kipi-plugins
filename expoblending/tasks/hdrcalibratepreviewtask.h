@@ -20,8 +20,8 @@
  *
  * ============================================================ */
 
-#ifndef HDRGENTASK_H
-#define HDRGENTASK_H
+#ifndef HDRCALIBRATEPREVIEWTASK_H
+#define HDRCALIBRATEPREVIEWTASK_H
 
 // Qt includes
 
@@ -42,15 +42,25 @@ using namespace KDcrawIface;
 namespace KIPIExpoBlendingPlugin
 {
 
-class HdrGenTask : public Task
+class HdrCalibratePreviewTask : public Task
 {
+  
+  
+    Q_OBJECT
+  
 public:
-   
-    KUrl::List          urls;      
+     
+    KUrl::List          urls;
     KTempDir*           preprocessingTmpDir;
-    QString*            name;
+    QString const       name;
+    
+    QProcess*           pfsinhdrgenProcess;
+    QProcess*           pfshdrcalibrateProcess;
+    QProcess*           pfsoutProcess;
+    
     PfsHdrSettings      settings;
-    int                 option;
+    
+    KUrl const          destUrl;
    
 protected:
 
@@ -60,12 +70,21 @@ protected:
 
 public:
 
-    HdrGenTask(QObject* const parent, const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);
-    HdrGenTask(const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
-    ~HdrGenTask();
+    HdrCalibratePreviewTask(QObject* const parent, const KUrl::List& inUrls,const QString& dirName,
+						 const PfsHdrSettings& pfsSettings,const KUrl& outputUrl);
+    HdrCalibratePreviewTask(const KUrl::List& inUrls,const QString& dirName,
+						 const PfsHdrSettings& pfsSettings,const KUrl& outputUrl);
+    ~HdrCalibratePreviewTask();
     
-    bool getXmpRational(const char* xmpTagName, long& num, long& den, KPMetadata& meta);
-    
+    bool startpfsHdrCalibrate(const QString& name, QString& errors, 
+						   const PfsHdrSettings& settings, 
+						   KUrl& exroutput);    
+
+Q_SIGNALS:
+
+    void starting(const KIPIExpoBlendingPlugin::ActionData& ad);
+    void finished(const KIPIExpoBlendingPlugin::ActionData& ad);
+
 protected:
 
     void run();
@@ -74,4 +93,4 @@ protected:
 
 }  // namespace KIPIExpoBlendingPlugin
 
-#endif /* HDRGENTASK_H */
+#endif /* HDRCALIBRATEPREVIEWTASK_H */

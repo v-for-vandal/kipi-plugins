@@ -25,10 +25,6 @@
 
 #include "actionthread.moc"
 
-// Under Win32, log2f is not defined...
-#ifdef _WIN32
-#define log2f(x) (logf(x)*1.4426950408889634f)
-#endif
 // Qt includes
 
 #include <QMutex>
@@ -55,6 +51,7 @@
 #include <threadweaver/ThreadWeaver.h>
 #include <threadweaver/JobCollection.h>
 #include <threadweaver/DependencyPolicy.h>
+#include <threadweaver/JobSequence.h>
 
 
 // LibKDcraw includes
@@ -97,7 +94,9 @@ public:
     KTempDir*                        preprocessingTmpDir;
 
     KUrl::List                       urls;
-    EvUrlsMap exposureValuesMapt;
+    EvUrlsMap                        exposureValuesMapt;
+    
+    QString                          name;
     
     void cleanAlignTmpDir()
     {
@@ -130,9 +129,7 @@ ActionThread::~ActionThread()
 }
 
 void ActionThread::cleanUpResultFiles()
-{
-    
-}
+{}
 
 void ActionThread::setEnfuseVersion(const double version)
 {
@@ -152,19 +149,17 @@ void ActionThread::identifyFiles(const KUrl::List& urlList, EvUrlsMap& exposureV
     foreach(const KUrl& url, urlList)    
     {
         d->urls.clear();
-	d->urls.append(url);
-	
-	exposureValuesMap.insert(url, EvValueUrls());
-	
-        GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY, exposureValuesMap[url]);
-	
-	connect(t, SIGNAL(started(ThreadWeaver::Job*)),
-                this, SLOT(slotStarting(ThreadWeaver::Job*)));
- 
-	connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
-                this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+        d->urls.append(url);
 
-	connect(t, SIGNAL(done(ThreadWeaver::Job*)),
+	exposureValuesMap.insert(url, EvValueUrls());
+
+        GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY, exposureValuesMap[url]);
+         
+        connect(t, SIGNAL(started(ThreadWeaver::Job*)),
+                this, SLOT(slotStarting(ThreadWeaver::Job*)));
+        connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
+                this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+        connect(t, SIGNAL(done(ThreadWeaver::Job*)),
                 this, SLOT(slotStepDone(ThreadWeaver::Job*)));
       
         jobs->addJob(t);
@@ -172,22 +167,6 @@ void ActionThread::identifyFiles(const KUrl::List& urlList, EvUrlsMap& exposureV
     }
     appendJob(jobs);
     
-}
-
-void ActionThread::hdrGen(const KUrl::List& urlList)
-{                     
-    JobCollection   *jobs           = new JobCollection();
-
-    HdrGenTask::Task *t = new HdrGenTask(this, urlList);
-
-    connect(t, SIGNAL(started(ThreadWeaver::Job*)),
-            this, SLOT(slotStarting(ThreadWeaver::Job*)));
-    connect(t, SIGNAL(done(ThreadWeaver::Job*)),
-            this, SLOT(slotDone(ThreadWeaver::Job*)));
-
-    jobs->addJob(t);
-
-    appendJob(jobs);
 }
 
 void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& alignPath)
@@ -199,13 +178,10 @@ void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& ali
 
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
 	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
-    
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
 	    this, SLOT(slotStarting(ThreadWeaver::Job*)));
- 
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
 	    this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
-
     connect(t, SIGNAL(done(ThreadWeaver::Job*)),
 	    this, SLOT(slotStepDone(ThreadWeaver::Job*)));
       
@@ -225,13 +201,10 @@ void ActionThread::loadProcessed(const KUrl& url)
    
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
 	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
-    
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
-    
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
             this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
-
     connect(t, SIGNAL(done(ThreadWeaver::Job*)),
             this, SLOT(slotStepDone(ThreadWeaver::Job*)));
    
@@ -252,13 +225,10 @@ void ActionThread::enfusePreview(const KUrl::List& alignedUrls, const KUrl& outp
     
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
 	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
-
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
-  
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
             this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
-    
     connect(t, SIGNAL(done(ThreadWeaver::Job*)),
             this, SLOT(slotStepDone(ThreadWeaver::Job*)));
    
@@ -277,14 +247,11 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
 						   settings, enfusePath, d->enfuseVersion4x); 
     
     connect(t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
-            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
-    
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));    
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
-
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
             this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
-
     connect(t, SIGNAL(done(ThreadWeaver::Job*)),
             this, SLOT(slotStepDone(ThreadWeaver::Job*)));
    
@@ -292,6 +259,86 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
     jobs->addJob(t);
     appendJob(jobs);
    
+}
+
+void ActionThread::hdrGen(const KUrl::List& urlList, QString& name, const PfsHdrSettings& settings, int option)
+{                     
+    JobCollection   *jobs           = new JobCollection();
+    
+    HdrGenTask* const pfshdrscript = new HdrGenTask(this, urlList, name, settings, option);
+
+    connect(pfshdrscript, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));  
+    connect(pfshdrscript, SIGNAL(started(ThreadWeaver::Job*)),
+            this, SLOT(slotStarting(ThreadWeaver::Job*)));
+    connect(pfshdrscript, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+    connect(pfshdrscript, SIGNAL(done(ThreadWeaver::Job*)),
+            this, SLOT(slotStepDone(ThreadWeaver::Job*)));
+
+    jobs->addJob(pfshdrscript);
+    appendJob(jobs);
+}
+
+void ActionThread::hdrCalibrate(const KUrl::List& urlList, const QString& name, const PfsHdrSettings& settings, int option)
+{
+    JobCollection   *jobs  = new JobCollection();
+    
+    CameraResponseTask* responsecurve = new CameraResponseTask(this, urlList, name, settings, option);
+
+    connect(responsecurve, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));  
+    connect(responsecurve, SIGNAL(started(ThreadWeaver::Job*)),
+            this, SLOT(slotStarting(ThreadWeaver::Job*)));
+    connect(responsecurve, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+    connect(responsecurve, SIGNAL(done(ThreadWeaver::Job*)),
+            this, SLOT(slotStepDone(ThreadWeaver::Job*)));
+
+    jobs->addJob(responsecurve);
+    appendJob(jobs);
+}
+
+void ActionThread::hdrOutExrPreview(const KUrl::List& urlList,const QString& name, 
+				    const KUrl& outputUrl, const PfsHdrSettings& settings)
+{
+    JobCollection   *jobs  = new JobCollection();
+    
+    HdrCalibratePreviewTask* calibratepreview = new HdrCalibratePreviewTask(this, urlList, name, settings, outputUrl);
+     
+    connect(calibratepreview, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));    
+    connect(calibratepreview, SIGNAL(started(ThreadWeaver::Job*)),
+            this, SLOT(slotStarting(ThreadWeaver::Job*)));
+    connect(calibratepreview, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+    connect(calibratepreview, SIGNAL(done(ThreadWeaver::Job*)),
+            this, SLOT(slotStepDone(ThreadWeaver::Job*)));
+    
+    jobs->addJob(calibratepreview);
+    
+    appendJob(jobs);
+}
+
+void ActionThread::hdrOutExrFinal(const KUrl::List& urlList,const QString& name, 
+				  const KUrl& outputUrl, const PfsHdrSettings& settings)
+{
+    JobCollection   *jobs  = new JobCollection();
+    
+    HdrCalibrateFinalTask* calibratefinal = new HdrCalibrateFinalTask(this, urlList, name, settings, outputUrl);
+     
+    connect(calibratefinal, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));    
+    connect(calibratefinal, SIGNAL(started(ThreadWeaver::Job*)),
+            this, SLOT(slotStarting(ThreadWeaver::Job*)));
+    connect(calibratefinal, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
+            this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+    connect(calibratefinal, SIGNAL(done(ThreadWeaver::Job*)),
+            this, SLOT(slotStepDone(ThreadWeaver::Job*)));
+    
+    jobs->addJob(calibratefinal);
+    
+    appendJob(jobs);
 }
 
 void ActionThread::slotStarting(Job* j)
@@ -331,7 +378,7 @@ void ActionThread::slotDone(Job* j)
     ad.action       = t->action;
     ad.success      = t->success();
     ad.message      = t->errString;
-   
+    
     emit finished(ad);
 
     ((QObject*) t)->deleteLater();

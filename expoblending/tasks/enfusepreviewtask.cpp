@@ -123,7 +123,7 @@ bool EnfusePreviewTask::startEnfuse(const KUrl::List& inUrls, KUrl& outUrl,
         comp = QString("--compression=DEFLATE");
 
     outUrl.setFileName(QString(".kipi-expoblending-tmp-") + QString::number(QDateTime::currentDateTime().toTime_t()) + ext);
-
+    
     enfuseProcess = new KProcess;
     enfuseProcess->clearProgram();
     enfuseProcess->setOutputChannelMode(KProcess::MergedChannels);

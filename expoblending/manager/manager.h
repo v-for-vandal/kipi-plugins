@@ -55,6 +55,8 @@ class ActionThread;
 class ExpoBlendingAboutData;
 class AlignBinary;
 class EnfuseBinary;
+class PfsCalibrateBinary;
+class PfsHdrGenBinary;
 class ManagerPriv;
 
 class Manager : public QObject
@@ -85,6 +87,8 @@ public:
     ActionThread* thread() const;
     AlignBinary&  alignBinary() const;
     EnfuseBinary& enfuseBinary() const;
+    PfsCalibrateBinary& pfscalibrateBinary() const;
+    PfsHdrGenBinary& pfshdrgenBinary() const;
 
     void run();
 

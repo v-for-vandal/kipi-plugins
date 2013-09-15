@@ -37,6 +37,7 @@
 // Local includes
 
 #include "enfusesettings.h"
+#include "pfshdrsettings.h"
 
 namespace KIPIExpoBlendingPlugin
 {
@@ -49,7 +50,10 @@ enum Action
     ENFUSEPREVIEW,
     ENFUSEFINAL,
     LOAD,
-    HDRGEN
+    HDRGEN,
+    CAMERARESPONSE,
+    HDRCALIBRATEPREVIEW,
+    HDRCALIBRATEFINAL
 };
 
 class ItemPreprocessedUrls
@@ -109,14 +113,17 @@ public:
 
     QImage         image;
 
+    QString        dirName;
     KUrl::List     inUrls;
     KUrl::List     outUrls;
 
     EnfuseSettings enfuseSettings;
+    PfsHdrSettings pfshdrSettings;
 
     ItemUrlsMap    preProcessedUrlsMap;
     
     int            id;
+    int            option;
 
     Action         action;
 };
@@ -125,5 +132,6 @@ public:
 
 Q_DECLARE_METATYPE(KIPIExpoBlendingPlugin::ActionData)
 Q_DECLARE_METATYPE(KIPIExpoBlendingPlugin::ItemPreprocessedUrls)
+Q_DECLARE_METATYPE(KIPIExpoBlendingPlugin::EvValueUrls)
 
 #endif /* ACTIONS_H */

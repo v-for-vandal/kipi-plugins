@@ -38,6 +38,8 @@
 #include "actionthread.h"
 #include "alignbinary.h"
 #include "enfusebinary.h"
+#include "pfsbinary.h"
+#include "pfshdrgenbinary.h"
 
 namespace KIPIExpoBlendingPlugin
 {
@@ -68,7 +70,9 @@ public:
 
     AlignBinary            alignBinary;
     EnfuseBinary           enfuseBinary;
-
+    PfsCalibrateBinary     pfscalibrateBinary;
+    PfsHdrGenBinary        hdrgenBinary;
+    
     ImportWizardDlg*       wizard;
     ExpoBlendingDlg*       dlg;
 };
@@ -104,6 +108,12 @@ bool Manager::checkBinaries()
     if (!d->enfuseBinary.recheckDirectories())
         return false;
 
+    if (!d->pfscalibrateBinary.recheckDirectories())
+        return false;
+    
+    if (!d->hdrgenBinary.recheckDirectories())
+        return false;
+    
     return true;
 }
 
@@ -115,6 +125,16 @@ AlignBinary& Manager::alignBinary() const
 EnfuseBinary& Manager::enfuseBinary() const
 {
     return d->enfuseBinary;
+}
+
+PfsCalibrateBinary& Manager::pfscalibrateBinary() const
+{
+    return d->pfscalibrateBinary;
+}
+
+PfsHdrGenBinary& Manager::pfshdrgenBinary() const
+{
+    return d->hdrgenBinary;
 }
 
 void Manager::setIface(Interface* const iface)

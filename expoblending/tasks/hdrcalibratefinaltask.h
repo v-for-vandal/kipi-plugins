@@ -20,8 +20,8 @@
  *
  * ============================================================ */
 
-#ifndef HDRGENTASK_H
-#define HDRGENTASK_H
+#ifndef HDRCALIBRATEFINALTASK_H
+#define HDRCALIBRATEFINALTASK_H
 
 // Qt includes
 
@@ -42,15 +42,26 @@ using namespace KDcrawIface;
 namespace KIPIExpoBlendingPlugin
 {
 
-class HdrGenTask : public Task
+class HdrCalibrateFinalTask : public Task
 {
+  
+    Q_OBJECT
+  
+  
 public:
-   
-    KUrl::List          urls;      
+     
     KTempDir*           preprocessingTmpDir;
-    QString*            name;
+    KUrl::List           urls;
+    
+    QString const       name;
+    
+    QProcess*           pfsinhdrgenProcess;
+    QProcess*           pfshdrcalibrateProcess;
+    QProcess*           pfsoutProcess;
+    
     PfsHdrSettings      settings;
-    int                 option;
+    
+    KUrl                destUrl;
    
 protected:
 
@@ -60,11 +71,22 @@ protected:
 
 public:
 
-    HdrGenTask(QObject* const parent, const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);
-    HdrGenTask(const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
-    ~HdrGenTask();
+    HdrCalibrateFinalTask(QObject* const parent, const KUrl::List& inUrls,const QString& dirName,
+				   const PfsHdrSettings& pfsSettings, const KUrl& outputUrl);
+    HdrCalibrateFinalTask(const KUrl::List& inUrls,const QString& dirName,
+				   const PfsHdrSettings& pfsSettings, const KUrl& outputUrl);
+    ~HdrCalibrateFinalTask();
     
-    bool getXmpRational(const char* xmpTagName, long& num, long& den, KPMetadata& meta);
+    bool startpfsHdrCalibrate(const QString& name, QString& errors, 
+						 const PfsHdrSettings& settings, 
+						 KUrl& exroutput);
+
+    
+
+Q_SIGNALS:
+
+    void starting(const KIPIExpoBlendingPlugin::ActionData& ad);
+    void finished(const KIPIExpoBlendingPlugin::ActionData& ad);
     
 protected:
 
@@ -74,4 +96,4 @@ protected:
 
 }  // namespace KIPIExpoBlendingPlugin
 
-#endif /* HDRGENTASK_H */
+#endif /* HDRCALIBRATETASK_H */

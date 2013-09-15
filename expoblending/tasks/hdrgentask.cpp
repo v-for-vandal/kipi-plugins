@@ -48,23 +48,29 @@ using namespace KIPIPlugins;
 namespace KIPIExpoBlendingPlugin
 {
 
-HdrGenTask::HdrGenTask(QObject* const parent, const KUrl::List& inUrls)
-    : Task(parent, HDRGEN, inUrls), urls(inUrls)
+HdrGenTask::HdrGenTask(QObject* const parent, const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option)
+    : Task(parent, HDRGEN, inUrls), urls(inUrls), name(&dirName), settings(pfsSettings), option(option)
 {}
 
-HdrGenTask::HdrGenTask(const KUrl::List& inUrls)
-    : Task(0, HDRGEN, inUrls), urls(inUrls)
+HdrGenTask::HdrGenTask(const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option)
+    : Task(0, HDRGEN, inUrls), urls(inUrls), name(&dirName), settings(pfsSettings), option(option)
 {}
 
 HdrGenTask::~HdrGenTask()
 {}
 
 void HdrGenTask::run()
-{   
-    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-hdr-exiftags-tmp-") +
-                                                       QString::number(QDateTime::currentDateTime().toTime_t()));
+{ 
+    ActionData ad1;
+    ad1.action         = HDRGEN;
+    ad1.starting       = true;
+    emit starting(ad1);
+    
+    *name = QString::number(QDateTime::currentDateTime().toTime_t());
+    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-hdr-exiftags-tmp-") + *name);
 
     preprocessingTmpDir = new KTempDir(prefix);
+    *name = preprocessingTmpDir->name();
     KUrl exifTags = KUrl(preprocessingTmpDir->name() + QString("exifTags.hdrgen"));
     QFile exifFile(exifTags.toLocalFile());
     exifFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -144,15 +150,25 @@ void HdrGenTask::run()
 
         kDebug() << url.fileName() << " : expo = " << expo;
 
-        if (meta.getExifTagRational("Exif.Photo.ApertureValue", num, den))
+        if (meta.getExifTagRational("Exif.Photo.FNumber", num, den))
         {
             if (den)
-                aper = (float)(num) / (float) (den) ;
+                aper = (float)(num) / (float)(den);
+        }
+        else if (getXmpRational("Xmp.exif.FNumber", num, den, meta))
+        {
+            if (den)
+                aper = (float)(num) / (float)(den);
+        }
+        else if (meta.getExifTagRational("Exif.Photo.ApertureValue", num, den))
+        {
+            if (den)
+                aper = (float)(exp(log(2.0) * (float)(num) / (float)(den) / 2.0));
         }
         else if (getXmpRational("Xmp.exif.ApertureValue", num, den, meta))
         {
             if (den)
-                aper = (float)(num) / (float) (den) ;
+                aper = (float)(exp(log(2.0) * (float)(num) / (float)(den) / 2.0));
         }
 
         kDebug() << url.fileName() << " :aper = " << aper;
@@ -187,9 +203,17 @@ void HdrGenTask::run()
 
         kDebug() << url.fileName() << " : iso = " << iso;
     
-        out << url.fileName() << " " << inverse_expo << " " << aper << " " << iso << " " << "0" <<endl;
+        out << url.toLocalFile() << " " << inverse_expo << " " << aper << " " << iso << " " << "0" <<endl;
     }
     exifFile.close();
+    
+    ActionData ad2;
+    ad2.action         = HDRGEN;
+    ad2.option         = option;
+    ad2.pfshdrSettings = settings;
+    
+    emit finished(ad2);
+    
     return;
     
 }
