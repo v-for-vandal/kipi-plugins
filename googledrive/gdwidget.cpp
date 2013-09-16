@@ -221,9 +221,4 @@ KIPIPlugins::KPProgressWidget* GoogleDriveWidget::progressBar() const
 {
     return m_progressBar;
 }
-/*
-void GoogleDriveWidget::slotImageListChanged(){
-    emit imageListChanged();
-}
-*/
 }

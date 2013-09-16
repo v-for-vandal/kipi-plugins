@@ -100,9 +100,6 @@ GDWindow::GDWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
     connect(this,SIGNAL(user1Clicked()),
             this,SLOT(slotStartTransfer()));
 
-   // connect(m_widget,SIGNAL(imageListChanged()),
-     //       this,SLOT(slotChangeProgressBar()));
-
     KPAboutData* const about = new KPAboutData(ki18n("Google Drive Export"),0,
                                                KAboutData::License_GPL,
                                                ki18n("A Kipi-plugin to export images "
@@ -266,10 +263,7 @@ void GDWindow::slotTextBoxEmpty(){
     kDebug() << "in slotTextBoxEmpty";
     KMessageBox::error(this, i18n("Text Box is Empty, Please Enter code from browser to textbox. To complete authentication press"
                                   " Change Account or start-upload button to authenticate again"));
-        kDebug() << "11";
         return;
-        //m_talker->doOAuth();
-
 }
 
 void GDWindow::slotStartTransfer(){
@@ -321,10 +315,6 @@ void GDWindow::slotStartTransfer(){
 
     uploadNextPhoto();
 }
-/*
-void GDWindow::slotChangeProgressBar(){
-    m_widget->progressBar()->hide();
-}*/
 
 void GDWindow::uploadNextPhoto(){
     kDebug() << "in upload nextphoto " << m_transferQueue.count();
@@ -371,10 +361,9 @@ void GDWindow::slotAddPhotoFailed(const QString& msg)
 void GDWindow::slotAddPhotoSucceeded(){
     // Remove photo uploaded from the list
     m_widget->m_imgList->removeItemByUrl(m_transferQueue.first().first);
-    kDebug() << "In slotAddPhotoSucceeded1";
     m_transferQueue.pop_front();
     m_imagesCount++;
-    kDebug() << "In slotAddPhotoSucceeded2" << m_imagesCount;
+    kDebug() << "In slotAddPhotoSucceeded" << m_imagesCount;
     m_widget->progressBar()->setMaximum(m_imagesTotal);
     m_widget->progressBar()->setValue(m_imagesCount);
     uploadNextPhoto();
@@ -404,7 +393,6 @@ void GDWindow::slotAccessTokenFailed(int errCode,const QString& errMsg){
 }
 
 void GDWindow::slotAccessTokenObtained(){
-    kDebug() << "acc : 111";
     m_talker->listFolders();
 }
 
@@ -419,7 +407,6 @@ void GDWindow::slotListAlbumsFailed(const QString& msg){
 }
 
 void GDWindow::slotCreateFolderFailed(const QString& msg){
-    kDebug() << "In slotCreateFolderFailed";
     KMessageBox::error(this, i18n("GoogleDrive Call Failed: %1\n", msg));
 }
 

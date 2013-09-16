@@ -30,7 +30,6 @@
 #include "kdialog.h"
 
 //local includes
-
 #include "gditem.h"
 
 namespace KIPIGoogleDrivePlugin{

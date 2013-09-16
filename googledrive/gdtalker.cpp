@@ -94,6 +94,7 @@ bool GDTalker::authenticated(){
     return true;
 }
 
+//starts authentication by opening the browser
 void GDTalker::doOAuth(){
     KUrl url("https://accounts.google.com/o/oauth2/auth");
     url.addQueryItem("scope",m_scope);
@@ -136,6 +137,7 @@ void GDTalker::doOAuth(){
     }
 }
 
+//gets access token from googledrive after authentication by user
 void GDTalker::getAccessToken(){
     KUrl url("https://accounts.google.com/o/oauth2/token?");
     url.addQueryItem("scope",m_scope.toAscii());
@@ -166,6 +168,7 @@ void GDTalker::getAccessToken(){
     emit signalBusy(true);
 }
 
+//gets access token from refresh token for handling login of user across digikam sessions
 void GDTalker::getAccessTokenFromRefreshToken(const QString& msg){
     KUrl url("https://accounts.google.com/o/oauth2/token");
 
@@ -193,6 +196,7 @@ void GDTalker::getAccessTokenFromRefreshToken(const QString& msg){
 
 }
 
+//gets username
 void GDTalker::getUserName(){
     KUrl url("https://www.googleapis.com/drive/v2/about");
     url.addQueryItem("scope",m_scope);
@@ -213,6 +217,7 @@ void GDTalker::getUserName(){
     emit signalBusy(true);
 }
 
+//gets list of folder of user in json format
 void GDTalker::listFolders(){
     KUrl url("https://www.googleapis.com/drive/v2/files?q=mimeType = 'application/vnd.google-apps.folder'");
     QString auth = "Authorization: " + m_bearer_access_token.toAscii();
@@ -230,6 +235,7 @@ void GDTalker::listFolders(){
     emit signalBusy(true);
 }
 
+//creates folder inside any folder(of which id is passed)
 void GDTalker::createFolder(const QString& title,const QString& id){
     if(m_job){
         m_job->kill();
@@ -412,7 +418,6 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
     QJson::Parser parser;
 
     bool ok;
-    kDebug() << "in parseResponseUserName";
     // json is a QString containing the data to convert
     QVariant result = parser.parse(data, &ok);
 
@@ -420,7 +425,7 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
         emit signalBusy(false);
         return;
     }
-    kDebug() << "in parseResponseUserName2";
+    kDebug() << "in parseResponseUserName";
     QVariantMap rlist = result.toMap();
     qDebug() << "size " << rlist.size();
     QList<QString> keys = rlist.uniqueKeys();
@@ -428,7 +433,7 @@ void GDTalker::parseResponseUserName(const QByteArray& data){
     QString temp;
     for(int i=0;i<rlist.size();i++){
         if(keys[i] == "name"){
-            kDebug() << "inside:" << rlist[keys[i]].value<QString>();
+            kDebug() << "username:" << rlist[keys[i]].value<QString>();
             temp = rlist[keys[i]].value<QString>();
             break;
         }
@@ -447,7 +452,6 @@ void GDTalker::parseResponseListFolders(const QByteArray& data){
         emit signalListAlbumsFailed(i18n("Failed to list Folders"));
         return;
     }
-    kDebug() << "in parseResponseListFolders";
     QVariantMap rMap = result.toMap();
     QList<QPair<QString,QString> > list;
     list.append(qMakePair(m_rootid,m_rootfoldername));
@@ -512,11 +516,9 @@ void GDTalker::parseResponseAddPhoto(const QByteArray& data){
     }
     emit signalBusy(false);
     if(!success){
-        kDebug() << "failed upload";
         emit signalAddPhotoFailed(i18n("Failed to Upload Photo"));
     }
     else{
-        kDebug() << "success upload";
         emit signalAddPhotoSucceeded();
     }
 }

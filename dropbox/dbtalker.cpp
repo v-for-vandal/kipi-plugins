@@ -87,6 +87,7 @@ DBTalker::~DBTalker(){
 
 }
 
+//generate a random number
 QString DBTalker::generateNonce(qint32 length)
 {
     QString clng = "";
@@ -95,6 +96,7 @@ QString DBTalker::generateNonce(qint32 length)
     return clng;
 }
 
+//dropbox first has to obtain request token before asking user for authorization
 void DBTalker::obtain_req_token(){
     KUrl url("https://api.dropbox.com/1/oauth/request_token");
     url.addQueryItem("oauth_consumer_key",m_oauth_consumer_key);
@@ -120,14 +122,13 @@ void DBTalker::obtain_req_token(){
 }
 
 bool DBTalker::authenticated(){
-    kDebug() << "in auth " << m_oauthToken;
     if(auth){
-        kDebug() << "in auth";
         return true;
     }
     return false;
 }
 
+//maintain login across digikam sessions
 void DBTalker::continueWithAccessToken(const QString& msg1,const QString& msg2,const QString& msg3){
     m_oauthToken = msg1;
     m_oauthTokenSecret = msg2;
@@ -135,6 +136,7 @@ void DBTalker::continueWithAccessToken(const QString& msg1,const QString& msg2,c
     emit signalAccessTokenObtained(m_oauthToken,m_oauthTokenSecret,m_access_oauth_signature);
 }
 
+//ask for authorization and login by opening browser
 void DBTalker::doOAuth(){
     KUrl url("https://api.dropbox.com/1/oauth/authorize");
     kDebug() << "in doOAuth()" << m_oauthToken;
@@ -167,7 +169,6 @@ void DBTalker::doOAuth(){
 
 
     if(dialog->exec() == QDialog::Accepted){
-        kDebug() << "1";
         getAccessToken();
     }
     else{
@@ -176,6 +177,7 @@ void DBTalker::doOAuth(){
 
 }
 
+//get access token from dropbox
 void DBTalker::getAccessToken(){
     KUrl url("https://api.dropbox.com/1/oauth/access_token");
     url.addQueryItem("oauth_consumer_key",m_oauth_consumer_key);
@@ -201,6 +203,7 @@ void DBTalker::getAccessToken(){
 
 }
 
+//creates folder at specified path
 void DBTalker::createFolder(const QString& path){
 //path also has name of new folder so send path parameter accordingly
     kDebug() << "in cre fol " << path;
@@ -232,6 +235,7 @@ void DBTalker::createFolder(const QString& path){
 
 }
 
+//get username of dropbox user
 void DBTalker::getUserName(){
     QUrl url("https://api.dropbox.com/1/account/info");
     url.addQueryItem("oauth_consumer_key",m_oauth_consumer_key);
@@ -257,6 +261,7 @@ void DBTalker::getUserName(){
 
 }
 
+//get list of folders by parsing json sent by dropbox
 void DBTalker::listFolders(const QString& path){
     QString make_url = QString("https://api.dropbox.com/1/metadata/dropbox/") + path;
     KUrl url(make_url);
@@ -480,7 +485,6 @@ void DBTalker::parseResponseUserName(const QByteArray& data){
     QString temp;
     for(int i=0;i<rmap.size();i++){
         if(keys[i] == "display_name"){
-        qDebug() << i << " " << keys[i] << " " << rmap[keys[i]].value<QString>();
         temp = rmap[keys[i]].value<QString>();
         }
     }
@@ -546,7 +550,6 @@ void DBTalker::parseResponseCreateFolder(const QByteArray& data){
     QString temp;
     for(int i=0;i<rmap.size();i++){
         if(keys[i] == "error"){
-            kDebug() << i << " " << keys[i] << " " << rmap[keys[i]].value<QString>();
             temp = rmap[keys[i]].value<QString>();
             success = false;
             signalCreateFolderFailed(rmap[keys[i]].value<QString>());

@@ -137,10 +137,10 @@ DBWindow::DBWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     connect(m_talker,SIGNAL(signalListAlbumsFailed(QString)),
             this,SLOT(slotListAlbumsFailed(QString)));
-    kDebug() << "114";
+
     connect(m_talker,SIGNAL(signalListAlbumsDone(QList<QPair<QString,QString> >)),
             this,SLOT(slotListAlbumsDone(QList<QPair<QString,QString> >)));
-    kDebug() << "115";
+
     connect(m_talker,SIGNAL(signalCreateFolderFailed(QString)),
             this,SLOT(slotCreateFolderFailed(QString)));
 
@@ -155,7 +155,6 @@ DBWindow::DBWindow(const QString& tmpFolder,QWidget* const /*parent*/) : KPToolD
 
     readSettings();
     buttonStateChange(false);
-    kDebug() << "116";
     if(m_accToken.isEmpty()){
         m_talker->obtain_req_token();
     }
@@ -262,7 +261,6 @@ void DBWindow::slotBusy(bool val)
 }
 
 void DBWindow::slotTextBoxEmpty(){
-    kDebug() << "in slotTextBoxEmpty";
     KMessageBox::error(this, i18n("Text Box is Empty, Please Enter code from browser to textbox. To complete authentication press"
                                   " Change Account or start-upload button to authenticate again"));
 
@@ -302,16 +300,12 @@ void DBWindow::slotStartTransfer(){
     m_imagesTotal = m_transferQueue.count();
     m_imagesCount = 0;
 
-    //m_progressDlg    = new KProgressDialog(this, i18n("Transfer Progress"));
     m_widget->progressBar()->setFormat(i18n("%v / %m"));
     m_widget->progressBar()->setMaximum(m_imagesTotal);
     m_widget->progressBar()->setValue(0);
     m_widget->progressBar()->show();
     m_widget->progressBar()->progressScheduled(i18n("Dropbox export"), true, true);
     m_widget->progressBar()->progressThumbnailChanged(KIcon("kipi").pixmap(22, 22));
-
-    //connect(m_progressDlg, SIGNAL(cancelClicked()),
-      //      this, SLOT(slotTransferCancel()));
 
     uploadNextPhoto();
 }
@@ -334,16 +328,11 @@ void DBWindow::uploadNextPhoto(){
         slotAddPhotoFailed("");
         return;
     }
-    /*else{
-        //m_progressDlg->setLabelText(i18n("Uploading file %1", m_transferQueue.first().path()));
-        slotAddPhotoSucceeded();
-        return;
-    }*/
+
 }
 
 void DBWindow::slotAddPhotoFailed(const QString& msg)
 {
-    kDebug() << "In slotAddPhotoFailed";
     if (KMessageBox::warningContinueCancel(this, i18n("Failed to upload photo to Dropbox. %1\nDo you want to continue?",msg))
         != KMessageBox::Continue)
     {
@@ -355,7 +344,6 @@ void DBWindow::slotAddPhotoFailed(const QString& msg)
     }
     else
     {
-        kDebug() << "In slotAddPhotoFailed 2";
         m_transferQueue.pop_front();
         m_imagesTotal--;
         m_widget->progressBar()->setMaximum(m_imagesTotal);
@@ -365,7 +353,6 @@ void DBWindow::slotAddPhotoFailed(const QString& msg)
 }
 
 void DBWindow::slotAddPhotoSucceeded(){
-    kDebug() << "In slotAddPhotoSucceeded";
     // Remove photo uploaded from the list
     m_widget->m_imgList->removeItemByUrl(m_transferQueue.first());
     m_transferQueue.pop_front();
@@ -382,7 +369,6 @@ void DBWindow::slotImageListChanged(){
 void DBWindow::slotNewAlbumRequest(){
     if (m_albumDlg->exec() == QDialog::Accepted)
     {
-        kDebug() << "Calling New Album method";
         DBFolder newFolder;
         m_albumDlg->getFolderTitle(newFolder);
         kDebug() << "in slotNewAlbumRequest() " << newFolder.title;
@@ -393,7 +379,6 @@ void DBWindow::slotNewAlbumRequest(){
 }
 
 void DBWindow::slotReloadAlbumsRequest(){
-    kDebug() << "Reload albums request";
     m_talker->listFolders("/");
 }
 
@@ -423,13 +408,11 @@ void DBWindow::slotListAlbumsFailed(const QString& msg){
 }
 
 void DBWindow::slotCreateFolderFailed(const QString& msg){
-    kDebug() << "In slotCreateFolderFailed";
     KMessageBox::error(this, i18n("Dropbox Call Failed: %1\n", msg));
     //return;
 }
 
 void DBWindow::slotCreateFolderSucceeded(){
-    kDebug() << "In slotCreateFolderSucceeded";
     m_talker->listFolders("/");
 }
 
