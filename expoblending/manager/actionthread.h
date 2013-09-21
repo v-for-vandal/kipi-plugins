@@ -80,11 +80,11 @@ public:
     void enfuseFinal(const KUrl::List& alignedUrls, const KUrl& outputUrl,
                      const EnfuseSettings& settings, const QString& enfusePath);
     
-    void hdrGen(const KUrl::List& urlList, QString& name, const PfsHdrSettings& settings, int option);
+    void hdrGen(const KUrl::List& urlList, const PfsHdrSettings& settings, int option);
     void hdrCalibrate(const KUrl::List& urlList, const QString& name, const PfsHdrSettings& settings, int option);
-    void hdrOutExrPreview(const KUrl::List& urlList,const QString& name, const KUrl& outputUrl, 
+    void hdrOutPreview(const KUrl::List& urlList,const QString& name, const KUrl& outputUrl, 
 			const PfsHdrSettings& settings);
-    void hdrOutExrFinal(const KUrl::List& urlList,const QString& name, const KUrl& outputUrl, 
+    void hdrOutFinal(const KUrl::List& urlList,const QString& name, const KUrl& outputUrl, 
 	                const PfsHdrSettings& settings);
     void cancel();
     

@@ -2,10 +2,10 @@ SUBDIRS(icons)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/importwizard
                     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg
+                    ${CMAKE_CURRENT_SOURCE_DIR}/hdrdlg
                     ${CMAKE_CURRENT_SOURCE_DIR}/manager
                     ${CMAKE_CURRENT_SOURCE_DIR}/plugin
-                    ${CMAKE_CURRENT_SOURCE_DIR}/tasks
-                    ${CMAKE_CURRENT_SOURCE_DIR}/hdrdlg
+                    ${CMAKE_CURRENT_SOURCE_DIR}/tasks     
                     
                    )
 
@@ -31,6 +31,7 @@ SET(expoblending_common_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/manager/manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/manager/actionthread.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/manager/enfusebinary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/manager/pfsbinary.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/importwizard/importwizarddlg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/importwizard/intropage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/importwizard/itemspage.cpp
@@ -41,6 +42,7 @@ SET(expoblending_common_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg/bracketstack.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/blendingdlg/enfusestack.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/hdrdlg/pfshdrstack.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/hdrdlg/hdrimagedlg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tasks/task.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tasks/preprocesstask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tasks/generictask.cpp

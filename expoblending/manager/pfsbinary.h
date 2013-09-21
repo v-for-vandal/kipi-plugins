@@ -55,6 +55,11 @@ public:
     ~PfsCalibrateBinary()
     {
     }
+
+protected:
+  
+    virtual bool parseHeader(const QString& output);
+    
 };
 
 } // namespace KIPIExpoBlendingPlugin

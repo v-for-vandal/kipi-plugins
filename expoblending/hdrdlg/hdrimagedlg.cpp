@@ -3,10 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2013-09-04
- * Description : a tool to blend bracketed images/create HDR images.
+ * Date        : 2009-12-13
+ * Description : a tool to blend bracketed images.
  *
- * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
+ * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -81,11 +81,10 @@ extern "C"
 #include "aboutdata.h"
 #include "actionthread.h"
 #include "bracketstack.h"
-#include "pfsbinary.h"
-#include "pfshdrgenbinary.h"
-#include "pfshdrstack.h"
-#include "pfshdrsettings.h"
+#include "enfusebinary.h"
+#include "enfusesettings.h"
 #include "enfusestack.h"
+#include "pfshdrstack.h"
 #include "kpoutputdialog.h"
 #include "kppreviewmanager.h"
 #include "kpsavesettingswidget.h"
@@ -106,7 +105,6 @@ public:
         previewWidget       = 0;
         saveSettingsBox     = 0;
         bracketStack        = 0;
-        pfshdrStack         = 0;
         settingsExpander    = 0;
         mngr                = 0;
         firstImageDisplayed = false;
@@ -116,9 +114,8 @@ public:
     QString               inputFileName;
     QString               output;
     QString               dirName;
-    
-    KUrl::List            inputList;
 
+    KUrl::List            listUrls;
     KLineEdit*            templateFileName;
 
     KPPreviewManager*     previewWidget;
@@ -141,7 +138,7 @@ HdrImageDlg::HdrImageDlg(Manager* const mngr, QWidget* const parent)
 {
     d->mngr = mngr;
 
-    setModal(false);
+   setModal(false);
     setButtons(Help | Default | User1 | User2 | User3 | Close);
     setDefaultButton(Close);
     setCaption(i18n("HDR Image Creation"));
@@ -160,7 +157,7 @@ HdrImageDlg::HdrImageDlg(Manager* const mngr, QWidget* const parent)
 
     setButtonToolTip(Close, i18n("Exit this tool"));
     setModal(false);
-    setAboutData(new HdrImageAboutData());
+    setAboutData(new ExpoBlendingAboutData());
 
     // ---------------------------------------------------------------
 
@@ -184,7 +181,7 @@ HdrImageDlg::HdrImageDlg(Manager* const mngr, QWidget* const parent)
     d->bracketStack      = new BracketStackList(d->mngr->iface(), panel);
 
     d->settingsExpander  = new RExpanderBox(panel);
-    d->settingsExpander->setObjectName("HDR Image Settings Expander");
+    d->settingsExpander->setObjectName("Hdr Image Settings Expander");
 
     d->saveSettingsBox   = new KPSaveSettingsWidget(d->settingsExpander);
 
@@ -198,8 +195,7 @@ HdrImageDlg::HdrImageDlg(Manager* const mngr, QWidget* const parent)
     d->pfshdrStack       = new PfsHdrStackList(panel);
 
     d->settingsExpander->addItem(d->saveSettingsBox,   i18n("Save Settings"),   QString("savesettings"), true);
-    d->settingsExpander->setItemIcon(0, SmallIcon("Hdr Image"));
-    d->settingsExpander->setItemIcon(1, SmallIcon("document-save"));
+    d->settingsExpander->setItemIcon(0, SmallIcon("document-save"));
 
     // ---------------------------------------------------------------
 
@@ -260,7 +256,7 @@ HdrImageDlg::~HdrImageDlg()
     delete d;
 }
 
-void ExpoBlendingDlg::closeEvent(QCloseEvent* e)
+void HdrImageDlg::closeEvent(QCloseEvent* e)
 {
     if (!e) return;
     d->mngr->thread()->cancel();
@@ -269,34 +265,35 @@ void ExpoBlendingDlg::closeEvent(QCloseEvent* e)
     e->accept();
 }
 
-void ExpoBlendingDlg::slotClose()
+void HdrImageDlg::slotClose()
 {
     d->mngr->thread()->cancel();
     saveSettings();
     done(Close);
 }
 
-void ExpoBlendingDlg::slotFileFormatChanged()
+void HdrImageDlg::slotFileFormatChanged()
 {
     d->pfshdrStack->setTemplateFileName(d->saveSettingsBox->fileFormat(), d->templateFileName->text());
 }
 
-void ExpoBlendingDlg::slotPreviewButtonClicked()
+void HdrImageDlg::slotPreviewButtonClicked()
 {
     KPOutputDialog dlg(kapp->activeWindow(),
-                       i18n("Hdr Image Creation Messages"),
+                       i18n("Pfs HDR Processing Messages"),
                        d->output);
 
     dlg.setAboutData(new ExpoBlendingAboutData());
+    dlg.exec();
 }
 
-void ExpoBlendingDlg::loadItems(const KUrl::List& urls)
+void HdrImageDlg::loadItems(const KUrl::List& urls)
 {
     d->bracketStack->clear();
     d->bracketStack->addItems(urls);
 }
 
-void ExpoBlendingDlg::slotAddItems(const KUrl::List& urls)
+void HdrImageDlg::slotAddItems(const KUrl::List& urls)
 {
     if (!urls.empty())
     {
@@ -306,21 +303,21 @@ void ExpoBlendingDlg::slotAddItems(const KUrl::List& urls)
     }
 }
 
-void ExpoBlendingDlg::slotLoadProcessed(const KUrl& url)
+void HdrImageDlg::slotLoadProcessed(const KUrl& url)
 {
     d->mngr->thread()->loadProcessed(url);
     if (!d->mngr->thread()->isRunning())
         d->mngr->thread()->start();
 }
 
-void ExpoBlendingDlg::setIdentity(const KUrl& url, const QString& identity)
+void HdrImageDlg::setIdentity(const KUrl& url, const QString& identity)
 {
     BracketStackItem* item = d->bracketStack->findItem(url);
     if (item)
         item->setExposure(identity);
 }
 
-void ExpoBlendingDlg::busy(bool val)
+void HdrImageDlg::busy(bool val)
 {
     d->saveSettingsBox->setEnabled(!val);
     d->bracketStack->setEnabled(!val);
@@ -332,16 +329,16 @@ void ExpoBlendingDlg::busy(bool val)
         d->previewWidget->setButtonVisible(false);
 }
 
-void ExpoBlendingDlg::slotDefault()
+void HdrImageDlg::slotDefault()
 {
     d->saveSettingsBox->resetToDefault();
-    d->templateFileName->setText("PfsHdr");
+    d->templateFileName->setText("pfshdr");
 }
 
-void ExpoBlendingDlg::readSettings()
+void HdrImageDlg::readSettings()
 {
     KConfig config("kipirc");
-    KConfigGroup group = config.group(QString("Hdr Image Settings"));
+    KConfigGroup group = config.group(QString("HDR Image Settings"));
 
     d->saveSettingsBox->readSettings(group);
 
@@ -351,16 +348,16 @@ void ExpoBlendingDlg::readSettings()
     d->settingsExpander->readSettings();
 #endif
 
-    d->templateFileName->setText(group.readEntry("Template File Name", QString("PfsHdr")));
+    d->templateFileName->setText(group.readEntry("Template File Name", QString("pfshdr")));
 
-    KConfigGroup group2 = config.group(QString("Hdr Image Creation Dialog"));
+    KConfigGroup group2 = config.group(QString("HDR image Dialog"));
     restoreDialogSize(group2);
 }
 
-void ExpoBlendingDlg::saveSettings()
+void HdrImageDlg::saveSettings()
 {
     KConfig config("kipirc");
-    KConfigGroup group = config.group(QString("Hdr Image Settings"));
+    KConfigGroup group = config.group(QString("HDR Image Settings"));
 
     d->saveSettingsBox->writeSettings(group);
 
@@ -372,12 +369,13 @@ void ExpoBlendingDlg::saveSettings()
 
     group.writeEntry("Template File Name", d->templateFileName->text());
 
-    KConfigGroup group2 = config.group(QString("Hdr Image Creation Dialog"));
+    KConfigGroup group2 = config.group(QString("ExpoBlending Dialog"));
     saveDialogSize(group2);
     config.sync();
 }
 
-void ExpoBlendingDlg::slotPreview()
+
+void HdrImageDlg::slotPreview()
 {
     KUrl::List selectedUrl = d->bracketStack->urls();
     if (selectedUrl.isEmpty()) return;
@@ -391,16 +389,16 @@ void ExpoBlendingDlg::slotPreview()
         preprocessedList.append(preprocessedUrls.previewUrl);
     }
 
-    d->inputList = preprocessedList;
-    PfsHdrSettings settings = new PfsHdrSettings();
+    d->listUrls = preprocessedList;
+    PfsHdrSettings settings;
     settings.inputUrls      = d->bracketStack->urls();
     settings.outputFormat   = d->saveSettingsBox->fileFormat();
-    d->mngr->thread()->hdrGen(preprocessedList, d->dirName, settings, 0);
+    d->mngr->thread()->hdrGen(selectedUrl, settings, 0);
     if (!d->mngr->thread()->isRunning())
         d->mngr->thread()->start();
 }
 
-void ExpoBlendingDlg::slotProcess()
+void HdrImageDlg::slotProcess()
 {
     QList<PfsHdrSettings> list = d->pfshdrStack->settingsList();
     if (list.isEmpty()) return;
@@ -418,13 +416,14 @@ void ExpoBlendingDlg::slotProcess()
             preprocessedList.append(preprocessedUrls.preprocessedUrl);
         }
 
-        d->mngr->thread()->hdrGen(preprocessedList, d->dirName, settings, 1);
+        d->mngr->thread()->hdrGen(settings.inputUrls, settings, 1);
         if (!d->mngr->thread()->isRunning())
             d->mngr->thread()->start();
     }
 }
 
-void ExpoBlendingDlg::saveItem(const KUrl& temp, const PfsHdrSettings& settings)
+
+void HdrImageDlg::saveItem(const KUrl& temp, const PfsHdrSettings& settings)
 {
     KUrl newUrl = temp;
     newUrl.setFileName(settings.targetFileName);
@@ -488,12 +487,12 @@ void ExpoBlendingDlg::saveItem(const KUrl& temp, const PfsHdrSettings& settings)
     }
 }
 
-void ExpoBlendingDlg::slotAbort()
+void HdrImageDlg::slotAbort()
 {
     d->mngr->thread()->cancel();
 }
 
-void ExpoBlendingDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
+void HdrImageDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
 {
     QString text;
 
@@ -508,6 +507,18 @@ void ExpoBlendingDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
             case(LOAD):
             {
                 busy(true);
+                break;
+            }
+            case(HDRGEN):
+            {
+                busy(true);
+                d->previewWidget->setBusy(true, i18n("Processing preview of bracketed images..."));
+                break;
+            }
+            case(CAMERARESPONSE):
+            {
+                busy(true);
+                d->previewWidget->setBusy(true, i18n("Processing preview of bracketed images..."));
                 break;
             }
             case(HDRCALIBRATEPREVIEW):
@@ -548,6 +559,24 @@ void ExpoBlendingDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
                     busy(false);
                     break;
                 }
+                case(HDRGEN):
+                {
+                    d->output = ad.message;
+                    d->previewWidget->setBusy(false);
+                    d->previewWidget->setButtonVisible(true);
+                    d->previewWidget->setText(i18n("Failed to process preview of bracketed images"), Qt::red);
+                    busy(false);
+                    break;
+                }
+                case(CAMERARESPONSE):
+                {
+                    d->output = ad.message;
+                    d->previewWidget->setBusy(false);
+                    d->previewWidget->setButtonVisible(true);
+                    d->previewWidget->setText(i18n("Failed to process preview of bracketed images"), Qt::red);
+                    busy(false);
+                    break;
+                }
                 case(HDRCALIBRATEPREVIEW):
                 {
                     d->output = ad.message;
@@ -564,7 +593,7 @@ void ExpoBlendingDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
                     d->previewWidget->setBusy(false);
                     d->previewWidget->setButtonVisible(true);
                     d->previewWidget->setText(i18n("Failed to process targets of bracketed images"), Qt::red);
-                    d->pfshdrStack->processingItem(ad.pfshdr.previewUrl, false);
+                    d->pfshdrStack->processingItem(ad.pfshdrSettings.previewUrl, false);
                     d->pfshdrStack->setOnItem(ad.pfshdrSettings.previewUrl, false);
                     busy(false);
                     break;
@@ -590,13 +619,13 @@ void ExpoBlendingDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
                 {
                     d->previewWidget->setImage(ad.image, !d->firstImageDisplayed);
                     d->firstImageDisplayed |= true;
-                    d->enfuseStack->setThumbnail(ad.inUrls[0], ad.image);
+                    d->pfshdrStack->setThumbnail(ad.inUrls[0], ad.image);
                     busy(false);
                     break;
                 }
                 case(HDRGEN):
                 {
-	            d->mngr->thread()->hdrCalibrate(d->listUrls, d->dirName, ad.pfshdrSettings, ad.option);
+	            d->mngr->thread()->hdrCalibrate(d->listUrls, ad.dirName, ad.pfshdrSettings, ad.option);
 	            break;
 	        }
 	        case(CAMERARESPONSE):
@@ -604,11 +633,11 @@ void ExpoBlendingDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
                     loadItems(d->mngr->itemsList());
 	            if(ad.option == 0)
 		    {
-	                d->mngr->thread()->hdrOutExrPreview(d->listUrls, d->dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
+	                d->mngr->thread()->hdrOutPreview(d->listUrls, ad.dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
 		    }
 		    if(ad.option == 1)
 		    {
-	                d->mngr->thread()->hdrOutExrFinal(d->listUrls, d->dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
+	                d->mngr->thread()->hdrOutFinal(d->listUrls, ad.dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
 		    }
 	            break;
 	        }

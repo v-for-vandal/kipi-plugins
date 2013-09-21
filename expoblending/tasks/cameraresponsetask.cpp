@@ -62,17 +62,35 @@ CameraResponseTask::~CameraResponseTask()
 {}
 
 void CameraResponseTask::run()
-{   
+{
     ActionData ad1;
     ad1.action         = CAMERARESPONSE;
     ad1.starting       = true;
     emit starting(ad1);
     
+    bool result = responseCurve(name);
+
+    ActionData ad2;
+    ad2.action         = CAMERARESPONSE;
+    ad2.option         = option;
+    ad2.dirName        = name;
+    ad2.pfshdrSettings = settings;
+    ad2.success        = result;
+    ad2.dirName        = name;
+    
+    emit finished(ad2);
+}
+ 
+bool CameraResponseTask::responseCurve(const QString& name)
+{   
     KUrl exifTags = KUrl(name + QString("exifTags.hdrgen"));
     KUrl cameraResponse= KUrl(name + QString("camera.response"));
     
     QStringList pfsinhdrgenArgs;
     QStringList pfshdrcalibrateArgs;
+    
+    QProcess*           pfsinhdrgenProcess;
+    QProcess*           pfshdrcalibrateProcess;
     
     pfsinhdrgenProcess = new QProcess();
     pfshdrcalibrateProcess = new QProcess();
@@ -95,19 +113,12 @@ void CameraResponseTask::run()
     {
         successFlag = false;  
         //errors = getProcessError(pfsoutexrProcess);
-        return ;
+        return false;
     }
     pfsinhdrgenProcess->close();
     pfshdrcalibrateProcess->close();
-    
-    ActionData ad2;
-    ad2.action         = CAMERARESPONSE;
-    ad2.option         = option;
-    ad2.dirName        = name;
-    ad2.pfshdrSettings = settings;
-    
-    emit finished(ad2);
-                    
+                
+    return true;
 }
 
 /*QString HdrCalibrateTask::getProcessError(QProcess* const proc) const

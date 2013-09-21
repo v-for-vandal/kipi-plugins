@@ -261,11 +261,11 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
    
 }
 
-void ActionThread::hdrGen(const KUrl::List& urlList, QString& name, const PfsHdrSettings& settings, int option)
+void ActionThread::hdrGen(const KUrl::List& urlList, const PfsHdrSettings& settings, int option)
 {                     
     JobCollection   *jobs           = new JobCollection();
     
-    HdrGenTask* const pfshdrscript = new HdrGenTask(this, urlList, name, settings, option);
+    HdrGenTask* const pfshdrscript = new HdrGenTask(this, urlList, settings, option);
 
     connect(pfshdrscript, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
             this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));  
@@ -299,7 +299,7 @@ void ActionThread::hdrCalibrate(const KUrl::List& urlList, const QString& name, 
     appendJob(jobs);
 }
 
-void ActionThread::hdrOutExrPreview(const KUrl::List& urlList,const QString& name, 
+void ActionThread::hdrOutPreview(const KUrl::List& urlList,const QString& name, 
 				    const KUrl& outputUrl, const PfsHdrSettings& settings)
 {
     JobCollection   *jobs  = new JobCollection();
@@ -320,7 +320,7 @@ void ActionThread::hdrOutExrPreview(const KUrl::List& urlList,const QString& nam
     appendJob(jobs);
 }
 
-void ActionThread::hdrOutExrFinal(const KUrl::List& urlList,const QString& name, 
+void ActionThread::hdrOutFinal(const KUrl::List& urlList,const QString& name, 
 				  const KUrl& outputUrl, const PfsHdrSettings& settings)
 {
     JobCollection   *jobs  = new JobCollection();

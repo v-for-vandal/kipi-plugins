@@ -48,8 +48,6 @@ public:
      
     KTempDir*           preprocessingTmpDir;
     QString const       name;
-    QProcess*           pfsinhdrgenProcess;
-    QProcess*           pfshdrcalibrateProcess;
     
     PfsHdrSettings      settings;
   
@@ -68,7 +66,7 @@ public:
     CameraResponseTask(const KUrl::List& inUrls, const QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
     ~CameraResponseTask();
     
-    bool cameraResponseCurve(const QString& name, QString& errors);
+    bool responseCurve(const QString& name);
     
 protected:
 

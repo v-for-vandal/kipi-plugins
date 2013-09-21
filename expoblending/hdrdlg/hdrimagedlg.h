@@ -3,10 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2013-09-04
- * Description : a tool to blend bracketed images/create HDR images.
+ * Date        : 2009-12-13
+ * Description : a tool to blend bracketed images.
  *
- * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
+ * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -73,7 +73,7 @@ private:
     void saveSettings();
 
     void busy(bool busy);
-    void saveItem(const KUrl& temp, const EnfuseSettings& settings);
+    void saveItem(const KUrl& temp, const PfsHdrSettings& settings);
 
     void setIdentity(const KUrl& url, const QString& identity);
 
@@ -100,4 +100,4 @@ private:
 
 } // namespace KIPIExpoBlendingPlugin
 
-#endif //  HDRIMAGEDLG_H
+#endif // EXPOBLENDINGDLG_H

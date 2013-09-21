@@ -47,8 +47,7 @@ class HdrGenTask : public Task
 public:
    
     KUrl::List          urls;      
-    KTempDir*           preprocessingTmpDir;
-    QString*            name;
+    QString             name;
     PfsHdrSettings      settings;
     int                 option;
    
@@ -60,10 +59,11 @@ protected:
 
 public:
 
-    HdrGenTask(QObject* const parent, const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);
-    HdrGenTask(const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
+    HdrGenTask(QObject* const parent, const KUrl::List& inUrls, const PfsHdrSettings& pfsSettings, int option);
+    HdrGenTask(const KUrl::List& inUrls, const PfsHdrSettings& pfsSettings, int option);   
     ~HdrGenTask();
     
+    bool hdrgenScript(const KUrl::List& urls, QString& name);
     bool getXmpRational(const char* xmpTagName, long& num, long& den, KPMetadata& meta);
     
 protected:

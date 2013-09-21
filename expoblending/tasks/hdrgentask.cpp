@@ -48,29 +48,45 @@ using namespace KIPIPlugins;
 namespace KIPIExpoBlendingPlugin
 {
 
-HdrGenTask::HdrGenTask(QObject* const parent, const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option)
-    : Task(parent, HDRGEN, inUrls), urls(inUrls), name(&dirName), settings(pfsSettings), option(option)
+HdrGenTask::HdrGenTask(QObject* const parent, const KUrl::List& inUrls, const PfsHdrSettings& pfsSettings, int option)
+    : Task(parent, HDRGEN, inUrls), urls(inUrls), settings(pfsSettings), option(option)
 {}
 
-HdrGenTask::HdrGenTask(const KUrl::List& inUrls, QString& dirName, const PfsHdrSettings& pfsSettings, int option)
-    : Task(0, HDRGEN, inUrls), urls(inUrls), name(&dirName), settings(pfsSettings), option(option)
+HdrGenTask::HdrGenTask(const KUrl::List& inUrls, const PfsHdrSettings& pfsSettings, int option)
+    : Task(0, HDRGEN, inUrls), urls(inUrls), settings(pfsSettings), option(option)
 {}
 
 HdrGenTask::~HdrGenTask()
 {}
 
 void HdrGenTask::run()
-{ 
+{
     ActionData ad1;
     ad1.action         = HDRGEN;
     ad1.starting       = true;
     emit starting(ad1);
     
-    *name = QString::number(QDateTime::currentDateTime().toTime_t());
-    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-hdr-exiftags-tmp-") + *name);
+    bool result = hdrgenScript(urls, name);
+    
+    ActionData ad2;
+    ad2.action         = HDRGEN;
+    ad2.option         = option;
+    ad2.pfshdrSettings = settings;
+    ad2.success        = result;
+    ad2.dirName        = name;
+    emit finished(ad2);
+    
+}
 
+bool HdrGenTask::hdrgenScript(const KUrl::List& urls, QString& name)
+{   
+    name = QString::number(QDateTime::currentDateTime().toTime_t());
+    QString prefix = KStandardDirs::locateLocal("tmp", QString("kipi-hdr-exiftags-tmp-") + name);
+
+    KTempDir*           preprocessingTmpDir;
+    
     preprocessingTmpDir = new KTempDir(prefix);
-    *name = preprocessingTmpDir->name();
+    name = preprocessingTmpDir->name();
     KUrl exifTags = KUrl(preprocessingTmpDir->name() + QString("exifTags.hdrgen"));
     QFile exifFile(exifTags.toLocalFile());
     exifFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -85,7 +101,7 @@ void HdrGenTask::run()
 	{
 	   errString = i18n("Image metadata has no Exif Information.");
            successFlag = false;
-           return;
+           return false;
 	}
     
         long num = 1, den = 1;
@@ -178,10 +194,9 @@ void HdrGenTask::run()
         if (aper == 0.0)
 	{
            successFlag = false;
-           return;
+           return false;
 	}
            
-
         // If iso is found use that value, otherwise assume a value of iso=100. (again, some cameras do not print iso in exif).
 
         if (meta.getExifTagRational("Exif.Photo.ISOSpeedRatings", num, den))
@@ -203,19 +218,19 @@ void HdrGenTask::run()
 
         kDebug() << url.fileName() << " : iso = " << iso;
     
-        out << url.toLocalFile() << " " << inverse_expo << " " << aper << " " << iso << " " << "0" <<endl;
+        if (inverse_expo != -1.0 && iso != -1.0 && aper != -1.0)
+	{
+            out << url.toLocalFile() << " " << inverse_expo << " " << aper << " " << iso << " " << "0" <<endl;
+	}
+	else
+	{
+	    kDebug() << "Camera Parameters Value error";
+	    return false;
+	}
+	
     }
     exifFile.close();
-    
-    ActionData ad2;
-    ad2.action         = HDRGEN;
-    ad2.option         = option;
-    ad2.pfshdrSettings = settings;
-    
-    emit finished(ad2);
-    
-    return;
-    
+    return true;
 }
 
 

@@ -38,9 +38,9 @@ class ExpoBlendingAboutData : public KPAboutData
 public:
 
     ExpoBlendingAboutData()
-        : KPAboutData(ki18n("Exposure Blending"), 0,
+        : KPAboutData(ki18n("Exposure Blending/HDR Image"), 0,
                       KAboutData::License_GPL,
-                      ki18n("A tool to blend bracketed images"),
+                      ki18n("A tool to blend bracketed images/Create HDR Images"),
                       ki18n("(c) 2009-2012, Gilles Caulier"))
     {
          addAuthor(ki18n("Gilles Caulier"),
@@ -51,6 +51,10 @@ public:
                    ki18n("Developer"),
                    "languitar at semipol dot de");
 
+	 addAuthor(ki18n("Soumajyoti Sarkar"),
+                   ki18n("Developer"),
+                   "ergy dot ergy at gmail dot com");
+	 
          setHandbookEntry("expoblending");
     }
 

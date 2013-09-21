@@ -35,6 +35,7 @@
 
 #include "importwizarddlg.h"
 #include "expoblendingdlg.h"
+#include "hdrimagedlg.h"
 #include "actionthread.h"
 #include "alignbinary.h"
 #include "enfusebinary.h"
@@ -53,7 +54,8 @@ public:
         iface  = 0;
         thread = 0;
         wizard = 0;
-        dlg    = 0;
+        hdrdlg = 0;
+	expdlg = 0;
     }
 
     KUrl::List             inputUrls;
@@ -70,11 +72,12 @@ public:
 
     AlignBinary            alignBinary;
     EnfuseBinary           enfuseBinary;
-    PfsCalibrateBinary     pfscalibrateBinary;
-    PfsHdrGenBinary        hdrgenBinary;
-    
+    //PfsCalibrateBinary     calibrateBinary;
+   // PfsHdrGenBinary        hdrgenBinary;
+
     ImportWizardDlg*       wizard;
-    ExpoBlendingDlg*       dlg;
+    ExpoBlendingDlg*       expdlg;
+    HdrImageDlg*           hdrdlg; 
 };
 
 Manager::Manager(QObject* const parent)
@@ -96,7 +99,8 @@ Manager::~Manager()
 {
     delete d->thread;
     delete d->wizard;
-    delete d->dlg;
+    delete d->hdrdlg;
+   // delete d->expdlg;
     delete d;
 }
 
@@ -107,13 +111,13 @@ bool Manager::checkBinaries()
 
     if (!d->enfuseBinary.recheckDirectories())
         return false;
-
-    if (!d->pfscalibrateBinary.recheckDirectories())
+/*
+     if (!d->calibrateBinary.recheckDirectories())
         return false;
-    
+
     if (!d->hdrgenBinary.recheckDirectories())
         return false;
-    
+    */
     return true;
 }
 
@@ -126,17 +130,17 @@ EnfuseBinary& Manager::enfuseBinary() const
 {
     return d->enfuseBinary;
 }
-
+/*
 PfsCalibrateBinary& Manager::pfscalibrateBinary() const
 {
-    return d->pfscalibrateBinary;
+    return d->calibrateBinary;
 }
 
-PfsHdrGenBinary& Manager::pfshdrgenBinary() const
+PfsHdrGenBinary& Manager::hdrgenscriptBinary() const
 {
-    return d->hdrgenBinary;
+    return d->hdrgensBinary;
 }
-
+*/
 void Manager::setIface(Interface* const iface)
 {
     d->iface = iface;
@@ -214,8 +218,10 @@ void Manager::startWizard()
 void Manager::slotStartDialog()
 {
     d->inputUrls = d->wizard->itemUrls();
-    d->dlg = new ExpoBlendingDlg(this);
-    d->dlg->show();
+    d->hdrdlg = new HdrImageDlg(this);
+    d->hdrdlg->show();
+    //d->expdlg = new ExpoBlendingDlg(this);
+    //d->expdlg->show();
 }
 
 void Manager::slotSetEnfuseVersion(double version)
