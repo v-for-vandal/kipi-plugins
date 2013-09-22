@@ -3,10 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2009-12-13
- * Description : a tool to blend bracketed images.
+ * Date        : 2013-08-31
+ * Description : a tool to blend bracketed images/create HDR images.
  *
- * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
+ * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General

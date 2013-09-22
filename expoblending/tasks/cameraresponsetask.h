@@ -4,7 +4,7 @@
  * http://www.digikam.org
  *
  * Date        : 2013-08-31
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
@@ -62,11 +62,12 @@ protected:
 public:
 
     CameraResponseTask(QObject* const parent, const KUrl::List& inUrls, const QString& dirName, 
-		       const PfsHdrSettings& pfsSettings, int option);
+                       const PfsHdrSettings& pfsSettings, int option);
     CameraResponseTask(const KUrl::List& inUrls, const QString& dirName, const PfsHdrSettings& pfsSettings, int option);   
     ~CameraResponseTask();
     
-    bool responseCurve(const QString& name);
+    bool responseCurve(const QString& name, QString& errors);
+    QString getProcessError(QProcess* const proc) const;
     
 protected:
 

@@ -31,7 +31,8 @@ SET(expoblending_common_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/manager/manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/manager/actionthread.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/manager/enfusebinary.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/manager/pfsbinary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/manager/pfshdrcalibratebinary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/manager/pfsinhdrgenbinary.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/importwizard/importwizarddlg.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/importwizard/intropage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/importwizard/itemspage.cpp

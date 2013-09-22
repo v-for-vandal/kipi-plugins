@@ -8,6 +8,7 @@
  *
  * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
  * Copyright (C) 2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
+ * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -40,6 +41,8 @@
 #include "kpbinarysearch.h"
 #include "alignbinary.h"
 #include "enfusebinary.h"
+#include "pfshdrcalibratebinary.h"
+#include "pfsinhdrgenbinary.h"
 
 namespace KIPIExpoBlendingPlugin
 {
@@ -87,6 +90,9 @@ IntroPage::IntroPage(Manager* const mngr, KAssistantDialog* const dlg)
     d->binariesWidget = new KIPIPlugins::KPBinarySearch(binaryBox);
     d->binariesWidget->addBinary(d->mngr->alignBinary());
     d->binariesWidget->addBinary(d->mngr->enfuseBinary());
+    d->binariesWidget->addBinary(d->mngr->pfscalibrateBinary());
+    d->binariesWidget->addBinary(d->mngr->pfshdrgenscriptBinary());
+    
 #ifdef Q_WS_MAC
     d->binariesWidget->addDirectory("/Applications/Hugin/HuginTools");
 #endif

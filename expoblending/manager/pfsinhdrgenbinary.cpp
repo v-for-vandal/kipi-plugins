@@ -3,12 +3,11 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2009-11-13
- * Description : a plugin to blend bracketed images.
+ * Date        : 2013-09-05
+ * Description : Autodetects pfsinhdrgen binary program 
  *
- * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
- * 
+ *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
@@ -16,45 +15,32 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */
 
-#ifndef INTRO_PAGE_H
-#define INTRO_PAGE_H
+#include "pfsinhdrgenbinary.h"
 
-// Local includes
+// KDE includes
 
-#include "kpwizardpage.h"
-#include "manager.h"
-
-using namespace KIPIPlugins;
+#include <kdebug.h>
 
 namespace KIPIExpoBlendingPlugin
 {
 
-class IntroPage : public KPWizardPage
+bool PfsInHdrGenBinary::parseHeader(const QString& output)
 {
-    Q_OBJECT
+    QString firstLine = output.section('\n', m_headerLine, m_headerLine);
+    kDebug() << path() << " help header line: \n" << firstLine;
 
-public:
+    if (firstLine.contains("Usage: pfsinhdrgen [--verbose] <file.hdrgen>"))
+    {
+        return true;
+    }
 
-    IntroPage(Manager* const mngr, KAssistantDialog* const dlg);
-    ~IntroPage();
+    return false;
+}
 
-    bool binariesFound();
+}  // namespace KIPIExpoBlendingPlugin
 
-Q_SIGNALS:
-
-    void signalIntroPageIsValid(bool);
-
-private:
-
-    class IntroPagePriv;
-    IntroPagePriv* const d;
-};
-
-}   // namespace KIPIExpoBlendingPlugin
-
-#endif /* INTRO_PAGE_H */

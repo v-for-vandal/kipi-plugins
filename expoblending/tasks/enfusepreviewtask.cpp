@@ -60,15 +60,15 @@ namespace KIPIExpoBlendingPlugin
 {
   
 EnfusePreviewTask::EnfusePreviewTask(QObject* const parent, const KUrl::List& fileUrl, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
+                                     const EnfuseSettings& settings, const QString& alignPath, bool version)
     : Task(parent, ENFUSEPREVIEW, fileUrl), urls(fileUrl), outputUrl(outputUrl), enfuseSettings(settings), 
-	   binaryPath(alignPath), enfuseVersion4x(version)
+           binaryPath(alignPath), enfuseVersion4x(version)
 {}
 
 EnfusePreviewTask::EnfusePreviewTask(const KUrl::List& fileUrl, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
+                                     const EnfuseSettings& settings, const QString& alignPath, bool version)
     : Task(0, ENFUSEPREVIEW, fileUrl), urls(fileUrl), outputUrl(outputUrl), enfuseSettings(settings), 
-	   binaryPath(alignPath), enfuseVersion4x(version)
+           binaryPath(alignPath), enfuseVersion4x(version)
 {}
 
 EnfusePreviewTask::~EnfusePreviewTask()
@@ -95,7 +95,7 @@ void EnfusePreviewTask::run()
     // preserve exif information for auto rotation
     if (result)
     {
-	KPMetadata metaIn(urls[0].toLocalFile());
+        KPMetadata metaIn(urls[0].toLocalFile());
         KPMetadata metaOut(destUrl.toLocalFile());
         metaOut.setImageOrientation(metaIn.getImageOrientation());
         metaOut.applyChanges();
@@ -179,7 +179,7 @@ bool EnfusePreviewTask::startEnfuse(const KUrl::List& inUrls, KUrl& outUrl,
     if (!enfuseProcess->waitForFinished(-1))
     {
         errors = getProcessError(enfuseProcess);
-	successFlag = false;
+        successFlag = false;
         return false;
     }
 

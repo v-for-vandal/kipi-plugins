@@ -3,10 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2009-12-13
- * Description : a tool to blend bracketed images.
+ * Date        : 2013-08-31
+ * Description : a tool to blend bracketed images/create HDR images.
  *
- * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
+ * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -403,25 +403,13 @@ void HdrImageDlg::slotProcess()
     QList<PfsHdrSettings> list = d->pfshdrStack->settingsList();
     if (list.isEmpty()) return;
 
-    ItemUrlsMap map = d->mngr->preProcessedMap();
-    KUrl::List preprocessedList;
-
     foreach(const PfsHdrSettings& settings, list)
     {
-        preprocessedList.clear();
-        
-        foreach(const KUrl& url, settings.inputUrls)
-        {
-            ItemPreprocessedUrls preprocessedUrls = *(map.find(url));
-            preprocessedList.append(preprocessedUrls.preprocessedUrl);
-        }
-
         d->mngr->thread()->hdrGen(settings.inputUrls, settings, 1);
         if (!d->mngr->thread()->isRunning())
             d->mngr->thread()->start();
     }
 }
-
 
 void HdrImageDlg::saveItem(const KUrl& temp, const PfsHdrSettings& settings)
 {
@@ -625,36 +613,37 @@ void HdrImageDlg::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
                 }
                 case(HDRGEN):
                 {
-	            d->mngr->thread()->hdrCalibrate(d->listUrls, ad.dirName, ad.pfshdrSettings, ad.option);
-	            break;
-	        }
-	        case(CAMERARESPONSE):
-	        { 
+                    d->mngr->thread()->hdrCalibrate(d->listUrls, ad.dirName, ad.pfshdrSettings, ad.option);
+                    break;
+                }
+                case(CAMERARESPONSE):
+                { 
                     loadItems(d->mngr->itemsList());
-	            if(ad.option == 0)
-		    {
-	                d->mngr->thread()->hdrOutPreview(d->listUrls, ad.dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
-		    }
-		    if(ad.option == 1)
-		    {
-	                d->mngr->thread()->hdrOutFinal(d->listUrls, ad.dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
-		    }
-	            break;
-	        }
-	        case(HDRCALIBRATEPREVIEW):
-	        {
-		    kDebug() << "Preview Done";
-		    d->pfshdrStack->addItem(ad.outUrls[0], ad.pfshdrSettings);
-		    busy(false);
-		    break;
-	        }
-	        case(HDRCALIBRATEFINAL):
-	        {
-		    kDebug() << "Final Done";
-		    d->pfshdrStack->processingItem(ad.pfshdrSettings.previewUrl, false);
-		    saveItem(ad.outUrls[0], ad.pfshdrSettings);
-		    break;
-	        }
+                    if(ad.option == 0)
+                    {
+                        d->mngr->thread()->hdrOutPreview(d->listUrls, ad.dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
+                    }
+                    if(ad.option == 1)
+                    {
+                        d->mngr->thread()->hdrOutFinal(d->listUrls, ad.dirName, d->mngr->itemsList()[0], ad.pfshdrSettings);
+                    }
+                    break;
+                }
+                case(HDRCALIBRATEPREVIEW):
+                {
+                    kDebug() << "Preview Done";
+                    d->pfshdrStack->addItem(ad.outUrls[0], ad.pfshdrSettings);
+                    busy(false);
+                    break;
+                }
+                case(HDRCALIBRATEFINAL):
+                {
+                    kDebug() << "Final Done";
+                    d->pfshdrStack->processingItem(ad.pfshdrSettings.previewUrl, false);
+                    saveItem(ad.outUrls[0], ad.pfshdrSettings);
+                    break;
+  
+                }
                 default:
                 {
                     kWarning() << "Unknown action";

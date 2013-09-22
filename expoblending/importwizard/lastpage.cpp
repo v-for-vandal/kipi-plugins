@@ -51,14 +51,10 @@ public:
     LastPagePriv()
     {
         mngr = 0;
-	pseudoHDRCheckBox = 0;
-	HDRCheckBox = 0;
     }
 
     Manager* mngr;
     
-    QCheckBox*      pseudoHDRCheckBox;
-    QCheckBox*      HDRCheckBox;
 };
 
 LastPage::LastPage(Manager* const mngr, KAssistantDialog* const dlg)
@@ -68,25 +64,20 @@ LastPage::LastPage(Manager* const mngr, KAssistantDialog* const dlg)
     d->mngr       = mngr;
     KVBox* vbox   = new KVBox(this);
     QLabel* title = new QLabel(vbox);
-    d->pseudoHDRCheckBox = new QCheckBox(i18n("Create Pseudo HDR images"), vbox);
-    d->HDRCheckBox = new QCheckBox(i18n("Create Real HDR images"), vbox);
-
+    
     title->setOpenExternalLinks(true);
     title->setWordWrap(true);
     title->setText(i18n("<qt>"
                         "<p><h1><b>Bracketed Images Pre-Processing is Done</b></h1></p>"
                         "<p>Congratulations. Your images are ready to be fused. </p>"
-                        "<p>To perform this operation, <b>%1</b> program from "
-                        "<a href='%2'>Enblend</a> "
-                        "project will be used.</p>"
-                        "<p>Press \"Finish\" button to fuse your items and make a pseudo HDR image.</p>"
-                        "</qt>",
-                        QDir::toNativeSeparators(d->mngr->enfuseBinary().path()),
-                        d->mngr->enfuseBinary().url().url()));
+                        "<p>To perform this operation, "
+                        "<b>PfsTools</b> project will be used.</p>"
+                        "<p>Press \"Finish\" button to fuse your items and make an HDR image.</p>"
+                        "</qt>" ));
    
     setPageWidget(vbox);
 
-    QPixmap leftPix = KStandardDirs::locate("data", "kipiplugin_expoblending/pics/assistant-enfuse.png");
+    QPixmap leftPix = KStandardDirs::locate("data", "kipiplugin_expoblending/pics/assistant-pfscalibration.png");
     setLeftBottomPix(leftPix.scaledToWidth(128, Qt::SmoothTransformation));
 }
 

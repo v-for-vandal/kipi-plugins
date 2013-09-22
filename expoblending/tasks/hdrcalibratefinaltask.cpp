@@ -4,7 +4,7 @@
  * http://www.digikam.org
  *
  * Date        : 2013-08-31
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
@@ -50,12 +50,12 @@ namespace KIPIExpoBlendingPlugin
 {
 
 HdrCalibrateFinalTask::HdrCalibrateFinalTask(QObject* const parent, const KUrl::List& inUrls,const QString& dirName,
-				   const PfsHdrSettings& pfsSettings, const KUrl& outputUrl)
+                                             const PfsHdrSettings& pfsSettings, const KUrl& outputUrl)
     : Task(parent, HDRCALIBRATEFINAL, inUrls), urls(inUrls), name(dirName), settings(pfsSettings), destUrl(outputUrl)
 {}
 
 HdrCalibrateFinalTask::HdrCalibrateFinalTask(const KUrl::List& inUrls, const QString& dirName,
-				   const PfsHdrSettings& pfsSettings, const KUrl& outputUrl)
+                                             const PfsHdrSettings& pfsSettings, const KUrl& outputUrl)
     : Task(0, HDRCALIBRATEFINAL, inUrls), urls(inUrls), name(dirName), settings(pfsSettings), destUrl(outputUrl)
 {}
 
@@ -82,7 +82,7 @@ void HdrCalibrateFinalTask::run()
     meta.setImageDateTime(QDateTime::currentDateTime());
     if (settings.outputFormat != KPSaveSettingsWidget::OUTPUT_JPEG)
     {
-	QImage img;
+        QImage img;
         if (img.load(outUrl.toLocalFile()))
             meta.setImagePreview(img.scaled(1280, 1024, Qt::KeepAspectRatio));
     }
@@ -102,8 +102,8 @@ void HdrCalibrateFinalTask::run()
 }
 
 bool HdrCalibrateFinalTask::startpfsHdrCalibrate(const QString& name, QString& errors, 
-						 const PfsHdrSettings& settings, 
-						 KUrl& exroutput)
+                                                 const PfsHdrSettings& settings, 
+                                                 KUrl& exroutput)
 {
     QString ext = KPSaveSettingsWidget::extensionForFormat(settings.outputFormat);
     exroutput.setFileName(QString(".kipi-hdr-exiftags-tmp-") + QString::number(QDateTime::currentDateTime().toTime_t()) + ext);
@@ -140,7 +140,7 @@ bool HdrCalibrateFinalTask::startpfsHdrCalibrate(const QString& name, QString& e
     if (!pfsoutProcess->waitForFinished(-1))
     {
         successFlag = false;  
-        //errors = getProcessError(pfsoutexrProcess);
+        errors = getProcessError(pfsoutProcess);
         return 0;
     }
     pfsinhdrgenProcess->close();
@@ -150,12 +150,12 @@ bool HdrCalibrateFinalTask::startpfsHdrCalibrate(const QString& name, QString& e
     return 1;
 }
 
-/*QString HdrCalibrateTask::getProcessError(QProcess* const proc) const
+QString HdrCalibrateFinalTask::getProcessError(QProcess* const proc) const
 {
     if (!proc) return QString();
 
     QString std = proc->readAll();
-    return (i18n("Cannot run %1:\n\n %2", proc->program()[0], std));
-}*/
+    return (i18n("Cannot run \n\n %2", std));
+}
 
 } // namespace KIPIExpoBlendingPlugin

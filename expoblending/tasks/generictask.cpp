@@ -70,7 +70,7 @@ GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const
 {}
 
 GenericTask::GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
-			 EvValueUrls& targetUrls)
+                         EvValueUrls& targetUrls)
     : Task(parent, action, fileUrl), urls(fileUrl), action(action), exposureValuesUrl(&targetUrls)
 {}
   
@@ -84,9 +84,9 @@ void GenericTask::run()
     {
         case IDENTIFY:
         {
-	    // Identify Exposure.
+            // Identify Exposure.
 
-	    QString avLum;
+            QString avLum;
             float val;
             if (!urls.isEmpty())
             {
@@ -100,18 +100,18 @@ void GenericTask::run()
             ad.inUrls  = urls;
             ad.message = avLum.isEmpty() ? i18n("unknown") : avLum;
             ad.success = avLum.isEmpty();
-	
-	    exposureValuesUrl->outputUrl = urls[0];
-	    exposureValuesUrl->exposure_value = avLum.isEmpty() ? i18n("unknown") : avLum;
-	    
-	    //qDebug() << exposureValuesUrl->exposure_value;
+  
+            exposureValuesUrl->outputUrl = urls[0];
+            exposureValuesUrl->exposure_value = avLum.isEmpty() ? i18n("unknown") : avLum;
+     
+            //qDebug() << exposureValuesUrl->exposure_value;
             emit finished(ad);
-	    break;
+            break;
         }
-		
+
         case LOAD:
         {
-		 
+   
             ActionData ad1;
             ad1.action   = LOAD;
             ad1.inUrls   = urls;

@@ -4,7 +4,7 @@
  * http://www.digikam.org
  *
  * Date        : 2009-11-13
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2009-2011 by Gilles Caulier <caulier dot gilles at gmail dot com>
  * Copyright (C) 2009-2011 by Johannes Wienke <languitar at semipol dot de>
@@ -151,7 +151,7 @@ void ActionThread::identifyFiles(const KUrl::List& urlList, EvUrlsMap& exposureV
         d->urls.clear();
         d->urls.append(url);
 
-	exposureValuesMap.insert(url, EvValueUrls());
+        exposureValuesMap.insert(url, EvValueUrls());
 
         GenericTask* const t = new GenericTask(this, d->urls, IDENTIFY, exposureValuesMap[url]);
          
@@ -163,7 +163,7 @@ void ActionThread::identifyFiles(const KUrl::List& urlList, EvUrlsMap& exposureV
                 this, SLOT(slotStepDone(ThreadWeaver::Job*)));
       
         jobs->addJob(t);
-	
+
     }
     appendJob(jobs);
     
@@ -177,13 +177,13 @@ void ActionThread::preProcessFiles(const KUrl::List& urlList, const QString& ali
     PreProcessTask* const t = new PreProcessTask(this, d->urls, d->rawDecodingSettings, d->align, alignPath);
 
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
-	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
-	    this, SLOT(slotStarting(ThreadWeaver::Job*)));
+            this, SLOT(slotStarting(ThreadWeaver::Job*)));
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
-	    this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
+            this, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)));
     connect(t, SIGNAL(done(ThreadWeaver::Job*)),
-	    this, SLOT(slotStepDone(ThreadWeaver::Job*)));
+            this, SLOT(slotStepDone(ThreadWeaver::Job*)));
       
     jobs->addJob(t);
     appendJob(jobs);
@@ -200,7 +200,7 @@ void ActionThread::loadProcessed(const KUrl& url)
     GenericTask* const t = new GenericTask(this, tempList , LOAD);
    
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
-	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
@@ -220,11 +220,11 @@ void ActionThread::enfusePreview(const KUrl::List& alignedUrls, const KUrl& outp
     JobCollection   *jobs  = new JobCollection();
    
     EnfusePreviewTask* const t = new EnfusePreviewTask(this, alignedUrls,outputUrl, 
-						       settings, enfusePath, d->enfuseVersion4x); 
+                                                       settings, enfusePath, d->enfuseVersion4x); 
      
     
     connect (t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
-	    this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
+            this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));
     connect(t, SIGNAL(started(ThreadWeaver::Job*)),
             this, SLOT(slotStarting(ThreadWeaver::Job*)));
     connect(t, SIGNAL(finished(KIPIExpoBlendingPlugin::ActionData)),
@@ -244,7 +244,7 @@ void ActionThread::enfuseFinal(const KUrl::List& alignedUrls, const KUrl& output
     JobCollection   *jobs  = new JobCollection();
     
     EnfuseFinalTask* const t = new EnfuseFinalTask(this, alignedUrls, outputUrl, 
-						   settings, enfusePath, d->enfuseVersion4x); 
+                                                   settings, enfusePath, d->enfuseVersion4x); 
     
     connect(t, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)),
             this, SIGNAL(starting(KIPIExpoBlendingPlugin::ActionData)));    
@@ -300,7 +300,7 @@ void ActionThread::hdrCalibrate(const KUrl::List& urlList, const QString& name, 
 }
 
 void ActionThread::hdrOutPreview(const KUrl::List& urlList,const QString& name, 
-				    const KUrl& outputUrl, const PfsHdrSettings& settings)
+                                 const KUrl& outputUrl, const PfsHdrSettings& settings)
 {
     JobCollection   *jobs  = new JobCollection();
     
@@ -321,7 +321,7 @@ void ActionThread::hdrOutPreview(const KUrl::List& urlList,const QString& name,
 }
 
 void ActionThread::hdrOutFinal(const KUrl::List& urlList,const QString& name, 
-				  const KUrl& outputUrl, const PfsHdrSettings& settings)
+                               const KUrl& outputUrl, const PfsHdrSettings& settings)
 {
     JobCollection   *jobs  = new JobCollection();
     
@@ -388,6 +388,5 @@ void ActionThread::cancel()
 {
     d->cancel = true;  
 }
-
 
 }  // namespace KIPIExpoBlendingPlugin

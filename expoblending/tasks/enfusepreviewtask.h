@@ -59,15 +59,15 @@ class EnfusePreviewTask : public Task
     
 public:
 
-    KUrl::List          		urls;
-    KUrl                		outputUrl;
-    EnfuseSettings      		enfuseSettings;
-    QString             		binaryPath;
-    bool 				enfuseVersion4x;
+    KUrl::List                          urls;
+    KUrl                                outputUrl;
+    EnfuseSettings                      enfuseSettings;
+    QString                             binaryPath;
+    bool                                enfuseVersion4x;
     
-    KProcess*           		enfuseProcess;
+    KProcess*                           enfuseProcess;
     
-    KTempDir*                        	preprocessingTmpDir;
+    KTempDir*                           preprocessingTmpDir;
 
 protected:
 
@@ -77,9 +77,9 @@ protected:
 
 public:
     EnfusePreviewTask(QObject* const parent, const KUrl::List& fileUrl, const KUrl& outputUrl,
-			         const EnfuseSettings& settings, const QString& alignPath, bool version);
+                      const EnfuseSettings& settings, const QString& alignPath, bool version);
     EnfusePreviewTask(const KUrl::List& fileUrl, const KUrl& outputUrl,
-			         const EnfuseSettings& settings, const QString& alignPath, bool version);
+                      const EnfuseSettings& settings, const QString& alignPath, bool version);
 
     ~EnfusePreviewTask();
 

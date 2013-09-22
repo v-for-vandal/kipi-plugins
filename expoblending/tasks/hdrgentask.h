@@ -4,7 +4,7 @@
  * http://www.digikam.org
  *
  * Date        : 2013-08-31
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *

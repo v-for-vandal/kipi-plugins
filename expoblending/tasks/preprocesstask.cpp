@@ -47,15 +47,15 @@ namespace KIPIExpoBlendingPlugin
 {
 
 PreProcessTask::PreProcessTask(QObject* const parent, const KUrl::List& inUrls, 
-			       const RawDecodingSettings& rawSettings, const bool align,
-			       const QString& alignPath)
+                               const RawDecodingSettings& rawSettings, const bool align,
+                               const QString& alignPath)
     : Task(parent, PREPROCESSING, inUrls), urls(inUrls), settings(rawSettings),
       align(align), binaryPath(alignPath)
 {}
 
 PreProcessTask::PreProcessTask(const KUrl::List& inUrls, 
-			       const RawDecodingSettings& rawSettings, const bool align,
-			       const QString& alignPath)
+                               const RawDecodingSettings& rawSettings, const bool align,
+                               const QString& alignPath)
     : Task(0, PREPROCESSING, inUrls), urls(inUrls), settings(rawSettings),
       align(align), binaryPath(alignPath)
 {}
@@ -118,14 +118,14 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
 
             if (!convertRaw(url, preprocessedUrl, settings))
             {
-		successFlag = false;
+                successFlag = false;
                 error = true;
                 continue;
             }
 
             if (!computePreview(preprocessedUrl, previewUrl))
             {
-	        successFlag = false;
+                successFlag = false;
                 error = true;
                 continue;
             }
@@ -141,7 +141,7 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
             KUrl previewUrl;
             if (!computePreview(url, previewUrl))
             {
-	        successFlag = false;
+                successFlag = false;
                 error = true;
                 continue;
             }
@@ -149,7 +149,7 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
             // In case of alignment is not performed.
             preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(url, previewUrl));
 
-	}
+        }
     }
 
     if (error)
@@ -172,7 +172,7 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
         args << "-a";
         args << "aligned";
 
-	foreach(const KUrl& url, mixedUrls)
+        foreach(const KUrl& url, mixedUrls)
         {
             args << url.toLocalFile();
         }
@@ -185,7 +185,7 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
 
         if (!alignProcess->waitForFinished(-1))
         {
-	    successFlag = false;  
+            successFlag = false;  
             errors = getProcessError(alignProcess);
             return false;
         }
@@ -199,10 +199,10 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
             KUrl previewUrl;
             KUrl alignedUrl = KUrl(preprocessingTmpDir->name() + temp.sprintf("aligned%04i", i) + QString(".tif"));
             if (!computePreview(alignedUrl, previewUrl))
-	    {
-	        successFlag = false;
+            {
+                successFlag = false;
                 return false;
-	    }
+            }
             preProcessedUrlsMap.insert(url, ItemPreprocessedUrls(alignedUrl, previewUrl));
             i++;
         }
@@ -217,10 +217,10 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
         kDebug() << "Align exit code      : "         << alignProcess->exitCode();
 
         if (alignProcess->exitStatus() != QProcess::NormalExit)
-	{
-	    successFlag = false;
+        {
+            successFlag = false;
             return false;
-	}
+        }
 
         if (alignProcess->exitCode() == 0)
         {
@@ -229,7 +229,7 @@ bool PreProcessTask::startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& p
         }
 
         errors = getProcessError(alignProcess);
-	successFlag = false;
+        successFlag = false;
         return false;
     }
     else
@@ -249,7 +249,7 @@ void PreProcessTask::cleanAlignTmpDir()
 {
     if (preprocessingTmpDir)
     {
-	preprocessingTmpDir->unlink();
+        preprocessingTmpDir->unlink();
         delete preprocessingTmpDir;
         preprocessingTmpDir = 0;
     }

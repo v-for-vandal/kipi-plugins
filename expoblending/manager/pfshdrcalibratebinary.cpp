@@ -3,10 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2011-05-23
- * Description : Autodetects cpfind binary program and version
+ * Date        : 2013-09-05
+ * Description : Autodetects pfshdrcalibrate binary 
  *
- * Copyright (C) 2011-2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
+ * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -20,8 +20,7 @@
  *
  * ============================================================ */
 
-#include "pfsbinary.h"
-
+#include "pfshdrcalibratebinary.h"
 // KDE includes
 
 #include <kdebug.h>
@@ -29,9 +28,9 @@
 namespace KIPIExpoBlendingPlugin
 {
 
-bool PfsCalibrateBinary::parseHeader(const QString& output)
+bool PfsHdrCalibrateBinary::parseHeader(const QString& output)
 {
-    QString firstLine = output.section('\n', 0, 0);
+    QString firstLine = output.section('\n', m_headerLine, m_headerLine);
     kDebug() << path() << " help header line: \n" << firstLine;
 
     if (firstLine.contains("pfshdrcalibrate: Assuming 8 Bits per pixel in the LDR images (use --bpp to change this)"))
@@ -42,5 +41,5 @@ bool PfsCalibrateBinary::parseHeader(const QString& output)
     return false;
 }
 
-}  // namespace KIPIPanoramaPlugin
+}  // namespace KIPIExpoBlendingPlugin
 

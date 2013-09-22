@@ -60,15 +60,15 @@ namespace KIPIExpoBlendingPlugin
 {
   
 EnfuseFinalTask::EnfuseFinalTask(QObject* const parent, const KUrl::List& fileUrl, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
+                                 const EnfuseSettings& settings, const QString& alignPath, bool version)
     : Task(parent, ENFUSEFINAL, fileUrl), urls(fileUrl), outputUrl(outputUrl), enfuseSettings(settings), 
-	   binaryPath(alignPath), enfuseVersion4x(version)
+           binaryPath(alignPath), enfuseVersion4x(version)
 {}
 
 EnfuseFinalTask::EnfuseFinalTask(const KUrl::List& fileUrl, const KUrl& outputUrl, 
-			 const EnfuseSettings& settings, const QString& alignPath, bool version)
+                                 const EnfuseSettings& settings, const QString& alignPath, bool version)
     : Task(0, ENFUSEFINAL, fileUrl), urls(fileUrl), outputUrl(outputUrl), enfuseSettings(settings), 
-	   binaryPath(alignPath), enfuseVersion4x(version)
+           binaryPath(alignPath), enfuseVersion4x(version)
 {}
 
 EnfuseFinalTask::~EnfuseFinalTask()
@@ -99,7 +99,7 @@ void EnfuseFinalTask::run()
     meta.setImageDateTime(QDateTime::currentDateTime());
     if (enfuseSettings.outputFormat != KPSaveSettingsWidget::OUTPUT_JPEG)
     {
-	QImage img;
+        QImage img;
         if (img.load(destUrl.toLocalFile()))
         meta.setImagePreview(img.scaled(1280, 1024, Qt::KeepAspectRatio));
     }

@@ -4,7 +4,7 @@
  * http://www.digikam.org
  *
  * Date        : 2013-08-31
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
@@ -23,7 +23,7 @@
 #include "cameraresponsetask.h"
 
 // Qt includes
-
+#include <QProcess>
 #include <QFileInfo>
 #include <QFile>
 #include <QCoreApplication>
@@ -49,12 +49,12 @@ namespace KIPIExpoBlendingPlugin
 {
 
 CameraResponseTask::CameraResponseTask(QObject* const parent, const KUrl::List& inUrls, const QString& dirName, 
-				       const PfsHdrSettings& pfsSettings, int option)
+                                       const PfsHdrSettings& pfsSettings, int option)
     : Task(parent, CAMERARESPONSE, inUrls), name(dirName), settings(pfsSettings), option(option)
 {}
 
 CameraResponseTask::CameraResponseTask(const KUrl::List& inUrls, const QString& dirName, 
-				       const PfsHdrSettings& pfsSettings, int option)
+                                       const PfsHdrSettings& pfsSettings, int option)
     : Task(0, CAMERARESPONSE, inUrls), name(dirName), settings(pfsSettings), option(option)
 {}
 
@@ -68,7 +68,8 @@ void CameraResponseTask::run()
     ad1.starting       = true;
     emit starting(ad1);
     
-    bool result = responseCurve(name);
+    QString errors;
+    bool result = responseCurve(name, errors);
 
     ActionData ad2;
     ad2.action         = CAMERARESPONSE;
@@ -77,11 +78,12 @@ void CameraResponseTask::run()
     ad2.pfshdrSettings = settings;
     ad2.success        = result;
     ad2.dirName        = name;
+    ad2.message        = errors;
     
     emit finished(ad2);
 }
  
-bool CameraResponseTask::responseCurve(const QString& name)
+bool CameraResponseTask::responseCurve(const QString& name, QString& errors)
 {   
     KUrl exifTags = KUrl(name + QString("exifTags.hdrgen"));
     KUrl cameraResponse= KUrl(name + QString("camera.response"));
@@ -112,7 +114,7 @@ bool CameraResponseTask::responseCurve(const QString& name)
     if (!pfshdrcalibrateProcess->waitForFinished(-1))
     {
         successFlag = false;  
-        //errors = getProcessError(pfsoutexrProcess);
+        errors = getProcessError(pfshdrcalibrateProcess);
         return false;
     }
     pfsinhdrgenProcess->close();
@@ -121,12 +123,12 @@ bool CameraResponseTask::responseCurve(const QString& name)
     return true;
 }
 
-/*QString HdrCalibrateTask::getProcessError(QProcess* const proc) const
+QString CameraResponseTask::getProcessError(QProcess* const proc) const
 {
     if (!proc) return QString();
 
     QString std = proc->readAll();
-    return (i18n("Cannot run %1:\n\n %2", proc->program()[0], std));
-}*/
+    return (i18n("Cannot run :\n\n %2", std));
+}
 
 } // namespace KIPIExpoBlendingPlugin

@@ -71,7 +71,7 @@ public:
 
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action);
     GenericTask(QObject* const parent, const KUrl::List& fileUrl, const Action& action, 
-			 EvValueUrls& targetUrls);
+                EvValueUrls& targetUrls);
     ~GenericTask();
 
     void setEnfuseVersion(const double version);

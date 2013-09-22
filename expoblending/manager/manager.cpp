@@ -4,10 +4,11 @@
  * http://www.digikam.org
  *
  * Date        : 2009-11-13
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2009-2011 by Gilles Caulier <caulier dot gilles at gmail dot com>
  * Copyright (C) 2012      by Benjamin Girault <benjamin dot girault at gmail dot com>
+ * Copyright (C) 2013      by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -39,8 +40,8 @@
 #include "actionthread.h"
 #include "alignbinary.h"
 #include "enfusebinary.h"
-#include "pfsbinary.h"
-#include "pfshdrgenbinary.h"
+#include "pfshdrcalibratebinary.h"
+#include "pfsinhdrgenbinary.h"
 
 namespace KIPIExpoBlendingPlugin
 {
@@ -55,7 +56,7 @@ public:
         thread = 0;
         wizard = 0;
         hdrdlg = 0;
-	expdlg = 0;
+        expdlg = 0;
     }
 
     KUrl::List             inputUrls;
@@ -72,8 +73,8 @@ public:
 
     AlignBinary            alignBinary;
     EnfuseBinary           enfuseBinary;
-    //PfsCalibrateBinary     calibrateBinary;
-   // PfsHdrGenBinary        hdrgenBinary;
+    PfsHdrCalibrateBinary  calibrateBinary;
+    PfsInHdrGenBinary      hdrgenBinary;
 
     ImportWizardDlg*       wizard;
     ExpoBlendingDlg*       expdlg;
@@ -111,13 +112,13 @@ bool Manager::checkBinaries()
 
     if (!d->enfuseBinary.recheckDirectories())
         return false;
-/*
-     if (!d->calibrateBinary.recheckDirectories())
+
+    if (!d->calibrateBinary.recheckDirectories())
         return false;
 
     if (!d->hdrgenBinary.recheckDirectories())
         return false;
-    */
+    
     return true;
 }
 
@@ -130,17 +131,17 @@ EnfuseBinary& Manager::enfuseBinary() const
 {
     return d->enfuseBinary;
 }
-/*
-PfsCalibrateBinary& Manager::pfscalibrateBinary() const
+
+PfsHdrCalibrateBinary& Manager::pfscalibrateBinary() const
 {
     return d->calibrateBinary;
 }
 
-PfsHdrGenBinary& Manager::hdrgenscriptBinary() const
+PfsInHdrGenBinary& Manager::pfshdrgenscriptBinary() const
 {
-    return d->hdrgensBinary;
+    return d->hdrgenBinary;
 }
-*/
+
 void Manager::setIface(Interface* const iface)
 {
     d->iface = iface;

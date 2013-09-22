@@ -125,8 +125,8 @@ void ItemsPage::slotAddItems(const KUrl::List& urls)
     if (!urls.empty())
     {
         d->mngr->thread()->identifyFiles(urls, d->mngr->exposureValuesMap());
-	d->exposureValues = d->mngr->exposureValuesMap();
-	
+        d->exposureValues = d->mngr->exposureValuesMap();
+
         if (!d->mngr->thread()->isRunning())
             d->mngr->thread()->start();
     }
@@ -160,9 +160,9 @@ void ItemsPage::slotAction(const KIPIExpoBlendingPlugin::ActionData& ad)
         switch (ad.action)
         {
             case(IDENTIFY):
-	    {
+            {
                 setIdentity(ad.inUrls[0], ad.message);                
-		break;
+                break;
             }
 
             default:

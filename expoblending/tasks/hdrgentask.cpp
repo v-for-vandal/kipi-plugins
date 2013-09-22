@@ -4,7 +4,7 @@
  * http://www.digikam.org
  *
  * Date        : 2013-08-31
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
@@ -98,11 +98,11 @@ bool HdrGenTask::hdrgenScript(const KUrl::List& urls, QString& name)
     {
         meta.load(url.toLocalFile());
         if (!meta.hasExif())
-	{
-	   errString = i18n("Image metadata has no Exif Information.");
+        {
+           errString = i18n("Image metadata has no Exif Information.");
            successFlag = false;
            return false;
-	}
+        }
     
         long num = 1, den = 1;
 
@@ -192,10 +192,10 @@ bool HdrGenTask::hdrgenScript(const KUrl::List& urls, QString& name)
         // Some cameras/lens DO print the aper but with value 0, and this is not allowed for ev computation purposes.
 
         if (aper == 0.0)
-	{
+        {
            successFlag = false;
            return false;
-	}
+        }
            
         // If iso is found use that value, otherwise assume a value of iso=100. (again, some cameras do not print iso in exif).
 
@@ -219,15 +219,15 @@ bool HdrGenTask::hdrgenScript(const KUrl::List& urls, QString& name)
         kDebug() << url.fileName() << " : iso = " << iso;
     
         if (inverse_expo != -1.0 && iso != -1.0 && aper != -1.0)
-	{
+        {
             out << url.toLocalFile() << " " << inverse_expo << " " << aper << " " << iso << " " << "0" <<endl;
-	}
-	else
-	{
-	    kDebug() << "Camera Parameters Value error";
-	    return false;
-	}
-	
+        }
+        else
+        {
+            kDebug() << "Camera Parameters Value error";
+            return false;
+        }
+
     }
     exifFile.close();
     return true;

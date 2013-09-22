@@ -3,11 +3,10 @@
  * This file is a part of kipi-plugins project
  * http://www.digikam.org
  *
- * Date        : 2009-12-23
- * Description : Autodetect align_image_stack binary program and version
+ * Date        : 2013-09-05
+ * Description : Autodetects pfshdrcalibrate binary 
  *
- * Copyright (C) 2009-2012 by Gilles Caulier <caulier dot gilles at gmail dot com>
- * Copyright (C) 2012 by Benjamin Girault <benjamin dot girault at gmail dot com>
+ * Copyright (C) 2013 by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -21,8 +20,8 @@
  *
  * ============================================================ */
 
-#ifndef PFSBINARY_H
-#define PFSBINARY_H
+#ifndef PFSHDRCALIBRATEBINARY_H
+#define PFSHDRCALIBRATEBINARY_H
 
 // Local includes
 
@@ -33,15 +32,15 @@ using namespace KIPIPlugins;
 namespace KIPIExpoBlendingPlugin
 {
 
-class PfsCalibrateBinary : public KPBinaryIface
+class PfsHdrCalibrateBinary : public KPBinaryIface
 {
 
 public:
 
-    PfsCalibrateBinary()
+    PfsHdrCalibrateBinary()
         : KPBinaryIface(QString("pfshdrcalibrate"), 
-                        QString("1.5"), 
-                        QString("pfshdrcalibrate "),
+                        QString(), 
+                        QString(),
                         0, 
                         QString("PfsCalibrate"), 
                         QString("http://pfstools.sourceforge.net/pfscalibration.html"),
@@ -52,7 +51,7 @@ public:
             setup();
         }
 
-    ~PfsCalibrateBinary()
+    ~PfsHdrCalibrateBinary()
     {
     }
 
@@ -64,4 +63,4 @@ protected:
 
 } // namespace KIPIExpoBlendingPlugin
 
-#endif  // PFSBINARY_H
+#endif  // PFSHDRCALIBRATEBINARY_H

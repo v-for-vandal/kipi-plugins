@@ -4,11 +4,12 @@
  * http://www.digikam.org
  *
  * Date        : 2009-11-13
- * Description : a plugin to blend bracketed images.
+ * Description : a plugin to blend bracketed images/create HDR images.
  *
  * Copyright (C) 2009-2011 by Gilles Caulier <caulier dot gilles at gmail dot com>
  * Copyright (C) 2012      by Benjamin Girault <benjamin dot girault at gmail dot com>
- *
+ * Copyright (C) 2013      by Soumajyoti Sarkar <ergy dot ergy at gmail dot com>
+ * 
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation;
@@ -55,8 +56,8 @@ class ActionThread;
 class ExpoBlendingAboutData;
 class AlignBinary;
 class EnfuseBinary;
-class PfsCalibrateBinary;
-class PfsHdrGenBinary;
+class PfsHdrCalibrateBinary;
+class PfsInHdrGenBinary;
 class ManagerPriv;
 
 class Manager : public QObject
@@ -87,8 +88,8 @@ public:
     ActionThread* thread() const;
     AlignBinary&  alignBinary() const;
     EnfuseBinary& enfuseBinary() const;
-    PfsCalibrateBinary& pfscalibrateBinary() const;
-    PfsHdrGenBinary& pfshdrgenBinary() const;
+    PfsHdrCalibrateBinary& pfscalibrateBinary() const;
+    PfsInHdrGenBinary& pfshdrgenscriptBinary() const;
 
     void run();
 

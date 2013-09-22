@@ -57,17 +57,17 @@ class PreProcessTask : public Task
          
 public:
    
-    KUrl::List          		urls;
-    const RawDecodingSettings   	settings;
+    KUrl::List                          urls;
+    const RawDecodingSettings           settings;
    
-    bool 				align;
-    QString             		binaryPath;
-    bool 				cancel;
+    bool                                align;
+    QString                             binaryPath;
+    bool                                cancel;
     
-    KProcess*           		enfuseProcess;
-    KProcess*           		alignProcess;
+    KProcess*                           enfuseProcess;
+    KProcess*                           alignProcess;
     
-    KTempDir*                        	preprocessingTmpDir;
+    KTempDir*                           preprocessingTmpDir;
    
 protected:
 
@@ -78,10 +78,10 @@ protected:
 public:
 
     PreProcessTask(QObject* const parent, const KUrl::List& inUrls, 
-		   const RawDecodingSettings& rawSettings, const bool align,
-	           const QString& alignPath);
+                   const RawDecodingSettings& rawSettings, const bool align,
+                   const QString& alignPath);
     PreProcessTask(const KUrl::List& inUrls, const RawDecodingSettings& rawSettings, 
-		   const bool align, const QString& alignPath);   
+                   const bool align, const QString& alignPath);   
     ~PreProcessTask();
     
     bool startPreProcessing(const KUrl::List& inUrls, ItemUrlsMap& preProcessedUrlsMap,
