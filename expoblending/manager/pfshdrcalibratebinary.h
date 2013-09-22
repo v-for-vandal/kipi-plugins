@@ -45,7 +45,7 @@ public:
                         QString("PfsCalibrate"), 
                         QString("http://pfstools.sourceforge.net/pfscalibration.html"),
                         QString("ExpoBlending"), 
-                        QStringList("-v")
+                        QStringList("--help")
                        )
         {
             setup();

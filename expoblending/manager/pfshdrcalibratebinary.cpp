@@ -33,7 +33,7 @@ bool PfsHdrCalibrateBinary::parseHeader(const QString& output)
     QString firstLine = output.section('\n', m_headerLine, m_headerLine);
     kDebug() << path() << " help header line: \n" << firstLine;
 
-    if (firstLine.contains("pfshdrcalibrate: Assuming 8 Bits per pixel in the LDR images (use --bpp to change this)"))
+    if (firstLine.contains("pfshdrcalibrate:"))
     {
         return true;
     }
