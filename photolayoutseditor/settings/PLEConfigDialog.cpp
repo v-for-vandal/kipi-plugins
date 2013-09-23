@@ -47,11 +47,6 @@ PLEConfigDialog::PLEConfigDialog(QWidget * parent) :
     this->addPage( d->confVWdg, i18n("View") )->setIcon(KIcon(QIcon(":/view.png")));
 }
 
-PLEConfigDialog::~PLEConfigDialog()
-{
-   delete d;
-}
-
 void PLEConfigDialog::updateSettings()
 {
     d->confVWdg->updateSettings();

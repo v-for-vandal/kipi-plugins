@@ -208,11 +208,6 @@ void CanvasSizeWidget::setupUI(const QSizeF & size, const QString & sizeUnits, c
     d->updateSizeLabel();
 }
 
-CanvasSizeWidget::~CanvasSizeWidget()
-{
-    delete d;
-}
-
 void CanvasSizeWidget::prepareSignalsConnections()
 {
     connect(d->xSize, SIGNAL(valueChanged(double)), this, SLOT(widthChanged(double)));
