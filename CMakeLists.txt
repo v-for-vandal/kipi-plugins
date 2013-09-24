@@ -21,7 +21,7 @@ SET (KIPIPLUGINS_RELEASE_DATE "2013-05-19")
 # "-beta3" : beta3 release.
 # "-rc"    : release candidate.
 # ""       : final relase. Can be used in production.
-SET(KIPIPLUGINS_SUFFIX_VERSION "-beta1")
+SET(KIPIPLUGINS_SUFFIX_VERSION "")
 
 # =======================================================
 # Set env. variables accordinly.
@@ -331,7 +331,7 @@ PRINT_PLUGIN_COMPILE_STATUS("Debian Screenshots" QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("Facebook"           QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("Imgur"              QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("GoogleDrive"        QJSON_FOUND)
-PRINT_PLUGIN_COMPILE_STATUS("Dropbox"        QJSON_FOUND)
+PRINT_PLUGIN_COMPILE_STATUS("Dropbox"            QJSON_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("VKontakte"          LIBKVKONTAKTE_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("IpodExport"         IPOD_FOUND AND GLIB2_FOUND AND GOBJECT_FOUND AND GDK_FOUND)
 PRINT_PLUGIN_COMPILE_STATUS("Calendar"           KDEPIMLIBS_FOUND)
@@ -463,7 +463,7 @@ IF(KIPIPLUGINS_CAN_BE_COMPILED)
         ADD_SUBDIRECTORY(facebook)
         ADD_SUBDIRECTORY(imgurexport)
         ADD_SUBDIRECTORY(googledrive)
-	ADD_SUBDIRECTORY(dropbox)
+        ADD_SUBDIRECTORY(dropbox)
     ENDIF(QJSON_FOUND)
 
     IF(LIBKVKONTAKTE_FOUND)
