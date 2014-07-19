@@ -44,6 +44,8 @@
 
 #include "aboutdata.h"
 #include "batchdialog.h"
+#include "settingswidget.h"
+#include "plugin_getwidget.h"
 
 namespace KIPIDNGConverterPlugin
 {
@@ -123,6 +125,10 @@ void Plugin_DNGConverter::slotActivate()
 
     m_batchDlg->show();
     m_batchDlg->addItems(images.images());
+    
+    m_settings = new SettingsWidget(0);
+    m_get      = new Plugin_GetWidget(interface(), m_settings);
+    m_get->getWidget();
 }
 
 } // namespace KIPIDNGConverterPlugin

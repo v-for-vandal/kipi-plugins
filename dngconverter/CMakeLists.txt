@@ -233,6 +233,7 @@ SET(dngconverter_common_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/plugin/actionthread.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/plugin/batchdialog.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/plugin/settingswidget.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/plugin/myimagelist.cpp
+                             ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin_getwidget.cpp
                              ${libdngwriter_SRCS}
    )
 

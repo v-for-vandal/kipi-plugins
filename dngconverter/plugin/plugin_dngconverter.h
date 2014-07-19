@@ -39,6 +39,8 @@ namespace KIPIDNGConverterPlugin
 {
 
 class BatchDialog;
+class Plugin_GetWidget;
+class SettingsWidget;
 
 class Plugin_DNGConverter : public Plugin
 {
@@ -63,8 +65,10 @@ private Q_SLOTS:
 
 private:
 
-    KAction*     m_action;
-    BatchDialog* m_batchDlg;
+    KAction*          m_action;
+    BatchDialog*      m_batchDlg;
+    Plugin_GetWidget* m_get;
+    SettingsWidget*   m_settings;
 };
 
 } // namespace KIPIDNGConverterPlugin
