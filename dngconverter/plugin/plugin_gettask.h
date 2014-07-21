@@ -4,8 +4,8 @@
  * This file is a part of digiKam project
  * <a href="http://www.digikam.org">http://www.digikam.org</a>
  *
- * @date   2014-07-19
- * @brief  Re-implemented class to get settings widget from DNGConverter 
+ * @date   2014-07-21
+ * @brief  Re-implemented class to get background processing from DNGConverter 
  *
  * @author Copyright (C) 2008-2012 by Gilles Caulier
  *         <a href="mailto:caulier dot gilles at gmail dot com">caulier dot gilles at gmail dot com</a>
@@ -25,46 +25,45 @@
  *
  * ============================================================ */
 
-#ifndef PLUGIN_GETWIDGET_H
-#define PLUGIN_GETWIDGET_H
+#ifndef PLUGIN_GETTASK_H
+#define PLUGIN_GETTASK_H
 
 // Qt includes
 
 #include <QtGui/QWidget>
 
-//kde includes
-
-#include <kurl.h>
-
 // libkipi includes
 
-#include "libkipi/plugsettings.h"
+#include "libkipi/bkgtask.h"
+#include <threadweaver/JobCollection.h>
+
+//local includes
+
+#include "actions.h"
 
 using namespace KIPI;
+using namespace ThreadWeaver;
 
 namespace KIPIDNGConverterPlugin
 {
-class SettingsWidget;
-  
-class Plugin_GetWidget: public PlugSettings
+
+class Plugin_GetTask: public BkgTask
 { 
-    Q_OBJECT
-  
+    Q_OBJECT  
+
 public:
 
-    Plugin_GetWidget(Interface* const interface);
-    ~Plugin_GetWidget();
+    Plugin_GetTask(Interface* const interface);
+    ~Plugin_GetTask();
 
-    void getWidget();
-    static Plugin_GetWidget* instance();
-    static SettingsWidget*   settingsInstance();
+    void getTask();
+    void processed(const KUrl& url, const QString& tmpFile);
     
 public Q_SLOTS:
-    void slotIdentify();
+
+    void slotFinished(const KIPIDNGConverterPlugin::ActionData& ad);
 
 private:
-    static Plugin_GetWidget* m_instance;
-    static SettingsWidget*   settings;
     class Private;
     Private* const d;
 };

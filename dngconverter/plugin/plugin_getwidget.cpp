@@ -43,9 +43,14 @@
 
 #include "libkipi/interface.h"
 
+//local includes
+
+#include "settingswidget.h"
+
 namespace KIPIDNGConverterPlugin
 {
 Plugin_GetWidget* Plugin_GetWidget::m_instance = 0;
+SettingsWidget* Plugin_GetWidget::settings = 0;
 
 class Plugin_GetWidget::Private
 {
@@ -57,15 +62,16 @@ public:
     }
     
     Interface* interface;
-    QWidget* settings;
 };
 
-Plugin_GetWidget::Plugin_GetWidget(Interface* const iface, QWidget* const widget)
-    : SettingsWidget(),d(new Private)
+Plugin_GetWidget::Plugin_GetWidget(Interface* const iface)
+    : PlugSettings(),d(new Private)
 {
     m_instance   = this;
     d->interface = iface;
-    d->settings  = widget;
+    settings  = new SettingsWidget(0);
+    connect(settings, SIGNAL(buttonChanged(int)),
+            this, SLOT(slotIdentify()));
 }
 
 Plugin_GetWidget::~Plugin_GetWidget()
@@ -78,10 +84,67 @@ Plugin_GetWidget* Plugin_GetWidget::instance()
     return m_instance;
 }
 
+SettingsWidget* Plugin_GetWidget::settingsInstance()
+{
+    return settings;
+}
+
 void Plugin_GetWidget::getWidget()
 {
-    SettingsWidget* set = d->interface->setWidget();
-    set->setWidget(d->settings);
+    PlugSettings* set = d->interface->setWidget();
+    set->setWidget(settings);
+    slotIdentify();
+}
+
+void Plugin_GetWidget::slotIdentify()
+{
+    KUrl::List urlList = d->interface->getImgURLs();
+
+    for (KUrl::List::const_iterator  it = urlList.constBegin(); it != urlList.constEnd(); ++it)
+    {
+        QFileInfo fi((*it).path());
+
+        if(settings->conflictRule() == SettingsWidget::OVERWRITE)
+        {
+            QString dest                    = fi.completeBaseName() + QString(".dng");
+            d->interface->setDestFileName(dest, *it);
+        }
+
+        else
+        {
+            QString dest = fi.absolutePath() + QString("/") + fi.completeBaseName() + QString(".dng");
+            QFileInfo a(dest);
+            bool fileNotFound = (a.exists());
+
+            if (!fileNotFound)
+            {
+                dest = fi.completeBaseName() + QString(".dng");
+            }
+
+            else
+            {
+                int i = 0;
+                while(fileNotFound)
+                {
+                    a = QFileInfo(dest);
+
+                    if (!a.exists())
+                    {
+                        fileNotFound = false;
+                    }
+                    else
+                    {
+                        i++;
+                        dest = fi.absolutePath() + QString("/") + fi.completeBaseName() + QString("_") + QString::number(i) + QString(".dng");
+                    }
+                }
+
+                dest = fi.completeBaseName() + QString("_") + QString::number(i) + QString(".dng");
+            }
+
+            d->interface->setDestFileName(dest, *it);
+        }
+    }  
 }
 
 } // namespace KIPIDNGConverterPlugin

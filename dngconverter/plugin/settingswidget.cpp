@@ -86,21 +86,21 @@ public:
         }
     }
 
-    QLabel*       conflictLabel;
-    QLabel*       previewModeLabel;
+    QLabel*           conflictLabel;
+    QLabel*           previewModeLabel;
 
-    QButtonGroup* conflictButtonGroup;
+    QButtonGroup*     conflictButtonGroup;
 
-    QRadioButton* overwriteButton;
-    QRadioButton* promptButton;
+    QRadioButton*     overwriteButton;
+    QRadioButton*     promptButton;
 
-    QCheckBox*    compressLossLess;
-    QCheckBox*    backupOriginalRawFile;
-    QCheckBox*    updateFileDate;
+    QCheckBox*        compressLossLess;
+    QCheckBox*        backupOriginalRawFile;
+    QCheckBox*        updateFileDate;
 
-    RComboBox*    previewModeCB;
+    RComboBox*        previewModeCB;
 
-    Interface*    iface;
+    Interface*        iface;
 };
 
 SettingsWidget::SettingsWidget(QWidget* const parent)
@@ -176,7 +176,7 @@ SettingsWidget::SettingsWidget(QWidget* const parent)
     settingsBoxLayout->setRowStretch(9, 10);
     settingsBoxLayout->setMargin(KDialog::spacingHint());
     settingsBoxLayout->setSpacing(KDialog::spacingHint());
-
+    
     connect(dngLogoLabel, SIGNAL(leftClickedUrl(QString)),
             this, SLOT(processUrl(QString)));
 

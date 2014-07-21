@@ -40,7 +40,7 @@ namespace KIPIDNGConverterPlugin
 
 class BatchDialog;
 class Plugin_GetWidget;
-class SettingsWidget;
+class Plugin_GetTask;
 
 class Plugin_DNGConverter : public Plugin
 {
@@ -68,7 +68,7 @@ private:
     KAction*          m_action;
     BatchDialog*      m_batchDlg;
     Plugin_GetWidget* m_get;
-    SettingsWidget*   m_settings;
+    Plugin_GetTask*   m_task;
 };
 
 } // namespace KIPIDNGConverterPlugin

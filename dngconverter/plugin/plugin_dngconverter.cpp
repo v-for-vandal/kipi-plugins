@@ -44,8 +44,8 @@
 
 #include "aboutdata.h"
 #include "batchdialog.h"
-#include "settingswidget.h"
 #include "plugin_getwidget.h"
+#include "plugin_gettask.h"
 
 namespace KIPIDNGConverterPlugin
 {
@@ -100,6 +100,7 @@ void Plugin_DNGConverter::setupActions()
 
 void Plugin_DNGConverter::slotActivate()
 {
+    /*
     if (!interface())
     {
         kError() << "Kipi interface is null!" ;
@@ -125,10 +126,13 @@ void Plugin_DNGConverter::slotActivate()
 
     m_batchDlg->show();
     m_batchDlg->addItems(images.images());
+    */
     
-    m_settings = new SettingsWidget(0);
-    m_get      = new Plugin_GetWidget(interface(), m_settings);
+    m_get  = new Plugin_GetWidget(interface());
     m_get->getWidget();
+    
+    m_task = new Plugin_GetTask(interface());
+    m_task->getTask();
 }
 
 } // namespace KIPIDNGConverterPlugin
