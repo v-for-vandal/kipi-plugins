@@ -62,6 +62,7 @@ public:
 public Q_SLOTS:
 
     void slotFinished(const KIPIDNGConverterPlugin::ActionData& ad);
+    void slotIdentify();
 
 private:
     class Private;

@@ -74,14 +74,25 @@ public:
     {
     }
     
-    Interface* interface;
-    
+    Interface*      interface;
+    BkgTask*        set;
+    SettingsWidget* settingsBox;
 };
 
 Plugin_GetTask::Plugin_GetTask(Interface* iface)
     : BkgTask(),d(new Private)
 {
     d->interface = iface;
+    d->settingsBox = Plugin_GetWidget::settingsInstance();
+    
+    connect(d->settingsBox, SIGNAL(stateChanged(int)),
+            this, SLOT(slotIdentify()));
+    
+    connect(d->settingsBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(slotIdentify()));
+    
+    d->set = d->interface->setTask();;
+    
     qRegisterMetaType<KIPIDNGConverterPlugin::ActionData>("KIPIDNGConverterPlugin::ActionData");
 }
 
@@ -92,8 +103,7 @@ Plugin_GetTask::~Plugin_GetTask()
 
 void Plugin_GetTask::getTask()
 {
-    BkgTask* set     = d->interface->setTask();
-    KUrl::List imgs  = set->getImgUrls();
+    KUrl::List imgs  = d->set->getImgUrls();
     JobCollection* const collection = new JobCollection();
     
     long i = 0;
@@ -102,13 +112,47 @@ void Plugin_GetTask::getTask()
     {
         KUrl img = *(it1+i);
 	Task*      task = new Task(0,img,PROCESS);
+	task->setBackupOriginalRawFile(d->settingsBox->backupOriginalRawFile());
+        task->setCompressLossLess(d->settingsBox->compressLossLess());
+        task->setUpdateFileDate(d->settingsBox->updateFileDate());
+        task->setPreviewMode(d->settingsBox->previewMode());
+	
 	connect(task, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
             this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
+	
 	collection->addJob(task);
 	i++;
     }
     
-    set->setTask(collection);
+    d->set->setTask(collection);
+}
+
+void Plugin_GetTask::slotIdentify()
+{
+    d->set->clearJobs();
+    
+    KUrl::List imgs  = d->set->getImgUrls();
+    JobCollection* const collection = new JobCollection();
+    
+    long i = 0;
+    KUrl::List::const_iterator  it1 = imgs.constBegin();
+    while((it1+i)!= imgs.constEnd())
+    {
+        KUrl img = *(it1+i);
+	Task*      task = new Task(0,img,PROCESS);
+	task->setBackupOriginalRawFile(d->settingsBox->backupOriginalRawFile());
+        task->setCompressLossLess(d->settingsBox->compressLossLess());
+        task->setUpdateFileDate(d->settingsBox->updateFileDate());
+        task->setPreviewMode(d->settingsBox->previewMode());
+	
+	connect(task, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
+            this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
+	
+	collection->addJob(task);
+	i++;
+    }
+    
+    d->set->setTask(collection);      
 }
 
 void Plugin_GetTask::slotFinished(const KIPIDNGConverterPlugin::ActionData& ad)
@@ -121,9 +165,8 @@ void Plugin_GetTask::processed(const KUrl& url, const QString& tmpFile)
 {
     KUrl dest = d->interface->getdestURl(url);
     QString destFile = dest.pathOrUrl();
-    SettingsWidget* settingsBox = Plugin_GetWidget::settingsInstance();
     
-    if (settingsBox->conflictRule() != SettingsWidget::OVERWRITE)
+    if (d->settingsBox->conflictRule() != SettingsWidget::OVERWRITE)
     {
         struct stat statBuf;
 

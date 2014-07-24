@@ -182,6 +182,18 @@ SettingsWidget::SettingsWidget(QWidget* const parent)
 
     connect(d->conflictButtonGroup, SIGNAL(buttonClicked(int)),
             this, SIGNAL(buttonChanged(int)));
+    
+    connect(d->compressLossLess, SIGNAL(stateChanged(int)),
+            this, SIGNAL(stateChanged(int)));
+    
+    connect(d->backupOriginalRawFile, SIGNAL(stateChanged(int)),
+            this, SIGNAL(stateChanged(int)));
+    
+    connect(d->updateFileDate, SIGNAL(stateChanged(int)),
+            this, SIGNAL(stateChanged(int)));
+    
+    connect(d->previewModeCB, SIGNAL(currentIndexChanged(int)),
+            this, SIGNAL(currentIndexChanged(int)));
 }
 
 SettingsWidget::~SettingsWidget()

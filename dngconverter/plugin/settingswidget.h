@@ -67,6 +67,8 @@ public:
 Q_SIGNALS:
 
     void buttonChanged(int);
+    void stateChanged(int);
+    void currentIndexChanged(int);
 
 private Q_SLOTS:
 
