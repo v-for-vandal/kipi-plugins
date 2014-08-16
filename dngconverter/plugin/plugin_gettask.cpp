@@ -101,30 +101,35 @@ Plugin_GetTask::~Plugin_GetTask()
     delete d;
 }
 
-void Plugin_GetTask::getTask()
+bool Plugin_GetTask::getTask()
 {
-    KUrl::List imgs  = d->set->getImgUrls();
-    JobCollection* const collection = new JobCollection();
-    
-    long i = 0;
-    KUrl::List::const_iterator  it1 = imgs.constBegin();
-    while((it1+i)!= imgs.constEnd())
+    if(d->set)
     {
-        KUrl img = *(it1+i);
-	Task*      task = new Task(0,img,PROCESS);
-	task->setBackupOriginalRawFile(d->settingsBox->backupOriginalRawFile());
-        task->setCompressLossLess(d->settingsBox->compressLossLess());
-        task->setUpdateFileDate(d->settingsBox->updateFileDate());
-        task->setPreviewMode(d->settingsBox->previewMode());
-	
-	connect(task, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
-            this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
-	
-	collection->addJob(task);
-	i++;
-    }
+        KUrl::List imgs  = d->set->getImgUrls();
+        JobCollection* const collection = new JobCollection();
     
-    d->set->setTask(collection);
+        long i = 0;
+        KUrl::List::const_iterator  it1 = imgs.constBegin();
+        while((it1+i)!= imgs.constEnd())
+        {
+            KUrl img = *(it1+i);
+	    Task*      task = new Task(0,img,PROCESS);
+	    task->setBackupOriginalRawFile(d->settingsBox->backupOriginalRawFile());
+            task->setCompressLossLess(d->settingsBox->compressLossLess());
+            task->setUpdateFileDate(d->settingsBox->updateFileDate());
+            task->setPreviewMode(d->settingsBox->previewMode());
+	
+	    connect(task, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
+                this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
+	
+	    collection->addJob(task);
+	    i++;
+        }
+    
+        d->set->setTask(collection);
+	return true;
+    }
+    return false;
 }
 
 void Plugin_GetTask::slotIdentify()

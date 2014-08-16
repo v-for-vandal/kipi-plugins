@@ -100,39 +100,41 @@ void Plugin_DNGConverter::setupActions()
 
 void Plugin_DNGConverter::slotActivate()
 {
-    /*
-    if (!interface())
-    {
-        kError() << "Kipi interface is null!" ;
-        return;
-    }
-
-    ImageCollection images = interface()->currentSelection();
-
-    if (!images.isValid())
-        return;
-
-    if (!m_batchDlg)
-    {
-        m_batchDlg = new BatchDialog(new DNGConverterAboutData);
-    }
-    else
-    {
-        if (m_batchDlg->isMinimized())
-            KWindowSystem::unminimizeWindow(m_batchDlg->winId());
-
-        KWindowSystem::activateWindow(m_batchDlg->winId());
-    }
-
-    m_batchDlg->show();
-    m_batchDlg->addItems(images.images());
-    */
-    
+        
     m_get  = new Plugin_GetWidget(interface());
-    m_get->getWidget();
+    bool check1 = m_get->getWidget();
     
     m_task = new Plugin_GetTask(interface());
-    m_task->getTask();
+    bool check2 = m_task->getTask();
+  
+    if(!check1 && !check2)
+    {
+        if (!interface())
+        {
+            kError() << "Kipi interface is null!" ;
+            return;
+        }
+
+        ImageCollection images = interface()->currentSelection();
+
+        if (!images.isValid())
+            return;
+
+        if (!m_batchDlg)
+        {
+            m_batchDlg = new BatchDialog(new DNGConverterAboutData);
+        }
+        else
+        {
+            if (m_batchDlg->isMinimized())
+                KWindowSystem::unminimizeWindow(m_batchDlg->winId());
+
+            KWindowSystem::activateWindow(m_batchDlg->winId());
+        }
+
+        m_batchDlg->show();
+        m_batchDlg->addItems(images.images());
+    }
 }
 
 } // namespace KIPIDNGConverterPlugin

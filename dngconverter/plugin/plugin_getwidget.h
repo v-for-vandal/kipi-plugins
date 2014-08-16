@@ -55,7 +55,7 @@ public:
     Plugin_GetWidget(Interface* const interface);
     ~Plugin_GetWidget();
 
-    void getWidget();
+    bool getWidget();
     static Plugin_GetWidget* instance();
     static SettingsWidget*   settingsInstance();
     

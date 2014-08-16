@@ -89,11 +89,17 @@ SettingsWidget* Plugin_GetWidget::settingsInstance()
     return settings;
 }
 
-void Plugin_GetWidget::getWidget()
+bool Plugin_GetWidget::getWidget()
 {
     PlugSettings* set = d->interface->setWidget();
-    set->setWidget(settings);
-    slotIdentify();
+    if(set)
+    { 
+        set->setWidget(settings);
+        slotIdentify();
+	return true;
+    }
+    return false;
+    
 }
 
 void Plugin_GetWidget::slotIdentify()

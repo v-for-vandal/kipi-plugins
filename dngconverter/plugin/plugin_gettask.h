@@ -56,7 +56,7 @@ public:
     Plugin_GetTask(Interface* const interface);
     ~Plugin_GetTask();
 
-    void getTask();
+    bool getTask();
     void processed(const KUrl& url, const QString& tmpFile);
     
 public Q_SLOTS:
