@@ -46,6 +46,7 @@
 #include "batchdialog.h"
 #include "plugin_getwidget.h"
 #include "plugin_gettask.h"
+#include "settingswidget.h"
 
 namespace KIPIDNGConverterPlugin
 {
@@ -60,10 +61,17 @@ Plugin_DNGConverter::Plugin_DNGConverter(QObject* const parent, const QVariantLi
 
     setUiBaseName("kipiplugin_dngconverterui.rc");
     setupXML();
+    
+    m_settingswidget = new SettingsWidget(0);
 }
 
 Plugin_DNGConverter::~Plugin_DNGConverter()
 {
+}
+
+QWidget* Plugin_DNGConverter::settingsWidget()
+{
+    return m_settingswidget;  
 }
 
 void Plugin_DNGConverter::setup(QWidget* const widget)

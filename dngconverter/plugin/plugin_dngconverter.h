@@ -41,6 +41,7 @@ namespace KIPIDNGConverterPlugin
 class BatchDialog;
 class Plugin_GetWidget;
 class Plugin_GetTask;
+class SettingsWidget;
 
 class Plugin_DNGConverter : public Plugin
 {
@@ -50,6 +51,8 @@ public:
 
     Plugin_DNGConverter(QObject* const parent, const QVariantList& args);
     ~Plugin_DNGConverter();
+    
+    virtual QWidget* settingsWidget();
 
     void setup(QWidget* const widget);
 
@@ -69,6 +72,7 @@ private:
     BatchDialog*      m_batchDlg;
     Plugin_GetWidget* m_get;
     Plugin_GetTask*   m_task;
+    SettingsWidget*   m_settingswidget;
 };
 
 } // namespace KIPIDNGConverterPlugin
