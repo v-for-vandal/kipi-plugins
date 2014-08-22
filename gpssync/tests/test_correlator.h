@@ -7,7 +7,7 @@
  * @date   2010-01-17
  * @brief  Test parsing gpx data.
  *
- * @author Copyright (C) 2010 by Michael G. Hansen
+ * @author Copyright (C) 2010, 2014 by Michael G. Hansen
  *         <a href="mailto:mike at mghansen dot de">mike at mghansen dot de</a>
  *
  * This program is free software; you can redistribute it
@@ -22,16 +22,12 @@
  *
  * ============================================================ */
 
-#ifndef TEST_GPXPARSING_H
-#define TEST_GPXPARSING_H
+#ifndef TEST_CORRELATOR_H
+#define TEST_CORRELATOR_H
 
 // Qt includes
 
 #include <QtTest/QtTest>
-
-// KDE includes
-
-// local includes
 
 class TestGPXParsing : public QObject
 {
@@ -40,15 +36,9 @@ class TestGPXParsing : public QObject
 private Q_SLOTS:
 
     void testNoOp();
-    void testQDateTimeParsing();
-    void testCustomDateTimeParsing();
-    void testSaxLoader();
-    void testSaxLoaderError();
-    void testFileLoading();
+    void testCorrelator1();
     void testInterpolation();
 
-    
 };
 
-#endif /* TEST_GPXPARSING_H */
-
+#endif /* TEST_CORRELATOR_H */

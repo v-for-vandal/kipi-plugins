@@ -1,11 +1,12 @@
-Kipi-plugins 4.1.0 - Release date: 2014/06/22
+Kipi-plugins 4.3.0 - Release date: 2014/09/07
 ------------------------------------------------------------------------
 
 NEW FEATURES:
 
+ExpoBlending : remove OPenMP dependency. Ported to QtConcurrentRun.
+
 BUGFIXES FROM KDE BUGZILLA (alias B.K.O | http://bugs.kde.org):
 
-001 ==> 323378 - digiKam crash when try to export to facebook.
-002 ==> 330684 - Advanced Slideshow in Gwenview.
-003 ==> 327415 - Crash after I interrupted the «create photo layout» tas.
-004 ==> 
+001 ==> 338037 - digiKam 4.2.0 compilation error: undefined reference to `cvFillImage'.
+002 ==> 335250 - Proposed minor fixes to MediaWiki plugin [patch].
+003 ==> 
