@@ -26,9 +26,12 @@
 // Qt includes
 
 #include <QWidget>
+#include <QMap>
 
 namespace KIPIDNGConverterPlugin
 {
+  
+typedef QMap<QString, QVariant> ToolSettings;
 
 class SettingsWidget : public QWidget
 {
@@ -69,10 +72,12 @@ Q_SIGNALS:
     void buttonChanged(int);
     void stateChanged(int);
     void currentIndexChanged(int);
+    void settingsChanged(QString,QMap<QString, QVariant>);
 
 private Q_SLOTS:
 
     void processUrl(const QString& url);
+    void slotSettingsChanged();
     
 private:
 

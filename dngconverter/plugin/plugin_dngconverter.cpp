@@ -63,6 +63,8 @@ Plugin_DNGConverter::Plugin_DNGConverter(QObject* const parent, const QVariantLi
     setupXML();
     
     m_settingswidget = new SettingsWidget(0);
+    connect(m_settingswidget, SIGNAL(settingsChanged(QString,QMap<QString, QVariant>)),
+            interface(), SLOT(settingsChanged(QString,QMap<QString, QVariant>)));
 }
 
 Plugin_DNGConverter::~Plugin_DNGConverter()
@@ -72,6 +74,14 @@ Plugin_DNGConverter::~Plugin_DNGConverter()
 QWidget* Plugin_DNGConverter::settingsWidget()
 {
     return m_settingswidget;  
+}
+
+void Plugin_DNGConverter::assignSettings(QMap<QString, QVariant> settings)
+{
+    m_settingswidget->setConflictRule((SettingsWidget::ConflictRule)(settings["ConflictRule"].toInt()));
+    m_settingswidget->setCompressLossLess(settings["compressLossLess"].toBool());
+    m_settingswidget->setPreviewMode(settings["previewMode"].toInt());
+    m_settingswidget->setBackupOriginalRawFile(settings["setBackupOriginalRawFile"].toBool());    
 }
 
 void Plugin_DNGConverter::setup(QWidget* const widget)

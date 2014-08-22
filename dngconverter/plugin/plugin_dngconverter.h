@@ -26,6 +26,7 @@
 // Qt includes
 
 #include <QVariant>
+#include <QMap>
 
 // LibKIPI includes
 
@@ -53,6 +54,7 @@ public:
     ~Plugin_DNGConverter();
     
     virtual QWidget* settingsWidget();
+    virtual void assignSettings(QMap<QString, QVariant>);
 
     void setup(QWidget* const widget);
 

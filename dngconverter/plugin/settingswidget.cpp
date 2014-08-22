@@ -194,6 +194,21 @@ SettingsWidget::SettingsWidget(QWidget* const parent)
     
     connect(d->previewModeCB, SIGNAL(currentIndexChanged(int)),
             this, SIGNAL(currentIndexChanged(int)));
+    
+    connect(d->conflictButtonGroup, SIGNAL(buttonClicked(int)),
+            this, SLOT(slotSettingsChanged()));
+    
+    connect(d->compressLossLess, SIGNAL(stateChanged(int)),
+            this, SLOT(slotSettingsChanged()));
+    
+    connect(d->backupOriginalRawFile, SIGNAL(stateChanged(int)),
+            this, SLOT(slotSettingsChanged()));
+    
+    connect(d->updateFileDate, SIGNAL(stateChanged(int)),
+            this, SLOT(slotSettingsChanged()));
+    
+    connect(d->previewModeCB, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(slotSettingsChanged()));
 }
 
 SettingsWidget::~SettingsWidget()
@@ -262,6 +277,17 @@ SettingsWidget::ConflictRule SettingsWidget::conflictRule()
 void SettingsWidget::setConflictRule(SettingsWidget::ConflictRule r)
 {
     d->conflictButtonGroup->button((int)r)->setChecked(true);
+}
+
+void SettingsWidget::slotSettingsChanged()
+{
+    ToolSettings ts;
+    ts.insert("previewMode",d->previewModeCB->currentIndex());
+    ts.insert("compressLossLess",d->compressLossLess->isChecked());
+    ts.insert("updateFileDate",d->updateFileDate->isChecked());
+    ts.insert("backupOriginalRawFile",d->backupOriginalRawFile->isChecked());
+    ts.insert("ConflictRule",(ConflictRule)(d->conflictButtonGroup->checkedId()));
+    emit settingsChanged("DNGConverter",ts);
 }
 
 } // namespace KIPIDNGConverterPlugin
