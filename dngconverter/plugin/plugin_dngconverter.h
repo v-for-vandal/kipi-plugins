@@ -31,6 +31,7 @@
 // LibKIPI includes
 
 #include <libkipi/plugin.h>
+#include <libkipi/embeddableplugin.h>
 
 class KAction;
 
@@ -44,7 +45,7 @@ class Plugin_GetWidget;
 class Plugin_GetTask;
 class SettingsWidget;
 
-class Plugin_DNGConverter : public Plugin
+class Plugin_DNGConverter : public EmbeddablePlugin
 {
     Q_OBJECT
 
@@ -53,8 +54,10 @@ public:
     Plugin_DNGConverter(QObject* const parent, const QVariantList& args);
     ~Plugin_DNGConverter();
     
-    virtual QWidget* settingsWidget();
-    virtual void assignSettings(QMap<QString, QVariant>);
+    virtual QWidget*                getWidget();
+    virtual QString                 outputSuffix();
+    virtual QMap<QString, QVariant> defaultSettings();
+    virtual void                    assignSettings(QMap<QString, QVariant>);
 
     void setup(QWidget* const widget);
 

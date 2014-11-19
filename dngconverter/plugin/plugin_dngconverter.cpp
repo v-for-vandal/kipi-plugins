@@ -55,7 +55,7 @@ K_PLUGIN_FACTORY( RawConverterFactory, registerPlugin<Plugin_DNGConverter>(); )
 K_EXPORT_PLUGIN ( RawConverterFactory("kipiplugin_dngconverter") )
 
 Plugin_DNGConverter::Plugin_DNGConverter(QObject* const parent, const QVariantList&)
-    : Plugin( RawConverterFactory::componentData(), parent, "DNGConverter")
+    : EmbeddablePlugin( RawConverterFactory::componentData(), parent, "DNGConverter")
 {
     kDebug(AREA_CODE_LOADING) << "Plugin_DNGConverter plugin loaded" ;
 
@@ -63,17 +63,36 @@ Plugin_DNGConverter::Plugin_DNGConverter(QObject* const parent, const QVariantLi
     setupXML();
     
     m_settingswidget = new SettingsWidget(0);
+    //connect(m_settingswidget, SIGNAL(settingsChanged(QString,QMap<QString, QVariant>)),
+    //        interface(), SLOT(settingsChanged(QString,QMap<QString, QVariant>)));
+    
     connect(m_settingswidget, SIGNAL(settingsChanged(QString,QMap<QString, QVariant>)),
-            interface(), SLOT(settingsChanged(QString,QMap<QString, QVariant>)));
+            this, SLOT(settingsChanged(QString,QMap<QString, QVariant>)));
 }
 
 Plugin_DNGConverter::~Plugin_DNGConverter()
 {
 }
 
-QWidget* Plugin_DNGConverter::settingsWidget()
+QWidget* Plugin_DNGConverter::getWidget()
 {
     return m_settingswidget;  
+}
+
+QString Plugin_DNGConverter::outputSuffix()
+{
+    return QString("dng");  
+}
+
+QMap<QString, QVariant> Plugin_DNGConverter::defaultSettings()
+{
+    QMap<QString, QVariant> ts;
+    ts.insert("previewMode",1);
+    ts.insert("compressLossLess",true);
+    ts.insert("updateFileDate",false);
+    ts.insert("backupOriginalRawFile",false);
+    ts.insert("ConflictRule",0);
+    return ts;
 }
 
 void Plugin_DNGConverter::assignSettings(QMap<QString, QVariant> settings)
