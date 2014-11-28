@@ -30,7 +30,7 @@
 
 // LibKIPI includes
 
-#include <libkipi/plugin.h>
+#include <libkipi/embeddableplugin.h>
 
 class KAction;
 
@@ -42,7 +42,7 @@ namespace KIPIKioExportPlugin
 class KioExportWindow;
 class KioImportWindow;
 
-class Plugin_KioExportImport: public Plugin
+class Plugin_KioExportImport: public EmbeddablePlugin
 {
     Q_OBJECT
 
@@ -52,6 +52,13 @@ public:
     ~Plugin_KioExportImport();
 
     void setup(QWidget* const widget);
+
+    virtual QWidget* getWidget();
+    virtual void assignSettings(QMap<QString, QVariant>);
+
+    QString outputSuffix();
+    QMap<QString, QVariant> defaultSettings();
+
 
 private Q_SLOTS:
 
@@ -76,6 +83,9 @@ private:
 
     KioExportWindow* m_dlgExport;
     KioImportWindow* m_dlgImport;
+
+    // EmbeddablePlugin interface
+
 };
 
 } // namespace KIPIKioExportPlugin

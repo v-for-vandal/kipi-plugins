@@ -47,6 +47,7 @@
 
 #include "KioExportWindow.h"
 #include "KioImportWindow.h"
+#include "KioExportWidget.h"
 
 namespace KIPIKioExportPlugin
 {
@@ -55,7 +56,7 @@ K_PLUGIN_FACTORY( KioFactory, registerPlugin<Plugin_KioExportImport>(); )
 K_EXPORT_PLUGIN ( KioFactory("kipiplugin_kioexportimport") )
 
 Plugin_KioExportImport::Plugin_KioExportImport(QObject* const parent, const QVariantList&)
-    : Plugin(KioFactory::componentData(), parent, "KioExportImport")
+    : EmbeddablePlugin(KioFactory::componentData(), parent, "KioExportImport")
 {
     kDebug(AREA_CODE_LOADING) << "Plugin_KioExportImport plugin loaded";
 
@@ -65,6 +66,33 @@ Plugin_KioExportImport::Plugin_KioExportImport(QObject* const parent, const QVar
 
 Plugin_KioExportImport::~Plugin_KioExportImport()
 {
+}
+
+
+
+QWidget* Plugin_KioExportImport::getWidget()
+{
+    KioExportWidget* widget = new KioExportWidget(0);
+    // TODO who's supposed to free this? is it the responsibility of the user?
+    return widget;
+}
+
+
+void Plugin_KioExportImport::assignSettings(QMap< QString, QVariant > settings)
+{
+    kWarning() << "assignSettings is not implemented";
+}
+
+QString Plugin_KioExportImport::outputSuffix()
+{
+    kWarning() << "outputSuffix not implemented";
+    return "foo";
+}
+
+QMap<QString, QVariant> Plugin_KioExportImport::defaultSettings()
+{
+    kWarning() << "defaultSettings not implemented";
+    return QMap<QString, QVariant>();
 }
 
 void Plugin_KioExportImport::setup(QWidget* const widget)
