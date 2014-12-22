@@ -119,6 +119,11 @@ void ActionThread::identifyRawFile(const KUrl& url)
     identifyRawFiles(oneFile);
 }
 
+void ActionThread::append(JobCollection* const job)
+{
+    appendJob(job);
+}
+
 void ActionThread::identifyRawFiles(const KUrl::List& urlList)
 {
     JobCollection* const collection = new JobCollection();

@@ -28,6 +28,7 @@
 
 #include <kurl.h>
 #include <threadweaver/Job.h>
+#include <threadweaver/JobCollection.h>
 
 // Libkdcraw includes
 
@@ -65,6 +66,8 @@ public:
 
     void processRawFile(const KUrl& url);
     void processRawFiles(const KUrl::List& urlList);
+    
+    void append(JobCollection* const job);
 
     void cancel();
 

@@ -33,6 +33,9 @@
 #include <libkipi/plugin.h>
 #include <libkipi/embeddableplugin.h>
 
+//local includes
+#include "actions.h"
+
 class KAction;
 
 using namespace KIPI;
@@ -58,7 +61,8 @@ public:
     virtual QString                 outputSuffix();
     virtual QMap<QString, QVariant> defaultSettings();
     virtual void                    assignSettings(QMap<QString, QVariant>);
-
+    virtual void                    startTask(KUrl img);
+    void processed(const KUrl& url, const QString& tmpFile);
     void setup(QWidget* const widget);
 
 private:
@@ -67,6 +71,10 @@ private:
 
     void setupActions();
 
+public Q_SLOTS:
+
+    void slotFinished(const KIPIDNGConverterPlugin::ActionData& ad);
+    
 private Q_SLOTS:
 
     void slotActivate();

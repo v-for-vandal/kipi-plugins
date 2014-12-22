@@ -22,6 +22,10 @@
 
 #include "plugin_dngconverter.moc"
 
+//Qt includes
+#include <QFile>
+ #include <QFileInfo>
+
 // KDE includes
 
 #include <kaction.h>
@@ -34,6 +38,7 @@
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kwindowsystem.h>
+#include <kde_file.h>
 
 // LibKIPI includes
 
@@ -41,9 +46,14 @@
 #include <libkipi/imagecollection.h>
 
 // Local includes
-
+#include "actionthread.h"
+#include "task.h"
+#include "actions.h"
 #include "aboutdata.h"
 #include "batchdialog.h"
+#include "kpimageinfo.h"
+#include "kpmetadata.h"
+#include "dngwriter.h"
 #include "plugin_getwidget.h"
 #include "plugin_gettask.h"
 #include "settingswidget.h"
@@ -68,6 +78,8 @@ Plugin_DNGConverter::Plugin_DNGConverter(QObject* const parent, const QVariantLi
     
     connect(m_settingswidget, SIGNAL(settingsChanged(QString,QMap<QString, QVariant>)),
             this, SLOT(settingsChanged(QString,QMap<QString, QVariant>)));
+    
+    qRegisterMetaType<KIPIDNGConverterPlugin::ActionData>("KIPIDNGConverterPlugin::ActionData");
 }
 
 Plugin_DNGConverter::~Plugin_DNGConverter()
@@ -101,6 +113,69 @@ void Plugin_DNGConverter::assignSettings(QMap<QString, QVariant> settings)
     m_settingswidget->setCompressLossLess(settings["compressLossLess"].toBool());
     m_settingswidget->setPreviewMode(settings["previewMode"].toInt());
     m_settingswidget->setBackupOriginalRawFile(settings["setBackupOriginalRawFile"].toBool());    
+}
+
+void Plugin_DNGConverter::startTask(KUrl img)
+{
+    ActionThread* thread = new ActionThread(0);
+    JobCollection* const collection = new JobCollection();
+    
+    Task* const t = new Task(0, img, PROCESS);
+    t->setBackupOriginalRawFile(m_settingswidget->backupOriginalRawFile());
+    t->setCompressLossLess(m_settingswidget->compressLossLess());
+    t->setUpdateFileDate(m_settingswidget->updateFileDate());
+    t->setPreviewMode(m_settingswidget->previewMode());
+    
+    connect(t, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
+            this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
+    
+    collection->addJob(t);
+    thread->append(collection);
+    thread->start();
+}
+
+void Plugin_DNGConverter::slotFinished(const KIPIDNGConverterPlugin::ActionData& ad)
+{
+    //temp = ad.destPath;
+    processed(ad.fileUrl, ad.destPath);
+}
+
+void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
+{
+    QFileInfo tmpInfo(tmpFile);
+    QString tmp = url.directory(KUrl::AppendTrailingSlash)+tmpInfo.completeBaseName()+".dng";
+    KUrl dest = KUrl(tmp);
+    QString destFile = dest.pathOrUrl();
+    
+    if (m_settingswidget->conflictRule() != SettingsWidget::OVERWRITE)
+    {
+        struct stat statBuf;
+
+        if (::stat(QFile::encodeName(destFile), &statBuf) == 0)
+        {
+            kDebug()<<"Failed to save image";
+        }
+    }
+    
+    if (!destFile.isEmpty())
+    {
+        if ( KIPIPlugins::KPMetadata::hasSidecar(tmpFile))
+        {
+            if (! KIPIPlugins::KPMetadata::moveSidecar(KUrl(tmpFile), KUrl(destFile)))
+            {
+                kDebug()<<"Failed to move sidecar";
+            }
+        }  
+      
+        if (KDE::rename(QFile::encodeName(tmpFile), QFile::encodeName(destFile)) != 0)
+            kDebug()<<"Failed to save image.";
+	else
+        {
+            KIPIPlugins::KPImageInfo info(url);
+            info.cloneData(KUrl(destFile));
+	    temp = KUrl(destFile);
+        }
+    }
 }
 
 void Plugin_DNGConverter::setup(QWidget* const widget)
