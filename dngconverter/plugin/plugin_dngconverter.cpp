@@ -129,6 +129,9 @@ void Plugin_DNGConverter::startTask(KUrl img)
     connect(t, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
             this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
     
+    connect(t, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
+            this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
+    
     collection->addJob(t);
     thread->append(collection);
     thread->start();
@@ -136,8 +139,13 @@ void Plugin_DNGConverter::startTask(KUrl img)
 
 void Plugin_DNGConverter::slotFinished(const KIPIDNGConverterPlugin::ActionData& ad)
 {
-    //temp = ad.destPath;
-    processed(ad.fileUrl, ad.destPath);
+    if(ad.result != DNGWriter::PROCESSCOMPLETE)
+    {
+        setErrorDescription("Failed to process image...");
+	status = FAILED;
+    }
+    else
+        processed(ad.fileUrl, ad.destPath);
 }
 
 void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
@@ -153,7 +161,9 @@ void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
 
         if (::stat(QFile::encodeName(destFile), &statBuf) == 0)
         {
-            kDebug()<<"Failed to save image";
+            kDebug()<<"Failed to save image...";
+	    setErrorDescription("Failed to save image...");
+	    status = FAILED;
         }
     }
     
@@ -163,17 +173,24 @@ void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
         {
             if (! KIPIPlugins::KPMetadata::moveSidecar(KUrl(tmpFile), KUrl(destFile)))
             {
-                kDebug()<<"Failed to move sidecar";
+                status = FAILED;
+	        kDebug()<<"Failed to move sidecar...";
+		setErrorDescription("Failed to move sidecar...");
             }
         }  
       
         if (KDE::rename(QFile::encodeName(tmpFile), QFile::encodeName(destFile)) != 0)
-            kDebug()<<"Failed to save image.";
+	{
+	    kDebug()<<"Failed to save image...";
+	    setErrorDescription("Failed to save image...");
+	    status = FAILED;
+	}
 	else
         {
             KIPIPlugins::KPImageInfo info(url);
             info.cloneData(KUrl(destFile));
 	    temp = KUrl(destFile);
+	    status = SUCCESS;
         }
     }
 }
