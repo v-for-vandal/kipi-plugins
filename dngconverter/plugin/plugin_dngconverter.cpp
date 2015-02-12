@@ -73,6 +73,7 @@ Plugin_DNGConverter::Plugin_DNGConverter(QObject* const parent, const QVariantLi
     setupXML();
     
     m_settingswidget = new SettingsWidget(0);
+    thread = new ActionThread(0);
     //connect(m_settingswidget, SIGNAL(settingsChanged(QString,QMap<QString, QVariant>)),
     //        interface(), SLOT(settingsChanged(QString,QMap<QString, QVariant>)));
     
@@ -117,7 +118,6 @@ void Plugin_DNGConverter::assignSettings(QMap<QString, QVariant> settings)
 
 void Plugin_DNGConverter::startTask(KUrl img)
 {
-    ActionThread* thread = new ActionThread(0);
     JobCollection* const collection = new JobCollection();
     
     Task* const t = new Task(0, img, PROCESS);
@@ -125,9 +125,6 @@ void Plugin_DNGConverter::startTask(KUrl img)
     t->setCompressLossLess(m_settingswidget->compressLossLess());
     t->setUpdateFileDate(m_settingswidget->updateFileDate());
     t->setPreviewMode(m_settingswidget->previewMode());
-    
-    connect(t, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
-            this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);
     
     connect(t, SIGNAL(signalFinished(KIPIDNGConverterPlugin::ActionData)),
             this, SLOT(slotFinished(KIPIDNGConverterPlugin::ActionData)),Qt::QueuedConnection);

@@ -47,6 +47,7 @@ class BatchDialog;
 class Plugin_GetWidget;
 class Plugin_GetTask;
 class SettingsWidget;
+class ActionThread;
 
 class Plugin_DNGConverter : public EmbeddablePlugin
 {
@@ -86,6 +87,7 @@ private:
     Plugin_GetWidget* m_get;
     Plugin_GetTask*   m_task;
     SettingsWidget*   m_settingswidget;
+    ActionThread*     thread;
 };
 
 } // namespace KIPIDNGConverterPlugin
