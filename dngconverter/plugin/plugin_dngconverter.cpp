@@ -139,6 +139,7 @@ void Plugin_DNGConverter::slotFinished(const KIPIDNGConverterPlugin::ActionData&
     if(ad.result != DNGWriter::PROCESSCOMPLETE)
     {
         setErrorDescription("Failed to process image...");
+	thread->cancel();
 	status = FAILED;
     }
     else
@@ -160,6 +161,7 @@ void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
         {
             kDebug()<<"Failed to save image...";
 	    setErrorDescription("Failed to save image...");
+	    thread->cancel();
 	    status = FAILED;
         }
     }
@@ -170,9 +172,10 @@ void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
         {
             if (! KIPIPlugins::KPMetadata::moveSidecar(KUrl(tmpFile), KUrl(destFile)))
             {
-                status = FAILED;
 	        kDebug()<<"Failed to move sidecar...";
 		setErrorDescription("Failed to move sidecar...");
+		thread->cancel();
+                status = FAILED;
             }
         }  
       
@@ -180,6 +183,7 @@ void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
 	{
 	    kDebug()<<"Failed to save image...";
 	    setErrorDescription("Failed to save image...");
+	    thread->cancel();
 	    status = FAILED;
 	}
 	else
@@ -187,8 +191,13 @@ void Plugin_DNGConverter::processed(const KUrl& url, const QString& tmpFile)
             KIPIPlugins::KPImageInfo info(url);
             info.cloneData(KUrl(destFile));
 	    temp = KUrl(destFile);
+	    thread->cancel();
 	    status = SUCCESS;
         }
+    }
+    else
+    {
+        thread->cancel();
     }
 }
 
