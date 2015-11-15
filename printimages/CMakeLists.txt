@@ -48,6 +48,7 @@ target_link_libraries(kipiplugin_printimages
                       KF5::KIOCore
                       KF5::Kipi
                       KF5::KExiv2
+                      KF5::I18n
 
                       KF5kipiplugins
                      )

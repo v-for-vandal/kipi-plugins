@@ -25,6 +25,7 @@ target_link_libraries(${PLUGIN_NAME}
         KF5::KIOCore
         KF5::KIOFileWidgets
         KF5::WindowSystem
+        KF5::I18n
 )
 
 configure_file(${PLUGIN_NAME}.desktop.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}.desktop)

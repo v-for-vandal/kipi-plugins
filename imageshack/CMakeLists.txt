@@ -26,6 +26,7 @@ target_link_libraries(kipiplugin_imageshack
                       KF5::KExiv2
                       KF5::KIOCore
                       KF5::KIOWidgets
+                      KF5::I18n
                       KF5kipiplugins
                      )
 

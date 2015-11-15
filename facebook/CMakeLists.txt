@@ -27,6 +27,7 @@ target_link_libraries(kipiplugin_facebook
                       KF5::KIOCore
                       KF5::KIOWidgets
                       KF5::WindowSystem
+                      KF5::I18n
                      )
 
 configure_file(kipiplugin_facebook.desktop.cmake ${CMAKE_CURRENT_BINARY_DIR}/kipiplugin_facebook.desktop)

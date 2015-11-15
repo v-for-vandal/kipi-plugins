@@ -26,6 +26,7 @@ target_link_libraries(kipiplugin_smug
                       KF5::KIOCore
                       KF5::KIOWidgets
                       KF5::WindowSystem
+                      KF5::I18n
                       KF5kipiplugins
                      )
 

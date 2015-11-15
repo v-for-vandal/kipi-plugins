@@ -29,6 +29,7 @@ target_link_libraries(kipiplugin_yandexfotki
         KF5::KIOCore
         KF5::KIOFileWidgets
         KF5::WindowSystem
+        KF5::I18n
         KF5kipiplugins
 )
 

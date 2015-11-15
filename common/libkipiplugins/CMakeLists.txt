@@ -46,10 +46,10 @@ target_link_libraries(KF5kipiplugins
 
                       PUBLIC
                       Qt5::Gui
+                      KF5::I18n
 
                       PRIVATE
 
-                      KF5::I18n
                       KF5::ConfigCore
 
                       KF5::Kipi
