@@ -141,7 +141,6 @@ public:
     void   setLongitude(double lng);
     double longitude() const;
     bool   hasLongitude() const;
-    bool   isValidLongtitude() const; // TODO: Implement?
 
     /** Manage item altitude geolocation information : double value in meters.
      */

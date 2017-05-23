@@ -44,7 +44,6 @@ namespace KIPIPlugins
 /** Extension for KPImageInfo. Provides signals and slots 
  * for using class in QML applications
  */
-// TODO: Finish wrapping other hasXXX methods in Q_INVOKABLE
 class KIPIPLUGINS_EXPORT KPQuickImageInfo : public QObject, public KPImageInfo
 {
     Q_OBJECT
@@ -58,47 +57,66 @@ public:
     KPQuickImageInfo(QObject* parent = 0);
     KPQuickImageInfo(const QUrl& url, QObject* parent = 0);
     ~KPQuickImageInfo();
-    
+
     void setUrl(const QUrl& url);
 
     void setDescription(const QString& desc);
     Q_INVOKABLE bool hasDescription() const { return KPImageInfo::hasDescription(); }
 
     void setTagsPath(const QStringList& tp);
+    Q_INVOKABLE bool hasTagsPath() const { return KPImageInfo::hasTagsPath(); }
+
+    Q_INVOKABLE bool hasKeywords() const { return KPImageInfo::hasKeywords(); }
 
     void setRating(int r);
+    Q_INVOKABLE bool hasRating() const { return KPImageInfo::hasRating(); }
 
     void setColorLabel(int cl);
+    Q_INVOKABLE bool hasColorLabel() const { return KPImageInfo::hasColorLabel(); }
 
     void setPickLabel(int pl);
+    Q_INVOKABLE bool hasPickLabel() const { return KPImageInfo::hasPickLabel(); }
 
     void setDate(const QDateTime& date);
-
-    bool isExactDate() const;
+    Q_INVOKABLE bool hasDate() const { return KPImageInfo::hasDate(); }
+    Q_INVOKABLE bool isExactDate() const { return KPImageInfo::isExactDate(); }
 
     void setTitle(const QString& title);
+    Q_INVOKABLE bool hasTitle() const { return KPImageInfo::hasTitle(); }
 
     void setName(const QString& name);
+    Q_INVOKABLE bool hasName() const { return KPImageInfo::hasName(); }
 
     void setLatitude(double lat);
+    Q_INVOKABLE bool hasLatitude() const { return KPImageInfo::hasLatitude(); }
 
     void setLongitude(double lng);
+    Q_INVOKABLE bool hasLongitude() const { return KPImageInfo::hasLongitude(); }
 
     void setAltitude(double alt);
+    Q_INVOKABLE bool hasAltitude() const { return KPImageInfo::hasAltitude(); }
+
+    Q_INVOKABLE bool hasGeolocationInfo() const { return KPImageInfo::hasGeolocationInfo(); }
+    Q_INVOKABLE bool removeGeolocationInfo() const { return KPImageInfo::removeGeolocationInfo(); }
 
     void setOrientation(int);
+    Q_INVOKABLE bool hasOrientation() const { return KPImageInfo::hasOrientation(); }
 
     void setCreators(const QStringList& list);
+    Q_INVOKABLE bool hasCreators() const { return KPImageInfo::hasCreators(); }
 
     void setCredit(const QString& val);
+    Q_INVOKABLE bool hasCredit() const { return KPImageInfo::hasCredit(); }
 
     void setRights(const QString& val);
+    Q_INVOKABLE bool hasRights() const { return KPImageInfo::hasRights(); }
 
     void setSource(const QString& val);
+    Q_INVOKABLE bool hasSource() const { return KPImageInfo::hasSource(); }
 
 public:
-	QUrl thumbnailUrl() const { return m_thumbnailUrl; }
-	QUrl previewUrl() const { return m_previewUrl; }
+    QUrl thumbnailUrl() const { return m_thumbnailUrl; }
+    QUrl previewUrl() const { return m_previewUrl; }
 
 Q_SIGNALS:
     /** Qt Meta Type system declarations
@@ -151,10 +169,10 @@ private Q_SLOTS:
     void onUrlChanged(const QUrl& newUrl);
 
 private:
-	QUrl m_thumbnailUrl;
-	QUrl m_previewUrl;
+    QUrl m_thumbnailUrl;
+    QUrl m_previewUrl;
 
-	void updateDependentData();
+    void updateDependentData();
 };
 
 } // namespace KIPIPlugins

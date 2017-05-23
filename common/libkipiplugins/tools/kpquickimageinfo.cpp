@@ -69,7 +69,7 @@ KPQuickImageInfo::KPQuickImageInfo(const QUrl& url, QObject* parent):
     QObject(parent), KPImageInfo(url)
 {
     connect( this, &KPQuickImageInfo::urlChanged, this, &KPQuickImageInfo::onUrlChanged );
-	updateDependentData();
+    updateDependentData();
 }
 
 KPQuickImageInfo::~KPQuickImageInfo()
@@ -86,9 +86,9 @@ void KPQuickImageInfo::updateDependentData()
 void KPQuickImageInfo::setUrl( const QUrl& newValue )
 {
     QUrl oldValue = KPImageInfo::url();
-	KPImageInfo::setUrl(newValue);
+    KPImageInfo::setUrl(newValue);
     if( oldValue != newValue ) {
-		updateDependentData();
+        updateDependentData();
         emit urlChanged(newValue);
     }
 }
