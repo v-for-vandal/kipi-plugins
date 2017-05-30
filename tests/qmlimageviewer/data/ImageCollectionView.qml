@@ -62,6 +62,28 @@ Rectangle {
             delegate: PhotoDelegate {}
             model : imagesModel
         }
+
+		Component {
+			id: imageInfoDelegate
+			ObjectIntrospectionDelegate {
+				target : imageInfo
+				title : "ImageInfo"
+				width : implicitWidth
+				height : ListView.view.height
+				ImageInfo {
+					id: imageInfo
+					url: model.url
+				}
+			}
+		}
+
+		ListView {
+            orientation : ListView.Horizontal
+            Layout.preferredWidth : imageCollectionView.width
+            Layout.preferredHeight : imageCollectionView.height / 3
+            delegate: imageInfoDelegate
+            model : imagesModel
+
     }
 }
 

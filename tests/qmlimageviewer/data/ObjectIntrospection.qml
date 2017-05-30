@@ -2,7 +2,7 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.3
 
 Rectangle {
-	property var target : null
+        property var target : null
         property var title : "Unnamed"
         //border.width: 4
         //border.color: "green"
@@ -15,7 +15,7 @@ Rectangle {
             anchors.horizontalCenter : parent.horizontalCenter
             height: contentHeight
             font.pointSize: 12
-        }
+		}
 	Column {
             id: grid
             width: parent.width
@@ -37,36 +37,38 @@ Rectangle {
 	Component {
 		id: propertyDelegate
 		
-                Rectangle {
-                    //border.color: "black"
-                    //border.width: 2
-                    width: grid.width
-                    //height: childrenRect.height
-                    height: 40
-                    readonly property int margin : Math.max( width / 10, 5)
-                    Text {
-                        id: propertyNameText
-                        width: parent.width / 2
-                        height: contentHeight
-                        anchors.left : parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.leftMargin : margin
-                        anchors.rightMargin : margin
-                        text: model.name
-                    }
-                    Text {
-                        id: propertyValueText
-                        width: parent.width / 2
-                        height: contentHeight
-                        anchors.right : parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.leftMargin : margin
-                        anchors.rightMargin : margin
-                        text : "\"" + model.value + "\""
-                    }
-                }
+		Rectangle {
+			//border.color: "black"
+			//border.width: 2
+			width: grid.width
+			//height: childrenRect.height
+			height: 40
+			implicitHeight : Math.max(propertyNameText.implicitHeight, propertyValueText.implicitHeight);
+			implicitWidth : grid.width
+			readonly property int margin : Math.max( width / 10, 5)
+			Text {
+				id: propertyNameText
+				width: parent.width / 2
+				height: contentHeight
+				anchors.left : parent.left
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.leftMargin : margin
+				anchors.rightMargin : margin
+				text: model.name
+			}
+			Text {
+				id: propertyValueText
+				width: parent.width / 2
+				height: contentHeight
+				anchors.right : parent.right
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.leftMargin : margin
+				anchors.rightMargin : margin
+				text : "\"" + model.value + "\""
+			}
+		}
 	}
 
 	Component.onCompleted : updateTargetProperties();

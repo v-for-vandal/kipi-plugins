@@ -55,6 +55,7 @@ class KIPIPLUGINS_EXPORT KPQuickInterface : public QObject
     Q_OBJECT
 
 public:
+    KPQuickInterface(QObject* parent = 0);
     KPQuickInterface(KIPI::Interface* interface, QObject* parent = 0);
 
     const KPQuickImageCollection* currentAlbum() const { return m_currentAlbum; }
