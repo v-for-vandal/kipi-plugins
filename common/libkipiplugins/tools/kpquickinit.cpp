@@ -52,6 +52,17 @@ const char* const kipi_qml_namespace = "com.kde.kipiplugins";
 const int kipi_qml_version_major = 0;
 const int kipi_qml_version_minor = 1;
 
+static QObject* kpquick_interface_singleton_provider(QQmlEngine*, QJSEngine*)
+{
+    KPQuickInterface* interface = 0;
+    if( PluginLoader::instance() != 0 && PluginLoader::instance()->interface() != 0 ) {
+         interface = new KPQuickInterface(PluginLoader::instance()->interface());
+         return interface;
+    }
+
+    return 0;
+}
+
 void InitKIPIQuick()
 {
     qmlRegisterType<KPQuickImageInfo>(kipi_qml_namespace, kipi_qml_version_major,
@@ -60,8 +71,8 @@ void InitKIPIQuick()
         kipi_qml_version_minor, "ImageCollectionModel" );
     qmlRegisterUncreatableType<KPQuickImageCollection>(kipi_qml_namespace, kipi_qml_version_major,
         kipi_qml_version_minor, "ImageCollection", QLatin1String("Plugin should never create ImageCollection. Only host can do that") );
-    qmlRegisterUncreatableType<KPQuickInterface>(kipi_qml_namespace, kipi_qml_version_major,
-        kipi_qml_version_minor, "Interface", QLatin1String("Plugin can't create Interface. It is provided by host") );
+    qmlRegisterSingletonType<KPQuickInterface>(kipi_qml_namespace, kipi_qml_version_major,
+        kipi_qml_version_minor, "Interface", kpquick_interface_singleton_provider );
 
 }
 

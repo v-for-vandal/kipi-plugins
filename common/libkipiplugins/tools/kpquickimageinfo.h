@@ -97,7 +97,7 @@ public:
     Q_INVOKABLE bool hasAltitude() const { return KPImageInfo::hasAltitude(); }
 
     Q_INVOKABLE bool hasGeolocationInfo() const { return KPImageInfo::hasGeolocationInfo(); }
-    Q_INVOKABLE bool removeGeolocationInfo() const { return KPImageInfo::removeGeolocationInfo(); }
+    Q_INVOKABLE void removeGeolocationInfo() { KPImageInfo::removeGeolocationInfo(); }
 
     void setOrientation(int);
     Q_INVOKABLE bool hasOrientation() const { return KPImageInfo::hasOrientation(); }

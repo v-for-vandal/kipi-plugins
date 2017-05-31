@@ -43,14 +43,14 @@ Rectangle {
             delegate: PhotoDelegate {}
             model : imagesModel
             Layout.preferredWidth : imageCollectionView.width
-            Layout.preferredHeight : imageCollectionView.height / 3
+            Layout.preferredHeight : imageCollectionView.height / 6
         }
         ListView {
             id: previewView
             property int mode : 1
             orientation : ListView.Horizontal
             Layout.preferredWidth : imageCollectionView.width
-            Layout.preferredHeight : imageCollectionView.height / 3
+            Layout.preferredHeight : imageCollectionView.height / 6
             delegate: PhotoDelegate {}
             model : imagesModel
         }
@@ -58,7 +58,7 @@ Rectangle {
             property int mode : 2
             orientation : ListView.Horizontal
             Layout.preferredWidth : imageCollectionView.width
-            Layout.preferredHeight : imageCollectionView.height / 3
+            Layout.preferredHeight : imageCollectionView.height / 6
             delegate: PhotoDelegate {}
             model : imagesModel
         }
@@ -68,7 +68,7 @@ Rectangle {
 			ObjectIntrospectionDelegate {
 				target : imageInfo
 				title : "ImageInfo"
-				width : implicitWidth
+				width : 300
 				height : ListView.view.height
 				ImageInfo {
 					id: imageInfo
@@ -80,9 +80,10 @@ Rectangle {
 		ListView {
             orientation : ListView.Horizontal
             Layout.preferredWidth : imageCollectionView.width
-            Layout.preferredHeight : imageCollectionView.height / 3
+            Layout.preferredHeight : imageCollectionView.height / 2
             delegate: imageInfoDelegate
             model : imagesModel
+        }
 
     }
 }

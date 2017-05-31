@@ -26,6 +26,7 @@
 // Qt includes
 
 #include <QUrl>
+#include <QQmlExtensionPlugin>
 
 // KIPI includes
 #include <KIPI/Interface>

@@ -56,7 +56,7 @@ Plugin_QmlImageViewer::Plugin_QmlImageViewer(QObject* const parent, const QVaria
     setUiBaseName("kipiplugin_qmlimageviewerui.rc");
     setupXML();
 
-    InitKIPIQuick(); 
+    // InitKIPIQuick();  // TODO: Remove, replaced by qml extension
 } 
 
 Plugin_QmlImageViewer::~Plugin_QmlImageViewer()
@@ -72,7 +72,7 @@ void Plugin_QmlImageViewer::setup(QWidget* const widget)
         qCCritical(KIPIPLUGINS_LOG) << "kipi interface is null";
         return;
     }
-
+    
     setupActions();
 }
 
@@ -90,9 +90,11 @@ void Plugin_QmlImageViewer::setupActions()
 
 void Plugin_QmlImageViewer::slotView()
 {
+    m_viewer = new KPQmlImageViewer(0, interface(), QApplication::activeWindow()->windowHandle());
+    /*
     if( m_viewer == 0 ) {
         m_viewer = new KPQmlImageViewer(0, interface(), QApplication::activeWindow()->windowHandle());
-    } else {
+    } else {*/
         /* TODO: How to implement ?
         if (m_viewer->isMinimized())
         {
@@ -100,7 +102,7 @@ void Plugin_QmlImageViewer::slotView()
         }*/
 
         //KWindowSystem::activateWindow(m_viewer->winId());
-    }
+    //}
 
     //m_viewer->show();
 }

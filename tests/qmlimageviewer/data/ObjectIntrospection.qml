@@ -7,6 +7,8 @@ Rectangle {
         //border.width: 4
         //border.color: "green"
         height: childrenRect.height
+        implicitHeight : childrenRect.height
+        implicitWidth : childrenRect.width
 
         Text {
             id: titleObject
@@ -56,6 +58,7 @@ Rectangle {
 				anchors.leftMargin : margin
 				anchors.rightMargin : margin
 				text: model.name
+                wrapMode: Text.Wrap
 			}
 			Text {
 				id: propertyValueText
@@ -67,6 +70,7 @@ Rectangle {
 				anchors.leftMargin : margin
 				anchors.rightMargin : margin
 				text : "\"" + model.value + "\""
+                wrapMode: Text.Wrap
 			}
 		}
 	}

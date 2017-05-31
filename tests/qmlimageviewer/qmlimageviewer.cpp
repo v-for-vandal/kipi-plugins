@@ -87,8 +87,13 @@ KPQmlImageViewer::KPQmlImageViewer(KPAboutData* const about, KIPI::Interface* if
 
     if (m_iface != 0 && !qmlUi.isEmpty()) {
         m_qmlAppEngine = new QQmlApplicationEngine(this);
+        // TODO: There must be some KDE way for this
+        QString importPath = QDir::homePath() + QStringLiteral("/.local/share/libkipiquick");
+        m_qmlAppEngine->addImportPath(importPath);
+        QString pluginPath = QDir::homePath() + QStringLiteral("/.local/lib/x86_64-linux-gnu/"); // TODO: That is soo very wrong
+        m_qmlAppEngine->addPluginPath(pluginPath);
         QPointer<KPQuickInterface> qmlKPInterface( new KPQuickInterface(m_iface));
-        InitKIPIQmlEngine(*m_qmlAppEngine, m_iface);
+        //InitKIPIQmlEngine(*m_qmlAppEngine, m_iface); // TODO: Remove, replaced by qml extension
         m_qmlAppEngine->rootContext()->setContextProperty(QStringLiteral("KIPIInterface"), qmlKPInterface);
 
         // Searching for qml file

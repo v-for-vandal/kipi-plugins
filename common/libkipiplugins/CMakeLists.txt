@@ -22,6 +22,7 @@ set(kipiplugins_LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/tools/kipiplugins_debug.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpimagecollectionmodel.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpquickinterface.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpquickinit.cpp
+                         ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpqmlplugin.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpquickglobal.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpquickasyncimageprovider.cpp
                          ${CMAKE_CURRENT_SOURCE_DIR}/tools/kpquickimagerequestresponse.cpp
@@ -104,3 +105,5 @@ set_target_properties(KF5kipiplugins PROPERTIES
 install(TARGETS KF5kipiplugins
         EXPORT  KF5kipipluginsTargets ${KF5_INSTALL_TARGETS_DEFAULT_ARGS}
 )
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/qmldir       DESTINATION ${DATA_INSTALL_DIR}/libkipiquick/com/kde/kipiplugins)

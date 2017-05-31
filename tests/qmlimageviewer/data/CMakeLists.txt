@@ -7,6 +7,7 @@
 
 install(FILES main.qml       DESTINATION ${DATA_INSTALL_DIR}/kipiplugin_qmlimageviewer)
 install(FILES ObjectIntrospection.qml       DESTINATION ${DATA_INSTALL_DIR}/kipiplugin_qmlimageviewer)
+install(FILES ObjectIntrospectionDelegate.qml       DESTINATION ${DATA_INSTALL_DIR}/kipiplugin_qmlimageviewer)
 install(FILES ImageCollectionView.qml       DESTINATION ${DATA_INSTALL_DIR}/kipiplugin_qmlimageviewer)
 install(FILES PhotoDelegate.qml       DESTINATION ${DATA_INSTALL_DIR}/kipiplugin_qmlimageviewer)
 

@@ -31,14 +31,14 @@
 using namespace KIPI;
 using namespace KIPIPlugins;
 
-void KPQmlPlugin::registerTypes(const char* uri)
+void KPQmlPlugin::registerTypes(const char* /*uri*/)
 {
     InitKIPIQuick();
 }
 
-void KPQmlPlugin::initializeEngine(QQmlEngine* engine, const char* uri)
+void KPQmlPlugin::initializeEngine(QQmlEngine* engine, const char* /*uri*/)
 {
-    if( PluginLoader::interface() != 0 ) {
-        InitKIPIQmlEngine(engine, PluginLoader::interface());
+    if( PluginLoader::instance() != 0 && PluginLoader::instance()->interface() != 0) {
+        InitKIPIQmlEngine(*engine, PluginLoader::instance()->interface());
     }
 }
